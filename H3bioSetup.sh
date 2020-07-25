@@ -11,7 +11,7 @@
 #+ Environment   [ Cygwin or Gitbash  ... ] 
 #+ otherwise we suggest to read the installation guide line ...  
 
-let  "version=1.0.0" 
+version="1.0.0" 
 
 set  -o errexit  # abort programme  if  an error was occured  
 
@@ -101,6 +101,8 @@ is_Authenticate_binary () {
          echo -e "~ X Non Auth X " 
       fi  
 }
+
+if [[  $arch_type  == "i386" ]]   ;then  arch_type="x86_64";fi  
 
 [[ "PLINK" ]] 
 {
