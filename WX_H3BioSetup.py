@@ -53,7 +53,7 @@ def  avoid_deprecation_osx () :
         log.error("please  upgrade your system Rstudio require  10.13+ ")
         sys.exit(21) 
 
-avoid_deprecation_osx
+avoid_deprecation_osx()
 
 def direct_downloader ( direct_link)  :  
     filename    = direct_link.split("/")[-1]
