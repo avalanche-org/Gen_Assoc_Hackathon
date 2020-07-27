@@ -37,7 +37,7 @@ has_command ()  {
 }  
 
 detect_os_type () {
-    local  sys_name=$(uname --kernel-name)  
+    local  sys_name=$(uname -s)  
     case  ${sys_name} in 
         ${MAIN_SUPPORTED_OS_ENV[GNU_LINUX]})
             echo -e "${MAIN_SUPPORTED_OS_ENV[GNU_LINUX]}";;
