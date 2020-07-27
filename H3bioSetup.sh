@@ -15,15 +15,15 @@ version="1.0.0"
 
 set  -o errexit  # abort programme  if  an error was occured  
 
-declare -r R_UID=$((2#000))  
+R_UID=$((2#000))  
 
-declare -Ar MAIN_SUPPORTED_OS_ENV=(  
+MAIN_SUPPORTED_OS_ENV=(  
 [GNU_LINUX]="Linux" 
 [OSX]="Darwin"
 [FREEBSD]="Freebsd" 
 )
 
-declare  -Ar  Win_GNU_EMULATOR=(
+Win_GNU_EMULATOR=(
 [LEEW]="cygwin"             # linux Environment Emulation for Windows
 [GNU_UTILITY]="msys"        # GNU utilities  for  Windows   
 )

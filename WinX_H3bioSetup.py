@@ -36,7 +36,7 @@ pckg_direct_link= {
 } 
 
 
-def main ( )   : 
+def main ( )   :  
     
     for bin_pkg , d_link  in  pckg_direct_link.items() :  
         file_src=direct_downloader(d_link)
