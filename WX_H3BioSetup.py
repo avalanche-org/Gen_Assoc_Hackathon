@@ -44,6 +44,17 @@ Arch        =  platform.architecture()[0b00][0:2]
 print(define_OS) 
 print(Arch)
 
+def  avoid_deprecation_osx () : 
+    osx_version= os.popen("sw_vers -productVersion").read() 
+    require_version=float(10.13)
+    major,minor,patch= osx_version.split(".")
+    current_version=major+"."+minor
+    if not float(current_version) >= require_version  :
+        log.error("please  upgrade your system Rstudio require  10.13+ ")
+        sys.exit(21) 
+
+avoid_deprecation_osx
+
 def direct_downloader ( direct_link)  :  
     filename    = direct_link.split("/")[-1]
     if  os.path.exists(filename)  : 
@@ -128,9 +139,8 @@ def main ( )   :
         
         # R Studio
         if not has_command("rstudio"):
-            install_Rstudio = sbp_cmdexe("MOUNTDIR=$(echo `hdiutil mount {}| tail -1 \
-                | awk '{$1=$2=""; print $0}'` | xargs -0 echo) \
-                && sudo installer -pkg '${MOUNTDIR}'/*.pkg -target / > /dev/null".format(rstudio))
+            install_Rstudio = sbp_cmdexe("MOUNTDIR=$(echo `hdiutil mount {} | tail -1 | awk '{$1=$2=""; print $0}'` | xargs -0 echo)\
+                    && sudo installer -pkg ${MOUNTDIR}/*.pkg -target /".format(rstudio))
 
             #install_Rstudio = sbp_cmdexe("sudo dmginstall {} > /dev/null".format(rstudio))  
             assert(install_Rstudio == 0) 
