@@ -61,9 +61,9 @@ def direct_downloader ( direct_link)  :
         return None
     
     # testing for mac    
-    #if  define_OS.__eq__("darwin") and  filename.__eq__("RStudio-1.3.1056.dmg") : 
-     #   print("Cannot Download  {}  ".format(filename))
-      #  avoid_deprecation_osx()  
+    if  define_OS.__eq__("darwin") and  filename.__eq__("RStudio-1.3.1056.dmg") : 
+        print("Cannot Download  {}  ".format(filename))
+        avoid_deprecation_osx()  
     
     print("+ Downloading {}".format(filename)) 
     binary_data = requests.get(direct_link)  
