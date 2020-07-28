@@ -60,10 +60,10 @@ def direct_downloader ( direct_link)  :
         print("{} is already present ".format(filename)) 
         return None
     
-     
-    if  define_OS.__eq__("darwin") : 
-        print("Cannot Download  {}  ".format(filename))
-        avoid_deprecation_osx()  
+    # testing for mac    
+    #if  define_OS.__eq__("darwin") and  filename.__eq__("RStudio-1.3.1056.dmg") : 
+     #   print("Cannot Download  {}  ".format(filename))
+      #  avoid_deprecation_osx()  
     
     print("+ Downloading {}".format(filename)) 
     binary_data = requests.get(direct_link)  
@@ -99,7 +99,6 @@ def  has_command ( cmd )  :
 def main ( )   :  
     
     pckg_direct_link = pkg_dispatcher(define_OS  ,Arch)
-    print(pckg_direct_link) 
 
     for bin_pkg , d_link  in  pckg_direct_link.items() :  
         file_src=direct_downloader(d_link)
@@ -130,7 +129,7 @@ def main ( )   :
             pckg_direct_link["Rstudio"].split("/")[-1] 
         )
 
-    if define_OS.__eq__("window")  : 
+    if define_OS.__eq__("windows")  : 
         current_path = os.getcwd() 
         os.system(current_path+"/"+rlang_exe) 
         os.system(current_path+"/"+rstudio)  
@@ -140,20 +139,23 @@ def main ( )   :
         # R lang  
         if not has_command("R")  : 
             install_Rlang = sbp_cmdexe("sudo  installer -pkg  {} -target  /  >  /dev/null".format(rlang_exe)) 
-            if  install_Rlang  ==   0x00  :  sys.write.stdout("R successfully installed") 
-            if  install_Rlang  !=   0x00  :  sys.write.sdterr("Fail to install  R Lang") 
+            if  install_Rlang  ==   0x00  :  sys.stdout.write("R successfully installed") 
+            if  install_Rlang  !=   0x00  :  sys.stderr.write("Fail to install  R Lang") 
         
         else :  print("R  Lang [Ok] ")
         
         # R Studio
         print("Mounting  file image ...")  
-        mountdir = os.popen("hdiutil  mount {}".format(rstudio)) 
+        mountdir = sbp_cmdexe("hdiutil  mount {}".format(rstudio))
+        if  mountdir != 0x00 : 
+            log.error("fail to auto mount {}".format(rstudio)) 
+            
         supposed_mounted_volume  = "/Volumes/{}/RStudio.app".format(rstudio[:-4]) 
-        cpy_status = sbp_cmdexe("sud  cp -R  {} /Applications".format(supposed_mounted_volume))  
+        cpy_status = sbp_cmdexe("sudo  cp -R  {} /Applications".format(supposed_mounted_volume))  
         
         if  cpy_status == 0x000  : print("Rstudio [Ok]")
         if  cpy_status != 0x000  : 
-            sys.write.stderr("file  to  Build  {}".format(rstudio))
+            sys.stderr.write("file  to  Build  {}".format(rstudio))
             sys.exit(1) 
 
      
