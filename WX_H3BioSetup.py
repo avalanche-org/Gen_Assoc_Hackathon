@@ -131,8 +131,10 @@ def main ( )   :
         )
 
     if define_OS.__eq__("win32")  : 
-        current_path = os.getcwd() 
+        current_path = os.getcwd()
+        sys.stdout.write("executing  R lang\n") 
         os.system(current_path+"/"+rlang_exe) 
+        sys.stdout.write("executing  R Studio\n") 
         os.system(current_path+"/"+rstudio)  
        
     if define_OS.__eq__("darwin") : 
