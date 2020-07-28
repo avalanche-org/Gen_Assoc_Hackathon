@@ -150,7 +150,7 @@ def main ( )   :
         if  mountdir != 0x00 : 
             log.error("fail to auto mount {}".format(rstudio)) 
             
-        supposed_mounted_volume  = "/Volumes/{}/RStudio.app".format(rstudio[:-4]) 
+        supposed_mounted_volume  = "/Volumes/{}/RStudio.app/".format(rstudio[:-4]) 
         cpy_status = sbp_cmdexe("sudo  cp -R  {} /Applications".format(supposed_mounted_volume))  
         
         if  cpy_status == 0x000  : print("Rstudio [Ok]")
