@@ -44,6 +44,7 @@ Arch        =  platform.architecture()[0b00][0:2]
 print(define_OS) 
 print(Arch)
 
+
 def  avoid_deprecation_osx () : 
     osx_version= os.popen("sw_vers -productVersion").read() 
     require_version=float(10.13)
@@ -79,9 +80,9 @@ def  pkg_dispatcher ( os_type  , arch )  :
                 "Rstudio":"https://download1.rstudio.org/desktop/macos/RStudio-1.3.1056.dmg", 
                 "Rlang"  :"https://cran.r-project.org/bin/macosx/R-4.0.2.pkg"
                 } 
-    elif os_type.__eq__("windows") :
+    elif os_type.__eq__("win32")  or  os_type.__eq__("win64") :
         return  { 
-                "Plink"  :"http://s3.amazonaws.com/plink1-assets/plink_{sys_arch}_{build}.zip".format(sys_arch=define_OS+Arch , build=PLINK_BUILD_VERSION)  , 
+                "Plink"  :"http://s3.amazonaws.com/plink1-assets/plink_{sys_arch}_{build}.zip".format(sys_arch=define_OS[:3]+Arch , build=PLINK_BUILD_VERSION)  , 
                 "Rstudio":"https://cran.r-project.org/bin/windows/base/R-4.0.2-win.exe",
                 "Rlang"  :"https://download1.rstudio.org/desktop/windows/RStudio-1.3.1056.exe"
                 } 
@@ -129,7 +130,7 @@ def main ( )   :
             pckg_direct_link["Rstudio"].split("/")[-1] 
         )
 
-    if define_OS.__eq__("windows")  : 
+    if define_OS.__eq__("win32")  : 
         current_path = os.getcwd() 
         os.system(current_path+"/"+rlang_exe) 
         os.system(current_path+"/"+rstudio)  
