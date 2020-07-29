@@ -1,11 +1,13 @@
 #!/usr/bin/env  python3  
 # -*- coding: utf-8 -*- 
 
-__author__ =  "jukoo <j_umar@outlook.fr>"  
+"jukoo <j_umar@outlook.fr>"  
+"Mame Astou Gassama  <>" 
 
 """
 Generic installation for  Windows and Mac OS X   
 """
+
 import os 
 import sys 
 import platform  
@@ -27,7 +29,6 @@ except :
         log.error("failed to trouble shooting  pip module install")
         sys.exit(BaseAbort.EXIT_FAILURE.value)
 
-
 try : 
     import requests 
     import zipfile 
@@ -44,15 +45,27 @@ Arch        =  platform.architecture()[0b00][0:2]
 print(define_OS) 
 print(Arch)
 
+#test fictif   section 
+#define_OS  =
+#Arch       =  
 
+def  Rstudio_ctrl (  mac_osx_version ) : 
+    RStudio="RStudio-1.3.1056.dmg"
+    def  depreciation_control  () : 
+        current_osx_version = mac_osx_version() 
+        allowed_version  = float(10.13) 
+        if current_osx_version >=  allowed_version: return  RStudio 
+        else: log.error("R Studion require mac  10.13+ make an upgrade")
+        
+    return depreciation_control  
+
+@avoid_deprecation_osx 
 def  avoid_deprecation_osx () : 
     osx_version= os.popen("sw_vers -productVersion").read() 
     require_version=float(10.13)
     major,minor,patch= osx_version.split(".")
     current_version=major+"."+minor
-    if not float(current_version) >= require_version  :
-        log.error("please  upgrade your system Rstudio require  10.13+ ")
-        sys.exit(21) 
+    return  float(current_version)  
 
 
 def direct_downloader ( direct_link)  :  
