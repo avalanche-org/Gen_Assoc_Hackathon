@@ -25,7 +25,7 @@ such as :
 
 To run the  installation  wizard  you need just  to  type  
 ```
-$ sudo ./H3bioSetup.sh
+$ sudo ./Linux_tools.sh
 ``` 
 >  have  Problem please   read the Trouble shooting section bellow 
 
@@ -45,7 +45,7 @@ $ sw_vers -productVersion
 
 ```
 
-$ ./WX_H3BioSetup.py  
+$ ./Win_MacOsx_tools.py  
 ```
 
 ### Windows
@@ -55,7 +55,7 @@ you can run directly the setup
 
 ```
 
-> python WX_H3BioSetup.py
+> python Win_MacOsx_tools.py
 ```
 However  if  you  run Conda
 first activate  the environment 
@@ -66,7 +66,7 @@ first activate  the environment
 and run  the setup  
 
 ```
->  python WX_H3BioSetup.py 
+>  python Win_MacOsx_tools.py 
 ```
 and that's it !
 

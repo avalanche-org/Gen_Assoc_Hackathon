@@ -135,11 +135,6 @@ def main ( )   :
                         MV_STAT= sbp_cmdexe("sudo   mv   {}  {}".format(plink_exec , exec_storage))
                         if  MV_STAT  != 0 : log.warning("fail  to enable  plink")
 			
-                elif define_OS.__eq__("win32") or define_OS.__eq__("win64")  :  
-                    pass 
-
-                        
-    
      
     # windows installation  
     rlang_exe , rstudio  = (
@@ -147,8 +142,11 @@ def main ( )   :
             pckg_direct_link["Rstudio"].split("/")[-1] 
         )
 
-    if define_OS.__eq__("win32")  : 
-        current_path = os.getcwd()
+    if define_OS.__eq__("win32")  or define_OS.__eq__("win64") : 
+        current_path = os.getcwd() 
+        sys.stdout.write("executing  Plink ") 
+        abs_plink_path =  "{}/{}/plink.exe".format(current_path,plink_folder_name)
+        os.system(abs_plink_path)  
         sys.stdout.write("executing  R lang\n") 
         os.system(current_path+"/"+rlang_exe) 
         sys.stdout.write("executing  R Studio\n") 
