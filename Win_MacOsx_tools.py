@@ -122,20 +122,19 @@ def main ( )   :
         except zipfile.BadZipFile as  Bz  : 
             print(Bz)
             log.warning("fail to exctract {}".format(zipf))
-            continue 
         else  :  
-            plink_exec  = "{}/{plink}".format(plink_folder_name) 
+            plink_exec  = "{}/plink".format(plink_folder_name) 
             if os.path.exists(plink_exec) :  
                 if  define_OS.__eq__("darwin") :  
                     import  shutil 
                     exec_storage =  "/usr/bin/"
-                    if  not os.path.exists(exec_storage+"plink")  :  
-                        try  :shutil.copy(plink_exec, exec_storage )
-                        except:
-                            log.warning("something wrong")  
-                    else : 
-                         print("plink is already available")
-
+                    if  not os.path.exists(exec_storage+"plink")  :
+                	# make it executable 
+                        E_STAT   = sbp_cmdexe("chmod +x {}".format(plink_exec))
+                        if  not E_STAT.__eq__(0b000)  :  log.warning("ERR_NOEXEC")
+                        MV_STAT= sbp_cmdexe("sudo   mv   {}  {}".format(plink_exec , exec_storage))
+                        if  MV_STAT  != 0 : log.warning("fail  to enable  plink")
+			
                 elif define_OS.__eq__("win32") or define_OS.__eq__("win64")  :  
                     pass 
 
