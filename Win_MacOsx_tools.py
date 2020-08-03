@@ -121,7 +121,25 @@ def main ( )   :
                 fz.extractall(plink_folder_name) 
         except zipfile.BadZipFile as  Bz  : 
             print(Bz)
-            sys.exit(2)  
+            log.warning("fail to exctract {}".format(zipf))
+            continue 
+        else  :  
+            plink_exec  = "{}/{plink}".format(plink_folder_name) 
+            if os.path.exists(plink_exec) :  
+                if  define_OS.__eq__("darwin") :  
+                    import  shutil 
+                    exec_storage =  "/usr/bin/"
+                    if  not os.path.exists(exec_storage+"plink")  :  
+                        try  :shutil.copy(plink_exec, exec_storage )
+                        except:
+                            log.warning("something wrong")  
+                    else : 
+                         print("plink is already available")
+
+                elif define_OS.__eq__("win32") or define_OS.__eq__("win64")  :  
+                    pass 
+
+                        
     
      
     # windows installation  
