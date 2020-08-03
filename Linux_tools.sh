@@ -17,13 +17,13 @@ set  -o errexit  # abort programme  if  an error was occured
 
 R_UID=$((2#000))  
 
-MAIN_SUPPORTED_OS_ENV=(  
+declare  -Ar MAIN_SUPPORTED_OS_ENV=(  
 [GNU_LINUX]="Linux" 
 [OSX]="Darwin"
 [FREEBSD]="Freebsd" 
 )
 
-Win_GNU_EMULATOR=(
+declare -Ar Win_GNU_EMULATOR=(
 [LEEW]="cygwin"             # linux Environment Emulation for Windows
 [GNU_UTILITY]="msys"        # GNU utilities  for  Windows   
 )
@@ -38,11 +38,15 @@ has_command ()  {
 
 detect_os_type () {
     local  sys_name=$(uname -s)  
+
     case  ${sys_name} in 
+
         ${MAIN_SUPPORTED_OS_ENV[GNU_LINUX]})
             echo -e "${MAIN_SUPPORTED_OS_ENV[GNU_LINUX]}";;
+        
         ${MAIN_SUPPORTED_OS_ENV[OSX]})       
             echo -e "${MAIN_SUPPORTED_OS_ENV[OSX]}"      ;; 
+        
         ${MAIN_SUPPORTED_OS_ENV[FREEBSD]}) 
             echo  -e "${MAIN_SUPPORTED_OS_ENV[FREEBSD]}" ;;    
 
@@ -107,7 +111,8 @@ if [[  $arch_type  == "i386" ]]   ;then  arch_type="x86_64";fi
 [[ "PLINK" ]] 
 {
     declare -r plink_static_url="http://s3.amazonaws.com/plink1-assets/plink" 
-    declare -r build_version="20200616.zip" 
+    declare -r build_version="20200616.zip"
+
     get_related_plink_build () {  
         local sys_target  
          if   [[  ${os_name,,} == "linux" ]]   ;then 
@@ -120,13 +125,40 @@ if [[  $arch_type  == "i386" ]]   ;then  arch_type="x86_64";fi
          echo  ${sys_target}  
     }
     readonly  plink_link="${plink_static_url}$(get_related_plink_build)${build_version}" 
-  
+    
     if  [[ ! -f  ${plink_link##*/} ]] ; then 
         echo -e  "downloading plink >>  ${plink_link##*/}"  
         $(dowloader ${plink_link}) 
         plink_=${plink_link##*/}
         echo -e  "inflating ... ${plink_}"  
-        unzip  ${plink_} -d  "plink" 
+     
+        unzip  ${plink_} -d  "plink"
+        if [[  -d  "plink" ]] ; then 
+           echo -e "+ enabling   plink  programme "    
+           if  [[ -x  "plink/plink" ]] ; then 
+               `mv  "plink/plink"   "/usr/bin/"`
+                test  $? -eq  0  && {
+                    echo  -e " plink [ enabled ]  "
+                } ||  {
+                    echo -e "x failed to enable plink"
+                } 
+          else
+              `chmod +x  "plink/plink"` 
+              [[  $? -eq 0  ]]  &&{
+                `mv  "plink/plink"   "/usr/bin/"`
+                 test  $? -eq  0  && {
+                    echo  -e " plink [ enabled ]  "
+                } ||  {
+                    echo -e "x failed to enable plink"
+                } 
+              }||{
+                  echo -e  "failed to make  plink  as executable"  
+                
+              } 
+
+           fi 
+             
+        fi
     fi     
 }
 
