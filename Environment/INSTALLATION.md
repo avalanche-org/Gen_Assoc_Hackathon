@@ -1,6 +1,6 @@
 # INSTALLATION GUIDE LINE   [ Beta version ]
 ---
-The H3BioNet  Installation Wizard is availabe on GNU/Linux, Windows and Mac OS X operating systems.
+The H3ABioNet  Installation Wizard is availabe on GNU/Linux, Windows and Mac OS X operating systems.
 
 Make a quick installation of : 
 - Plink
@@ -8,21 +8,19 @@ Make a quick installation of :
 - RStudio  
 
 ## For GNU/Linux
---- 
-Before launching H3BioNet setup, you must already have Bash version 4ˆ. 
-To check this out 
-```
-$ echo $BASH_VERSINFO  
-```
-* this installation  cover the majority GNU/Linux OS  
-such as :
-    - OpenSuse                                          [ recommanded version 15]
-    - Debian   ( or Debian Base  like Ubuntu 18)        [ recommanded version 9 - 10]
-    - RedHat   
-        -  Fedora                                       [ recommanded version 19 - 28]  
-        -  Centos                                       [ recommanded version 7  - 8 ]
-        -  ... 
 
+This installation  cover the majority GNU/Linux OS 
+ 
+such as :
+
+   - OpenSuse                                          [ recommanded version 15]
+   - Debian   ( or Debian Base  like Ubuntu 18)        [ recommanded version 9 - 10]
+   - RedHat   
+        -  Fedora                                      [ recommanded version 19 - 28]  
+        -  Centos                                      [ recommanded version 7  - 8 ]
+       
+       
+       
 To run the  installation  wizard  you need just  to  type  
 ```
 $ sudo ./Linux_tools.sh
@@ -30,7 +28,7 @@ $ sudo ./Linux_tools.sh
 >  have  Problem please   read the Trouble shooting section bellow 
 
 ##  Windows and Mac OS X  
----   
+
 Before  running  the  installation wizard  
 you need to have some requirements 
 -  python3   or  Conda 
@@ -41,11 +39,12 @@ to see your mac os version type this command bellow
 ```
 $ sw_vers -productVersion 
 ```
+
 ###  MAC OS X
 
 ```
 
-$ ./Win_MacOsx_tools.py  
+$ ./setup_tools.py  
 ```
 
 ### Windows
@@ -55,7 +54,7 @@ you can run directly the setup
 
 ```
 
-> python Win_MacOsx_tools.py
+> python setup_tools.py
 ```
 However  if  you  run Conda
 first activate  the environment 
@@ -66,15 +65,16 @@ first activate  the environment
 and run  the setup  
 
 ```
->  python Win_MacOsx_tools.py 
+>  python setup_tools.py 
 ```
 and that's it !
 
 # TROUBLE SHOOTING   
 ---
-* For any issue  encountered  with  this setup  please  contact  the maintainer <j_umar@outlook.com> 
+* For any issue  encountered  with  this setup  please  contact  the maintainer [j_umar@outlook.com](j_umar@outlook.com)
 If you are a member of Avalanche Team please submit an issue  or make a pull request 
 
+>
 In some case when you run the script at the first time it may fail due to  pip module (depreciated version). 
 In General the setup resolve this  conflict  by  auto install the  missing  libraries and required libraries 
 
