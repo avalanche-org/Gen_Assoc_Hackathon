@@ -48,6 +48,17 @@ $ ./setup_tools.py
 ```
 
 ### Windows
+For Windows users  we recommande to have python already installed in  
+Otherwise  here  is   somes direct link to Download 
+
+[Windows x86-64 executable installer](https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe)
+
+[Windows x86 executable installer](https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe)
+
+for  more  info  visite  : 
+> https://www.python.org/downloads/release/python-379/
+
+---
 
 If you have  python3 available  in your  System 
 you can run directly the setup  
