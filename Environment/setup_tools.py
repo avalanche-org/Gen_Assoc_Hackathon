@@ -75,7 +75,7 @@ Arch        =  lambda x = None :  platform.architecture()[0b00][0:2]
 has_command =  lambda cmd  : (False , True) [ sbp_cmdexe("command -v {}".format(cmd)).__eq__(0b00) ]
 
 def  detect_current_base_distro () :
-    if  not define_OS.__eq__("linux") : return  
+    if  not define_OS.__eq__("linux") : return (  False , False )  
     for  dist , pkgman  in supported_distribtions.items() : 
         if has_command(pkgman)  : return  ( dist , pkgman) 
 
@@ -117,8 +117,12 @@ print(define_OS())
 print(Arch())
 
 #  this  part is only  active on gnu/linux  os 
-distro_name  , pkgm  = detect_current_base_distro()  
-if distro_name and pkgm : print("your  base distribution is  \033[3;32m%s*\x1b[0m" % (distro_name) )   
+
+distro_name  , pkgm  = None , None 
+
+if define_OS().__eq__("linux")  : 
+    distro_name , pkgm = detect_current_base_distro() 
+    if distro_name and pkgm : print("your  base distribution is  \033[3;32m%s*\x1b[0m" % (distro_name) )   
 
 # ---- 
 def  macosx_version_ctrl ()  : pass  
@@ -185,8 +189,6 @@ def softpack_env   ( os_type , arch )  :
                "Rstudio" :rstudio                                                                   
                # R lang  is download  from  package manager ... 
                }
-
-
 
 def main ( )   :  
     
@@ -294,9 +296,5 @@ def main ( )   :
                 
 
              
-            
-        
-     
-
 if __name__ =="__main__":  
     main()  
