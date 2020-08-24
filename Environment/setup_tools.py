@@ -177,7 +177,7 @@ def softpack_env   ( os_type , arch )  :
         return {
                "Plink"   :source.plink  +"plink_{sys_arch}_{build_V}.zip".format(sys_arch=define_OS()[:3]+arch,build_V=PLINK_BUILD_VERSION) , 
                "Rstudio" :source.rstudio+"windows/{}.exe".format(RSTUDIO_SOFT_VERSION)                                                    ,
-               "Rlang"   :source.rlang  +"windows/base/{}.exe".format(RLANG_VERSION)
+               "Rlang"   :source.rlang  +"windows/base/{}-win.exe".format(RLANG_VERSION)
                }
      
     if os_type.__eq__("linux")   : 
@@ -237,6 +237,8 @@ def main ( )   :
         current_path = os.getcwd() 
         sys.stdout.write("executing  Plink ") 
         abs_plink_path =  "{}/{}/plink.exe".format(current_path,plink_folder_name)
+        sys.stdout.write("put plink  in  envar\n")  
+        os.environ["plink"] =  abs_plink_path  
         os.system(abs_plink_path)  
         sys.stdout.write("executing  R lang\n") 
         os.system(current_path+"/"+rlang_exe) 
