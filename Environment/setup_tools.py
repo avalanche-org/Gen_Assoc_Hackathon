@@ -175,7 +175,7 @@ def softpack_env   ( os_type , arch )  :
                 }
     if os_type.__eq__("win32") or  os_type.__eq__("win64")  :  
         return {
-               "Plink"   :source.plink  +"plink_{sys_arch}_{build_V}.zip".format(sys_arch=define_OS[:3]+arch,build_V=PLINK_BUILD_VERSION) , 
+               "Plink"   :source.plink  +"plink_{sys_arch}_{build_V}.zip".format(sys_arch=define_OS()[:3]+arch,build_V=PLINK_BUILD_VERSION) , 
                "Rstudio" :source.rstudio+"windows/{}.exe".format(RSTUDIO_SOFT_VERSION)                                                    ,
                "Rlang"   :source.rlang  +"windows/base/{}.exe".format(RLANG_VERSION)
                }
