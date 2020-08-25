@@ -20,7 +20,12 @@ import platform
 import logging as log 
 import subprocess 
 from enum import Enum  
-from collections import  namedtuple 
+from collections import  namedtuple
+
+class BaseAbort  ( Enum ) : 
+    EXIT_FAILURE  = 1  
+    EXIT_SUCCESS  = 0  
+
 
 def  sbp_cmdexe ( cmd )  : 
     stdargv     =  subprocess.Popen(cmd , stdout=subprocess.PIPE  ,shell=True) 
@@ -43,11 +48,6 @@ try :
 except :   
     pip.main(["install" ,"requests"])  
     pip.main(["install" ,"zipfile"])
-
-
-class BaseAbort  ( Enum ) : 
-    EXIT_FAILURE  = 1  
-    EXIT_SUCCESS  = 0  
 
    
 DIRECT_LINK  =  namedtuple("DIRECT_LINK" , [ "plink"  , "rstudio" , "rlang"])  
