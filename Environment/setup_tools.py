@@ -59,7 +59,7 @@ distro_name  , pkgm  = None , None
 
 if define_OS().__eq__("linux")  : 
     distro_name , pkgm = detect_current_base_distro() 
-    if distro_name and pkgm : print("your  base distribution is  \033[3;32m%s Base*\x1b[0m" % (distro_name) )   
+    if distro_name and pkgm : print("Your  base distribution is  \033[3;32m%s Base*\x1b[0m" % (distro_name) )   
 
 
 try :
@@ -69,12 +69,10 @@ except :
     trooble_shooting_cmd ="python{} -m pip  install --upgrade pip".format(sys.version_info.major)
     exit_status  =  sbp_cmdexe(trooble_shooting_cmd)
     if  not exit_status.__eq__(0b0000)  :
-        sys.stderr.write("-[e]  failed to trouble shooting  pip module install") 
+        sys.stderr.write("-[w]  failed to trouble shooting  pip module install") 
         if define_OS().__eq__("linux")  :  
-            print("-[f] force to  install pip module vie package manager")  
+            print("-[w] force to  install pip module via  package manager")  
             pipmod =  sbp_cmdexe("sudo  {}  install   python3-pip -y  > /dev/null".format(pkgm)) 
-
-    
 
 try : 
     import requests 
