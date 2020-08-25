@@ -32,36 +32,6 @@ def  sbp_cmdexe ( cmd )  :
     status_code =  stdargv.wait() 
     return  status_code     
 
-try :
-    import  pip
-except :
-    # probably pip   is not installed or  the version is deprecated
-    trooble_shooting_cmd ="python{} -m pip  install --upgrade pip".format(sys.version_info.major)
-    exit_status  =  sbp_cmdexe(trooble_shooting_cmd)
-    if  not exit_status.__eq__(0b0000)  :
-        log.error("failed to trouble shooting  pip module install")
-        sys.exit(BaseAbort.EXIT_FAILURE.value)
-
-try : 
-    import requests 
-    import zipfile 
-except :   
-    pip.main(["install" ,"requests"])  
-    pip.main(["install" ,"zipfile"])
-
-   
-DIRECT_LINK  =  namedtuple("DIRECT_LINK" , [ "plink"  , "rstudio" , "rlang"])  
-source       =  DIRECT_LINK(
-        "http://s3.amazonaws.com/plink1-assets/"  , 
-        "https://download1.rstudio.org/desktop/"  , 
-        "https://cran.r-project.org/bin/"
-        )      
-
-PLINK_BUILD_VERSION  ="20200616"            #   plink  1.90 Beta version 
-RSTUDIO_SOFT_VERSION ="RStudio-1.3.1073"
-RLANG_VERSION        ="R-4.0.2"
-
-
 supported_distribtions =  {  
         "debian"  :  "apt-get" ,
         "fedora"  :   "dnf"    ,
@@ -78,6 +48,52 @@ def  detect_current_base_distro () :
     if  not define_OS.__eq__("linux") : return (  False , False )  
     for  dist , pkgman  in supported_distribtions.items() : 
         if has_command(pkgman)  : return  ( dist , pkgman) 
+   
+
+print(define_OS()) 
+print(Arch())
+
+#  this  part is only  active on gnu/linux  os 
+
+distro_name  , pkgm  = None , None 
+
+if define_OS().__eq__("linux")  : 
+    distro_name , pkgm = detect_current_base_distro() 
+    if distro_name and pkgm : print("your  base distribution is  \033[3;32m%s Base*\x1b[0m" % (distro_name) )   
+
+
+try :
+    import  pip
+except :
+    # probably pip   is not installed or  the version is deprecated
+    trooble_shooting_cmd ="python{} -m pip  install --upgrade pip".format(sys.version_info.major)
+    exit_status  =  sbp_cmdexe(trooble_shooting_cmd)
+    if  not exit_status.__eq__(0b0000)  :
+        sys.stderr.write("-[e]  failed to trouble shooting  pip module install") 
+        if define_OS().__eq__("linux")  :  
+            print("-[f] force to  install pip module vie package manager")  
+            pipmod =  sbp_cmdexe("sudo  {}  install   python3-pip -y  > /dev/null".format(pkgm)) 
+
+    
+
+try : 
+    import requests 
+    import zipfile 
+except :
+    pip.main(["install" ,"requests"])  
+    pip.main(["install" ,"zipfile"])
+   
+DIRECT_LINK  =  namedtuple("DIRECT_LINK" , [ "plink"  , "rstudio" , "rlang"])  
+source       =  DIRECT_LINK(
+        "http://s3.amazonaws.com/plink1-assets/"  , 
+        "https://download1.rstudio.org/desktop/"  , 
+        "https://cran.r-project.org/bin/"
+        )      
+
+PLINK_BUILD_VERSION  ="20200616"            #   plink  1.90 Beta version 
+RSTUDIO_SOFT_VERSION ="RStudio-1.3.1073"
+RLANG_VERSION        ="R-4.0.2"
+
 
 
 def  gnu_linux_r_collections (distro_name)  :   
@@ -111,19 +127,7 @@ def  gnu_linux_r_collections (distro_name)  :
     
     return  (__sb__.pkgm[distro_name] , __sb__.rlang[distro_name] ,__sb__.rstudio[distro_name]) 
 
-    
-
-print(define_OS()) 
-print(Arch())
-
-#  this  part is only  active on gnu/linux  os 
-
-distro_name  , pkgm  = None , None 
-
-if define_OS().__eq__("linux")  : 
-    distro_name , pkgm = detect_current_base_distro() 
-    if distro_name and pkgm : print("your  base distribution is  \033[3;32m%s*\x1b[0m" % (distro_name) )   
-
+ 
 # ---- 
 def  macosx_version_ctrl ()  : pass  
 
