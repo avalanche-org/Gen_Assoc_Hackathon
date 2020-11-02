@@ -20,7 +20,9 @@ completePedigree <- function(dbwork){
   return(dataset)
 }
 
-######################################################################################################################################
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                        #DATA CLEANING PROCESS with PLINK: Dont take into acccount
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 setwd("/home/share/malaria_senegal/test_geno_inference")
@@ -56,8 +58,11 @@ for(i in 1:6){
   malaria_senegal_autosome_samp_clean[,i] = gsub("N", "S2", malaria_senegal_autosome_samp_clean[, i])
 }
 write.table(malaria_senegal_autosome_samp_clean, "malaria_senegal_autosome_samp_clean.ped", sep = "\t", quote = F, col.names = F, row.names = F)
+#--------------------------------------------------------------------------------------------------------------------------------------
 
-# Run genotype inference script
+#------------------ Run genotype inference script
+#--------------------------------------------------------------------------------
+
 system("Rscript genoInference.R --file malaria_senegal_autosome_samp_clean --cutsize 50 --cores 4")
 
 # MERGE
