@@ -85,9 +85,16 @@ def dialog_box (main_frame)->  None :
     show_frame(dialog_frame)  
 
 
+def rbtn_on_toggle  ( rbt_wiget  : Gtk.RadioButton ,  name : str ) ->  str :  
+    if  rbt_wiget.get_active()  :  
+        print(f"this -> {name}  is active")  
+    else  : 
+        print("off")  
+
+
 def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
     
-    dbox_frame.destroy()
+    dbox_frame.destroy() 
 
     main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename} {mw.WIDTH}x{mw.HEIGHT}")  
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
@@ -99,8 +106,18 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     # TODO  : 
     # add radio buttons  and  run button  
     choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
-    test_btn1   = Gtk.Button(label=  " box 1 " )  
-    choicebox.pack_start(test_btn1 , True , True , 0 )  
+    
+    genotype_radiobtn  : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,"Genotype Reference")  
+    genotype_radiobtn.connect("toggled" , rbtn_on_toggle ,"gen")
+
+    mtdt_radiobtn   : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(genotype_radiobtn)  
+    mtdt_radiobtn.set_label("mTDT") 
+    mtdt_radiobtn.connect("toggled" , rbtn_on_toggle ,"mtdt")
+
+    choicebox.pack_start(genotype_radiobtn , True , True , 0 )  
+    choicebox.pack_start(mtdt_radiobtn , True , True , 0 )  
+
+    
     # LOG OR SUMMARY BOX
     slogbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
     test_btn2    = Gtk.Button(label="box2") 
@@ -116,7 +133,7 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
 
 
     
-    main_container.pack_start(choicebox , True , True , 0 ) 
+    main_container.pack_start(choicebox , False, False , 0 ) 
     main_container.pack_start(slogbox   , True , True , 0 ) 
     main_container.pack_start(btnsbox   , False, True , 0 ) 
     
