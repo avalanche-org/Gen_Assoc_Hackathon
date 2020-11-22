@@ -85,11 +85,20 @@ def dialog_box (main_frame)->  None :
     show_frame(dialog_frame)  
 
 
-def rbtn_on_toggle  ( rbt_wiget  : Gtk.RadioButton ,  name : str ) ->  str :  
+state  :  str  =  ""  
+def rbtn_on_toggle  ( rbt_wiget  : Gtk.RadioButton ) ->  str :  
+    global state  
     if  rbt_wiget.get_active()  :  
-        print(f"this -> {name}  is active")  
+        state =  rbt_wiget.get_label() 
+        print(state)  
     else  : 
         print("off")  
+
+def even_launch   ( btn_widget )  ->  None  : 
+    print(f" =>    { state }  ")
+
+
+
 
 
 def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
@@ -107,16 +116,19 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     # add radio buttons  and  run button  
     choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
     
-    genotype_radiobtn  : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,"Genotype Reference")  
-    genotype_radiobtn.connect("toggled" , rbtn_on_toggle ,"gen")
-
+    genotype_radiobtn  : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,"Genotype Reference (optional)")  
+    genotype_radiobtn.connect("toggled" , rbtn_on_toggle)
     mtdt_radiobtn   : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(genotype_radiobtn)  
-    mtdt_radiobtn.set_label("mTDT") 
-    mtdt_radiobtn.connect("toggled" , rbtn_on_toggle ,"mtdt")
-
+    mtdt_radiobtn.set_label("mTDT *") 
+    mtdt_radiobtn.connect("toggled" , rbtn_on_toggle)
+    
+    
+    validate_btn    : Gtk.Button       = Gtk.Button(label=f"Run")  
+    validate_btn.connect("clicked" , even_launch)  
+    
     choicebox.pack_start(genotype_radiobtn , True , True , 0 )  
-    choicebox.pack_start(mtdt_radiobtn , True , True , 0 )  
-
+    choicebox.pack_start(mtdt_radiobtn     , True , True , 0 )  
+    choicebox.pack_start(validate_btn      , True ,False , 0 ) 
     
     # LOG OR SUMMARY BOX
     slogbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
@@ -128,14 +140,14 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     
     quit_bnt      : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
-    btnsbox.pack_start(quit_bnt ,  True , True,0 )  
+    btnsbox.pack_start(quit_bnt ,  True , False,0 )  
 
 
 
     
     main_container.pack_start(choicebox , False, False , 0 ) 
     main_container.pack_start(slogbox   , True , True , 0 ) 
-    main_container.pack_start(btnsbox   , False, True , 0 ) 
+    main_container.pack_start(btnsbox   , False, False , 0 ) 
     
     main_window_frame.add(main_container) 
     
