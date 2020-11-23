@@ -29,7 +29,7 @@ setting   = namedtuple("setting" , SETTING_PARAMS)
 #  PARAMETER  DEFINITION FOR MAIN WINDOW  
 mw = setting(
         0x32 << 4  ,     #  WIDTH 
-        0x64 << 3  ,     #  HEIGHT 
+        0x258      ,     #  HEIGHT 
         False      ,     #  RESIZABLE
         0x0a             #  BORDER  WIDTH  
         )             
@@ -94,11 +94,16 @@ def rbtn_on_toggle  ( rbt_wiget  : Gtk.RadioButton ) ->  str :
     else  : 
         print("off")  
 
-def even_launch   ( btn_widget )  ->  None  : 
+def even_launch   ( btn_widget )  ->  None  :  
+    """
+    even_lauchn 
+    @param :  
+    btn_widget :  Gtk.Button  : 
+    event  trigger  to run choice  
+    @return  : 
+    None
+    """
     print(f" =>    { state }  ")
-
-
-
 
 
 def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
@@ -110,14 +115,17 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
 
-    main_container: Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL)
+    main_container: Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
+    
+    #  ------------  BOX  CONTAINER  LAYOUT -----  )
     # CHOICE BOX  
     # TODO  : 
     # add radio buttons  and  run button  
-    choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
-    
+    choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)
+
     genotype_radiobtn  : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,"Genotype Reference (optional)")  
     genotype_radiobtn.connect("toggled" , rbtn_on_toggle)
+   
     mtdt_radiobtn   : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(genotype_radiobtn)  
     mtdt_radiobtn.set_label("mTDT *") 
     mtdt_radiobtn.connect("toggled" , rbtn_on_toggle)
@@ -126,18 +134,33 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     validate_btn    : Gtk.Button       = Gtk.Button(label=f"Run")  
     validate_btn.connect("clicked" , even_launch)  
     
+    #SUB BOX  CONTAINER  THAT'S CONTAINER  FILES LISTER  AND SUMMARY
+    slogbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    ## SUMMARY SECTION   
+    test_btn2    = Gtk.Button(label="box2") 
+    
+    
+    ## FILE LISTER  SECTION  
+    filelistbox   : Gtk.Box    = Gtk.Box(spacing=0x06 ,  orientation=Gtk.Orientation.VERTICAL )  
+    test_btn3    =  Gtk.Button(label="box3") 
+    
+    slogbox.pack_start(test_btn2 , True ,True ,  0 ) 
+    slogbox.pack_start(test_btn3 , True ,True ,  0 )   
+
+
+    # BUTTONS BOX  
+    btnsbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
+
+
+
+    # -------------------
+
+
+    
     choicebox.pack_start(genotype_radiobtn , True , True , 0 )  
     choicebox.pack_start(mtdt_radiobtn     , True , True , 0 )  
     choicebox.pack_start(validate_btn      , True ,False , 0 ) 
-    
-    # LOG OR SUMMARY BOX
-    slogbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
-    test_btn2    = Gtk.Button(label="box2") 
-    slogbox.pack_start(test_btn2 , True ,True ,  0 ) 
-    
-    # BUTTONS BOX  
-    btnsbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
-    
+ 
     quit_bnt      : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     btnsbox.pack_start(quit_bnt ,  True , False,0 )  
