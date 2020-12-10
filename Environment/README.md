@@ -1,6 +1,6 @@
 # INSTALLATION GUIDE LINE   [ Beta version ]
 ---
-The H3ABioNet  Installation Wizard is availabe on GNU/Linux, Windows and Mac OS X operating systems.
+The Installation Wizard is availabe on GNU/Linux, Windows and Mac OS X operating systems.
 
 Make a quick installation of : 
 - Plink
