@@ -22,7 +22,7 @@
  
  
 (i) the PED file: begins with 6 columns following 
-by genotypes columns, respecting the following order
+by genotypes columns, respecting the following order: 
  
 			- family ID  
 			- individual ID
@@ -72,8 +72,7 @@ __!!! ADVICES__ :
  
  
  
-- alleles should be coded in integer (1: major allele, 2: minor allele for a bi
-- allelic marker for instance)
+- alleles should be coded in integer (1: major allele, 2: minor allele for a bi-allelic marker for instance)
 - allele separator is SPACE (e.g., "1 2")  
 - missing genotypes should be coded "0 0"
  
@@ -81,7 +80,7 @@ __!!! ADVICES__ :
 ### HOW TO RUN
   
  * Place yourself in directory containing the main program file (cd to "mTDT" folder here)
- * parameters3
+ * parameters
  	```
  	
  	 	 --pedfile    : name of 'ped' file
