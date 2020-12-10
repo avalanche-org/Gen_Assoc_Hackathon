@@ -24,13 +24,13 @@
 (i) the PED file: begins with 6 columns following 
 by genotypes columns, respecting the following order: 
  
-			- family ID  
-			- individual ID
-			- Father ID
-			- Mother ID
-			- sex
-			- affection (this column will not be taken into account, but its presence is required)
-			- genotypes columns (...)
+	- family ID  
+	- individual ID
+	- Father ID
+	- Mother ID
+	- sex
+	- affection (this column will not be taken into account, but its presence is required)
+	- genotypes columns (...)
  
  
  
