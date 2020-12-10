@@ -41,6 +41,12 @@ dbox  = setting (
         0x05             # BORDER WIDTH
        ) 
 
+
+def  current_dir_view ( actual_path  )  :   
+    if sys.platform.__eq__("linux") :  
+        p =  os.popen(f"tree {actual_path}").read()  
+        return  p  
+
 def show_frame  ( mf  : Gtk.Window)  ->  None : 
     """ 
     show_frame  : Generic  function do display  frame 
@@ -57,7 +63,9 @@ def show_frame  ( mf  : Gtk.Window)  ->  None :
 
 default_file  : str  = str ()  
 
-def  on_file_chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry)  -> None : 
+mut_label : str = str () 
+
+def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type  :str  = "directory")  -> None : 
     """ 
     file_chooser  :  file chooser wiget  
     give the way to choose file
@@ -67,20 +75,29 @@ def  on_file_chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry)  -> 
     @return :  
     None  
     """
+    global  mut_label  
+    def_attr     =   Gtk.FileChooserAction.OPEN      \
+                     if   chooser_type.lower().__eq__("file") \
+                     else  Gtk.FileChooserAction.SELECT_FOLDER
+
+    mut_label    = "Open File" if   chooser_type.lower().__eq__("file") \
+                    else  "Select Folder"
+
+
     fc_dialog  : Gtk.FileChooserDialog  = Gtk.FileChooserDialog ( 
-            title  =   "please  select  a file "  , 
+            title  =   f"please  select  a  {chooser_type} "  , 
             parent =   None ,   
-            action =   Gtk.FileChooserAction.OPEN 
+            action =   def_attr #Gtk.FileChooserAction.SELECT_FOLDER  if  chooser_type.__eq__(""
             )
 
-    fc_dialog.add_button("_Open" ,Gtk.ResponseType.OK) 
+    fc_dialog.add_button(f"_{mut_label}" ,Gtk.ResponseType.OK) 
     fc_dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL) 
     fc_dialog.set_default_response(Gtk.ResponseType.OK) 
     
     response  =  fc_dialog.run() 
     if  response.__eq__(Gtk.ResponseType.OK) :  
-        print("clicked file ... ") 
-        sys.stdout.write("file selected {}".format( fc_dialog.get_filename()))
+        print(f"clicked  {chooser_type}... ") 
+        print(f"{chooser_type}  selected {fc_dialog.get_filename()}")
         default_file =  fc_dialog.get_filename()  
         entry_widget.set_text( fc_dialog.get_filename() )
         fc_dialog.destroy() 
@@ -108,17 +125,19 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     hbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
     # input entry  
     entry    : Gtk.Entry  =  Gtk.Entry()  
-    entry.set_text(os.getcwd())  #  TODO  :  use config  file  to file  this area 
+    #  TODO  :
+    # [] read default path to   config  file  to file  this area
+    entry.set_text(os.getcwd()) 
     vbox.pack_start(entry , True , True , 0 )  
 
     # buttons   
     startbtn    : Gtk.Button = Gtk.Button(label="Start !")  
-    choose_file : Gtk.Button = Gtk.Button(label="choose file") 
+    choose_file : Gtk.Button = Gtk.Button(label=f"Select {mut_label}") 
     cancelbtn   : Gtk.Button = Gtk.Button(label="Close x") 
     
     # events
     startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
-    choose_file.connect("clicked", on_file_chooser ,  entry) 
+    choose_file.connect("clicked", chooser ,  entry ) 
     cancelbtn.connect("clicked"  ,  Gtk.main_quit)
     
 
@@ -208,11 +227,12 @@ def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> 
     
     
     ## FILE LISTER  SECTION  
-    filelistbox   : Gtk.Box    = Gtk.Box(spacing=0x06 ,  orientation=Gtk.Orientation.VERTICAL )  
-    test_btn3    =  Gtk.Button(label="box3") 
+    filelistbox   : Gtk.Box    = Gtk.Box(spacing=0x06 ,  orientation=Gtk.Orientation.VERTICAL )
+    dir  =  current_dir_view("/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/")
+    frame_viewer  : Gtk.Frame   =  Gtk.Frame(label=f"{dir}")   
     
     slogbox.pack_start(summary_expender_area , True ,True  ,  0 ) 
-    slogbox.pack_start(test_btn3 , True ,True ,  0 )   
+    slogbox.pack_start(frame_viewer, True ,True ,  0 )   
 
 
     # BUTTONS BOX  
