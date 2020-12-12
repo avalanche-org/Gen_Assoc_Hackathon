@@ -65,6 +65,7 @@ default_file  : str  = str ()
 
 mut_label : str = str () 
 
+abs_path_dir_target  :str  =   str()  
 def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type  :str  = "directory")  -> None : 
     """ 
     file_chooser  :  file chooser wiget  
@@ -97,12 +98,16 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
     response  =  fc_dialog.run() 
     if  response.__eq__(Gtk.ResponseType.OK) :  
         print(f"clicked  {chooser_type}... ") 
-        print(f"{chooser_type}  selected {fc_dialog.get_filename()}")
+        print(f"{chooser_type}  selected {fc_dialog.get_filename()}") 
         default_file =  fc_dialog.get_filename()  
-        entry_widget.set_text( fc_dialog.get_filename() )
-        fc_dialog.destroy() 
+        entry_widget.set_text( fc_dialog.get_filename())
+        abs_path_dir_target =fc_dialog.get_filename()  
+        
+        fc_dialog.destroy()
+        
     else  : 
         fc_dialog.destroy()
+
 
 
 def dialog_box (main_frame : Gtk.Window)->  None : 
@@ -120,14 +125,21 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     dialog_frame.set_resizable(dbox.RESIZABLE)  
      
     #  box  layer  
-    mainbox  : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
+    mainbox  : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
+    
     vbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
     hbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
+    # logo  area 
+    logo_label  : Gtk.Label  =  Gtk.Label()  
+    logo_label.set_markup("<big> Gen  Assoc  </big>")
+    logo_label.set_max_width_chars(78) 
+
     # input entry  
     entry    : Gtk.Entry  =  Gtk.Entry()  
     #  TODO  :
-    # [] read default path to   config  file  to file  this area
+    # [] read default path to   config  file  to file  this area 
     entry.set_text(os.getcwd()) 
+    vbox.pack_start(logo_label  , False, True , 0 )  
     vbox.pack_start(entry , True , True , 0 )  
 
     # buttons   
