@@ -1,17 +1,21 @@
 #!/usr/bin/env python3  
 #coding: utf-8  
 __author__ : str  = "Umar <j_umar@outlook.com>  "
+__version__: str  = "1.0.1" 
+__stage__  : str  = "alpha"  
+
 """  
- !! DISCLAIMER HERE !! 
+ !! DISCLAIMER HERE  !! 
 """
 import os , sys , gi , argparse    
 gi.require_version("Gtk" , "3.0")  
-from gi.repository import  Gtk  
+from gi.repository import  Gtk , GLib
 
+from time import sleep 
 from  typing  import List , Dict , Tuple  
 from  collections import  namedtuple 
 
-basename  :  str  = "Gen Assoc" 
+basename  :  str  = f"mTDT {__stage__} v{__version__}"  
 #  THIS  IS GLOBAL SETTING   
 #  EVERY FRAME  IS BASED ON THIS SETTING  
 #  YOU  CAN  ADD PROPERTY  ON THE LIST BELLOW  
@@ -33,7 +37,7 @@ mw = setting(
         False      ,     #  RESIZABLE
         0x0a             #  BORDER  WIDTH  
         )             
- 
+#  PARAMETER FOR  START UP  DIALOG  BOX   
 dbox  = setting (  
         0x32 << 3  ,     # WIDTH 
         0x64 >> 2  ,     # HEIGHT
@@ -41,13 +45,20 @@ dbox  = setting (
         0x05             # BORDER WIDTH
        ) 
 
+#  PARAMETER FOR  MIDDLEWARE  CHECKER  
+pb   = setting  (  
+       0x32  << 3  ,     # WIDTH 
+       0x64  >> 2  ,     # HEIGHT  
+       False       ,     # RESIZABLE 
+       0x05              # BORDER WIDTH
+       ) 
 
 def  current_dir_view ( actual_path  )  :   
     if sys.platform.__eq__("linux") :  
         p =  os.popen(f"tree {actual_path}").read()  
         return  p  
 
-def show_frame  ( mf  : Gtk.Window)  ->  None : 
+def show_frame  ( mf : Gtk.Window)  ->  None : 
     """ 
     show_frame  : Generic  function do display  frame 
     show  widget frame  
@@ -76,7 +87,8 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
     @return :  
     None  
     """
-    global  mut_label  
+    global  mut_label 
+    global  abs_path_dir_target  
     def_attr     =   Gtk.FileChooserAction.OPEN      \
                      if   chooser_type.lower().__eq__("file") \
                      else  Gtk.FileChooserAction.SELECT_FOLDER
@@ -109,7 +121,7 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
         fc_dialog.destroy()
 
 
-
+ 
 def dialog_box (main_frame : Gtk.Window)->  None : 
     """
     dialog_box :  display  little dialog Box  
@@ -117,8 +129,7 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     main_frame  :  Gtk.Window   ( the next frame called  on start event )  
     @return  : 
     None 
-    """
-
+   """
     dialog_frame  : Gtk.Window  =  Gtk.Window(title=f"{basename} {dbox.WIDTH}x{dbox.HEIGHT}")  
     dialog_frame.set_border_width(dbox.BORDER_WIDTH) 
     dialog_frame.set_default_size(dbox.WIDTH , dbox.HEIGHT) 
@@ -127,37 +138,40 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     #  box  layer  
     mainbox  : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
     
-    vbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)  
+    vbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)  
     hbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
     # logo  area 
     logo_label  : Gtk.Label  =  Gtk.Label()  
     logo_label.set_markup("<big> Gen  Assoc  </big>")
     logo_label.set_max_width_chars(78) 
 
+    choose_file : Gtk.Button = Gtk.Button(label=f"Browse {mut_label}") 
     # input entry  
     entry    : Gtk.Entry  =  Gtk.Entry()  
     #  TODO  :
     # [] read default path to   config  file  to file  this area 
     entry.set_text(os.getcwd()) 
-    vbox.pack_start(logo_label  , False, True , 0 )  
     vbox.pack_start(entry , True , True , 0 )  
-
+    vbox.pack_start(choose_file , False , True , 0 ) 
     # buttons   
     startbtn    : Gtk.Button = Gtk.Button(label="Start !")  
-    choose_file : Gtk.Button = Gtk.Button(label=f"Select {mut_label}") 
-    cancelbtn   : Gtk.Button = Gtk.Button(label="Close x") 
+    cancelbtn   : Gtk.Button = Gtk.Button(label="Abort x")
+
     
     # events
-    startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
+    # TODO  :  
+    # before  the main frame apparition  ->  show  progresse bar   #  middleware_checker 
+    #startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
+    startbtn.connect("clicked"   , middleware_checker , dialog_frame,  os.getcwd() )#     ,  dialog_frame) 
     choose_file.connect("clicked", chooser ,  entry ) 
     cancelbtn.connect("clicked"  ,  Gtk.main_quit)
     
 
     # box layer display   
-    hbox.pack_start(startbtn    , True , True , 0 ) 
-    hbox.pack_start(choose_file , True , True , 0 ) 
-    hbox.pack_start(cancelbtn   , True , True , 0 )
+    hbox.pack_start(startbtn    , True , False, 0 ) 
+    hbox.pack_start(cancelbtn   , True , False, 0 )
 
+    mainbox.pack_start(logo_label  , True , True , 0 ) 
     mainbox.pack_start(vbox   , True , True , 0 ) 
     mainbox.pack_start(hbox   , True , True , 0 ) 
     
@@ -193,11 +207,69 @@ def even_launch   ( btn_widget :  Gtk.Button)  ->  None  :
     print(f" =>    { state }  ")
 
 
-def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
-    
-    dbox_frame.destroy() 
 
-    main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename} {mw.WIDTH}x{mw.HEIGHT}")  
+ 
+call_count   : int = 0x000  
+def  on_timeout (
+        trigger : bool                      , 
+        activity_bar     : Gtk.ProgressBar  , 
+        main_container   : Gtk.Window       , 
+        dbox_frame       : Gtk.Window  
+        )  ->     bool   :   
+
+    global call_count  
+    call_count+=1 
+    print("0> " ,  call_count  ) 
+    trigger   =  (True , False)[call_count  >=  0x64 ]  # replace  0x64 by the  size of the folder  !  
+    if trigger : activity_bar.pulse() 
+    else  :  
+        activity_bar.set_text("laoding data ")  
+        activity_bar.set_show_text(True)  
+        sleep(2) 
+        main_container.destroy()
+        Gtk.main_quit()
+
+        #call  main frame   after  killin'  midchecker  
+        main_frame(dbox_frame)
+    return trigger  
+
+def middleware_checker ( 
+        start_btn_launcher  :  Gtk.Button ,
+        dbox                :  Gtk.Window,
+        abs_path_dir_target :  str )  ->  None   : 
+
+    """
+    check  the integrity of the folder if  it has all requirements available  
+    """  
+    main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}://{abs_path_dir_target} {pb.WIDTH}x{pb.HEIGHT}")  
+    main_pb.set_border_width(pb.BORDER_WIDTH)  
+    main_pb.set_default_size(pb.WIDTH , pb.HEIGHT)  
+    main_pb.set_resizable(pb.RESIZABLE) 
+    
+    vbox          : Gtk.Box            =  Gtk.Box (spacing =0x06   , orientation =  Gtk.Orientation.VERTICAL ) 
+    activity_bar  :  Gtk.ProgressBar   =  Gtk.ProgressBar()
+    activity_bar.pulse()  
+    trigger  =  True
+    
+    status: str  =  f"Scanning ... {abs_path_dir_target.split('/')[-1]}" 
+    activity_bar.set_text(status) 
+    activity_bar.set_show_text(True)  
+    
+    timout_id    =    GLib.timeout_add(0x64, on_timeout ,trigger ,  activity_bar  ,main_pb ,   dbox) 
+    if  trigger  == False  :   print("and of animation")
+
+    vbox.pack_start(activity_bar  , True ,True , 0  )   
+    main_pb.add(vbox) 
+    show_frame(main_pb) 
+     
+
+#def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
+def main_frame  (dbox_frame  : Gtk.Window)  -> None :
+    
+    dbox_frame.destroy()
+    Gtk.main_quit()  
+
+    main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename} ://  {abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
