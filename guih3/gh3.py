@@ -100,7 +100,7 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
     fc_dialog  : Gtk.FileChooserDialog  = Gtk.FileChooserDialog ( 
             title  =   f"please  select  a  {chooser_type} "  , 
             parent =   None ,   
-            action =   def_attr #Gtk.FileChooserAction.SELECT_FOLDER  if  chooser_type.__eq__(""
+            action =   def_attr 
             )
 
     fc_dialog.add_button(f"_{mut_label}" ,Gtk.ResponseType.OK) 
@@ -220,7 +220,7 @@ def  on_timeout (
     global call_count  
     call_count+=1 
     print("0> " ,  call_count  ) 
-    trigger   =  (True , False)[call_count  >=  0x64 ]  # replace  0x64 by the  size of the folder  !  
+    trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # replace  0x64 by the  size of the folder  !  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
@@ -263,20 +263,80 @@ def middleware_checker (
     show_frame(main_pb) 
      
 
+
+def kill_frame  (target_frame  :Gtk.Window )  :  
+    target_frame.destroy() 
+    Gtk.main_quit()  
+    
+
 #def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
-    dbox_frame.destroy()
-    Gtk.main_quit()  
+    kill_frame(dbox_frame) 
 
     main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename} ://  {abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
 
-    main_container: Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
+    master_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL)  
+    main_container: Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL )  
+
+    
+    file_viewer   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )
+    fa    = Gtk.Button(label="file area")   
+    file_viewer.pack_start (fa , True , True , 0 ) 
+    
+    container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL )  
+    setup_box     : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
+    choose_box    : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
+    # area detail  
+    # 
+    run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")  
+    
+    log_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
+
+    bottombox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
+    quit_bnt      : Gtk.Button =  Gtk.Button(label="Quit")  
+    quit_bnt.connect("clicked" , Gtk.main_quit)  
+    bottombox.pack_start(quit_bnt ,  True , False,0 )  
+
+
+    bnt1  =  Gtk.Button(label="1") 
+    bnt2  =  Gtk.Button(label="2") 
+    bnt2a =  Gtk.Button(label="2a") 
+    bnt2b =  Gtk.Button(label="2b") 
+    
+    setup_box.pack_start(bnt1 , True , True , 0  )  
+    setup_box.pack_start(bnt2 , True , True , 0  )  
+    choose_box.pack_start(bnt2a , True , True , 0  )  
+    choose_box.pack_start(bnt2b, True , True , 0  )
+    
+
+    bnt3  =  Gtk.Button(label="3")
+    log_container.pack_start(bnt3, True , True , 0 )   
+    
+    container_box.pack_start(setup_box , True , True , 0 )  
+    container_box.pack_start(choose_box , True , True , 0 ) 
+    container_box.pack_start(run_btn ,  True , True , 0 )
+    container_box.pack_start(log_container, True , True , 0 )   
+
+    main_container.pack_start(file_viewer , True  , True  ,  0 )  
+    main_container.pack_start(container_box , True , True , 0  )  
+    
+    master_container.pack_start(main_container ,  True ,True , 0 )
+    master_container.pack_start(bottombox, False,True ,  0 )  
+
+    
+    
+
+    
+    
+
+
     
     #  ------------  BOX  CONTAINER  LAYOUT -----  )
+    """  
     
     choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)
 
@@ -302,11 +362,11 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     summary_expender_area.set_expanded(True) 
      
     summary   :  Gtk.Label =  Gtk.Label() 
-    summary.set_text("""
+    summary.set_text("
 -> this  is  a simple  test
 -> bla bla  bla 
 -> bla bla bla again 
-            """) 
+            ") 
     summary_expender_area.add(summary)
     
     
@@ -329,16 +389,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     choicebox.pack_start(no_rbtn       , True  , True  , 0 )  
     choicebox.pack_start(validate_btn  , True  , False , 0 ) 
  
-    quit_bnt      : Gtk.Button =  Gtk.Button(label="Quit")  
-    quit_bnt.connect("clicked" , Gtk.main_quit)  
-    btnsbox.pack_start(quit_bnt ,  True , False,0 )  
-
-    
+        
     main_container.pack_start(choicebox , False, False , 0 ) 
     main_container.pack_start(slogbox   , True , True , 0 ) 
     main_container.pack_start(btnsbox   , False, False , 0 ) 
-    
-    main_window_frame.add(main_container) 
+    """  
+    main_window_frame.add(master_container) 
     
     
     show_frame(main_window_frame)  
