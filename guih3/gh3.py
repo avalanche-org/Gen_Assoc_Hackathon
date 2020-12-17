@@ -159,8 +159,6 @@ def dialog_box (main_frame : Gtk.Window)->  None :
 
     
     # events
-    # TODO  :  
-    # before  the main frame apparition  ->  show  progresse bar   #  middleware_checker 
     #startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
     startbtn.connect("clicked"   , middleware_checker , dialog_frame,  os.getcwd() )#     ,  dialog_frame) 
     choose_file.connect("clicked", chooser ,  entry ) 
@@ -288,10 +286,30 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     file_viewer.pack_start (fa , True , True , 0 ) 
     
     container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL )  
-    setup_box     : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
+    setup_box     : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL) 
+    # setup_box  component
+    #  combox box 
+    #  TODO  :  add   data  inside combo box    
+    ped_label     : Gtk.Label  =  Gtk.Label(label="ped :")  
+    ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
+    
+    med_label     : Gtk.Label  =  Gtk.Label(label="med :") 
+    med_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
+    
+    phen_label    :  Gtk.Label = Gtk.Label(label ="phen :") 
+    phen_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText()
+    
+    setup_box.pack_start(ped_label , True , True ,  0 )  
+    setup_box.pack_start(ped_cb    , True , True ,  0 )  
+    setup_box.pack_start(med_label , True , True ,  0 )  
+    setup_box.pack_start(med_cb    , True , True ,  0 )  
+    setup_box.pack_start(phen_label, True , True ,  0 )  
+    setup_box.pack_start(phen_cb   , True , True ,  0 )  
+
+
     choose_box    : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
-    # area detail  
-    # 
+    # check box  area 
+    
     run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")  
     
     log_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
@@ -306,9 +324,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     bnt2  =  Gtk.Button(label="2") 
     bnt2a =  Gtk.Button(label="2a") 
     bnt2b =  Gtk.Button(label="2b") 
-    
-    setup_box.pack_start(bnt1 , True , True , 0  )  
-    setup_box.pack_start(bnt2 , True , True , 0  )  
+
+
+
     choose_box.pack_start(bnt2a , True , True , 0  )  
     choose_box.pack_start(bnt2b, True , True , 0  )
     
@@ -316,7 +334,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     bnt3  =  Gtk.Button(label="3")
     log_container.pack_start(bnt3, True , True , 0 )   
     
-    container_box.pack_start(setup_box , True , True , 0 )  
+    container_box.pack_start(setup_box , False , False , 0 )  
     container_box.pack_start(choose_box , True , True , 0 ) 
     container_box.pack_start(run_btn ,  True , True , 0 )
     container_box.pack_start(log_container, True , True , 0 )   
