@@ -285,7 +285,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     fa    = Gtk.Button(label="file area")   
     file_viewer.pack_start (fa , True , True , 0 ) 
     
-    container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL )  
+    container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL ) 
+
     setup_box     : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL) 
     # setup_box  component
     #  combox box 
@@ -299,17 +300,36 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     phen_label    :  Gtk.Label = Gtk.Label(label ="phen :") 
     phen_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText()
     
+    load_btn     : Gtk.Button =  Gtk.Button(label="Load")  
+    
+    
     setup_box.pack_start(ped_label , True , True ,  0 )  
     setup_box.pack_start(ped_cb    , True , True ,  0 )  
     setup_box.pack_start(med_label , True , True ,  0 )  
     setup_box.pack_start(med_cb    , True , True ,  0 )  
     setup_box.pack_start(phen_label, True , True ,  0 )  
     setup_box.pack_start(phen_cb   , True , True ,  0 )  
-
+    setup_box.pack_start(load_btn  , True , True ,  0 )
 
     choose_box    : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
     # check box  area 
+    run_opts   : Dict[str , str ]    =  {  
+            "1" :  "Single Marker" ,
+            "2" :  "Multiple Marker"
+            }  
+    single_marker_rbtn       : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,f"{run_opts['1']}")  
+    single_marker_rbtn.connect("toggled" , rbtn_on_toggle)
+   
+    multiple_marker_rbtn     : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(single_marker_rbtn)  
+    multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
+    multiple_marker_rbtn.connect("toggled" , rbtn_on_toggle)
+
+    choose_box.pack_start(single_marker_rbtn , True, False  , 0  )  
+    choose_box.pack_start(multiple_marker_rbtn, True ,False, 0  )
     
+
+
+
     run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")  
     
     log_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
@@ -320,22 +340,14 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
 
 
-    bnt1  =  Gtk.Button(label="1") 
-    bnt2  =  Gtk.Button(label="2") 
-    bnt2a =  Gtk.Button(label="2a") 
-    bnt2b =  Gtk.Button(label="2b") 
+  
 
-
-
-    choose_box.pack_start(bnt2a , True , True , 0  )  
-    choose_box.pack_start(bnt2b, True , True , 0  )
-    
 
     bnt3  =  Gtk.Button(label="3")
     log_container.pack_start(bnt3, True , True , 0 )   
     
     container_box.pack_start(setup_box , False , False , 0 )  
-    container_box.pack_start(choose_box , True , True , 0 ) 
+    container_box.pack_start(choose_box , False, False, 0 ) 
     container_box.pack_start(run_btn ,  True , True , 0 )
     container_box.pack_start(log_container, True , True , 0 )   
 
