@@ -177,19 +177,20 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     
     show_frame(dialog_frame)  
 
-
 state  :  str  ="yes"   
 
-def rbtn_on_toggle  ( rbt_wiget  : Gtk.RadioButton ) ->   None :  
+def on_togglable_widget ( w_togglable ) ->   None :  
     """ 
     rbtn_on_toggle  :  get  the state  of radio button  on toggle event  
+    max arguments  2   
     @param    : 
     rbt_wiget :   Gtk.RadioButton  
     @return   :  
     None  
-    """
+    """ 
+
     global state  
-    state  =   (rbt_wiget.get_label() , rbt_wiget.get_label()) [rbt_wiget.get_active()]  
+    state  =   (w_togglable.get_label() , w_togglable.get_label()) [w_togglable.get_active()]  
     sys.stdout.write("{}\n".format(state)) 
  
 
@@ -204,8 +205,6 @@ def even_launch   ( btn_widget :  Gtk.Button)  ->  None  :
     """
     print(f" =>    { state }  ")
 
-
-
  
 call_count   : int = 0x000  
 def  on_timeout (
@@ -218,7 +217,7 @@ def  on_timeout (
     global call_count  
     call_count+=1 
     print("0> " ,  call_count  ) 
-    trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # replace  0x64 by the  size of the folder  !  
+    trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
@@ -254,7 +253,6 @@ def middleware_checker (
     activity_bar.set_show_text(True)  
     
     timout_id    =    GLib.timeout_add(0x64, on_timeout ,trigger ,  activity_bar  ,main_pb ,   dbox) 
-    if  trigger  == False  :   print("and of animation")
 
     vbox.pack_start(activity_bar  , True ,True , 0  )   
     main_pb.add(vbox) 
@@ -265,7 +263,18 @@ def middleware_checker (
 def kill_frame  (target_frame  :Gtk.Window )  :  
     target_frame.destroy() 
     Gtk.main_quit()  
-    
+
+
+def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None : 
+    """
+    switch_sync_inverted  :   make a syncronisation  of 2  switch wiget 
+    on/off  
+    """
+    state  : bool  =  switch_widget.get_active()  
+    ss_widget.set_active(not state)  
+  
+
+
 
 #def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
@@ -282,7 +291,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 
     
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )
-    fa    = Gtk.Button(label="file area")   
+    fa    = Gtk.Button(label="file area Viewer ")   
     file_viewer.pack_start (fa , True , True , 0 ) 
     
     container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL ) 
@@ -294,8 +303,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ped_label     : Gtk.Label  =  Gtk.Label(label="ped :")  
     ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
     
-    med_label     : Gtk.Label  =  Gtk.Label(label="med :") 
-    med_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
+    map_label     : Gtk.Label  =  Gtk.Label(label="map:") 
+    map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
     
     phen_label    :  Gtk.Label = Gtk.Label(label ="phen :") 
     phen_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText()
@@ -305,8 +314,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     setup_box.pack_start(ped_label , True , True ,  0 )  
     setup_box.pack_start(ped_cb    , True , True ,  0 )  
-    setup_box.pack_start(med_label , True , True ,  0 )  
-    setup_box.pack_start(med_cb    , True , True ,  0 )  
+    setup_box.pack_start(map_label , True , True ,  0 )  
+    setup_box.pack_start(map_cb    , True , True ,  0 )  
     setup_box.pack_start(phen_label, True , True ,  0 )  
     setup_box.pack_start(phen_cb   , True , True ,  0 )  
     setup_box.pack_start(load_btn  , True , True ,  0 )
@@ -318,20 +327,44 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
             "2" :  "Multiple Marker"
             }  
     single_marker_rbtn       : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,f"{run_opts['1']}")  
-    single_marker_rbtn.connect("toggled" , rbtn_on_toggle)
+    single_marker_rbtn.connect("toggled" , on_togglable_widget)
    
     multiple_marker_rbtn     : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(single_marker_rbtn)  
     multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
-    multiple_marker_rbtn.connect("toggled" , rbtn_on_toggle)
+    multiple_marker_rbtn.connect("toggled" , on_togglable_widget)
+
+    run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")
+  
 
     choose_box.pack_start(single_marker_rbtn , True, False  , 0  )  
     choose_box.pack_start(multiple_marker_rbtn, True ,False, 0  )
     
+    choose_box.pack_start(run_btn  ,  True , True, 0 )   
 
-
-
-    run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")  
+    tne_box   :  Gtk.Box  = Gtk.Box(spacing  = 0x06  , orientation = Gtk.Orientation.HORIZONTAL )  
     
+    # emperical  label 
+ 
+    # switch  button  to enable  emperical   
+    emp_label  : Gtk.Label =  Gtk.Label(label="Enable Emperical : ") 
+    enable_emperical : Gtk.Switch()  = Gtk.Switch ()
+    # by default  the emperical is desable   
+    enable_emperical.set_active(False)    
+     
+    th_label   : Gtk.Label =  Gtk.Label(label="Enable Theorical")   
+    enable_theorical  : Gtk.Switch()   =  Gtk.Switch()  
+    enable_theorical.set_active(True)  
+    enable_theorical.connect("notify::active" , switch_sync_inverted ,enable_emperical ) 
+    enable_emperical.connect("notify::active" , switch_sync_inverted ,enable_theorical )  
+     
+    tne_box.pack_start(emp_label , True , True , 0 )  
+    tne_box.pack_start(enable_emperical , True , True , 0 )  
+    tne_box.pack_start(th_label , True , True , 0 )  
+    tne_box.pack_start(enable_theorical , True , True , 0 )  
+    
+    
+
+   
     log_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
@@ -339,19 +372,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
 
-
-  
-
-
     bnt3  =  Gtk.Button(label="3")
     log_container.pack_start(bnt3, True , True , 0 )   
     
     container_box.pack_start(setup_box , False , False , 0 )  
     container_box.pack_start(choose_box , False, False, 0 ) 
-    container_box.pack_start(run_btn ,  True , True , 0 )
-    container_box.pack_start(log_container, True , True , 0 )   
+    container_box.pack_start(tne_box,  False ,  False  , 0 )
+    container_box.pack_start(log_container, True  ,True, 0 )   
 
-    main_container.pack_start(file_viewer , True  , True  ,  0 )  
+    main_container.pack_start(file_viewer , False  , True  ,  0 )  
     main_container.pack_start(container_box , True , True , 0  )  
     
     master_container.pack_start(main_container ,  True ,True , 0 )
