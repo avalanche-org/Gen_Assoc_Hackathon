@@ -15,11 +15,12 @@ from time import sleep
 from  typing  import List , Dict , Tuple  
 from  collections import  namedtuple 
 
-basename  :  str  = f"mTDT {__stage__} v{__version__}"  
+basename  :  str  = f"mTDT {__stage__} v{__version__}" 
+
+
 #  THIS  IS GLOBAL SETTING   
 #  EVERY FRAME  IS BASED ON THIS SETTING  
 #  YOU  CAN  ADD PROPERTY  ON THE LIST BELLOW  
-
 
 SETTING_PARAMS  :  List[str]   =  [ 
         "WIDTH", 
@@ -230,6 +231,9 @@ def  on_timeout (
         main_frame(dbox_frame)
     return trigger  
 
+
+abriged_path  =  lambda  abs_path  : abs_path.split("/")[-1]  
+
 def middleware_checker ( 
         start_btn_launcher  :  Gtk.Button ,
         dbox                :  Gtk.Window,
@@ -265,6 +269,7 @@ def kill_frame  (target_frame  :Gtk.Window )  :
     Gtk.main_quit()  
 
 
+
 def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None : 
     """
     switch_sync_inverted  :   make a syncronisation  of 2  switch wiget 
@@ -291,8 +296,14 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 
     
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )
-    fa    = Gtk.Button(label="file area Viewer ")   
-    file_viewer.pack_start (fa , True , True , 0 ) 
+   
+    _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {abriged_path(os.getcwd())}") #  TODO : replace  wd to  dir name 
+    _ff.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)  #  0x004   
+    expander      : Gtk.Expander =  Gtk.Expander(label="-----") #  TODO : replace  wd to  dir name
+    current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(os.getcwd())))  
+    expander.add(current_dir_content) 
+    _ff.add(expander)  
+    file_viewer.pack_start (_ff , True , True , 0 ) 
     
     container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL ) 
 
@@ -360,63 +371,70 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     tne_box.pack_start(emp_label , True , True , 0 )  
     tne_box.pack_start(enable_emperical , True , True , 0 )  
     tne_box.pack_start(th_label , True , True , 0 )  
-    tne_box.pack_start(enable_theorical , True , True , 0 )  
+    tne_box.pack_start(enable_theorical , True , True , 0 ) 
     
-    
+    marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = 0x006 ,  orientation=Gtk.Orientation.HORIZONTAL)  
 
-   
-    log_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
+    marker_frame    :  Gtk.Frame  =   Gtk.Frame(label="Marker Set")   
+    
+    setup_args_box  :  Gtk.Box    =   Gtk.Box(spacing =0x006 ,  orientation= Gtk.Orientation.VERTICAL)  
+    
+    nsim_box        :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    ncore_box       :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    pheno_box       :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    
+    nsim_label      :  Gtk.Label  =   Gtk.Label(label= "Nsims    :")  
+    ncore_label      :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
+    pheno_label     :  Gkt.Label  =   Gtk.Label(label= "Phenotype:")
+    
+    available_data  :  Gtk.ListStore = Gtk.ListStore(int , int )  
+
+    for    i ,  iA_  in  enumerate( range(0 ,10)) : available_data.append ([i  , iA_])  
+
+    nsim_cb         :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))    
+    ncore_cb        :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))   
+    pheno_cb        :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))   
+    
+    nsim_box.pack_start(nsim_label      , True , True , 0 ) 
+    nsim_box.pack_start(nsim_cb         , True , True , 0 ) 
+    
+    ncore_box.pack_start(ncore_label    , True , True , 0 ) 
+    ncore_box.pack_start(ncore_cb       , True , True , 0 ) 
+    
+    pheno_box.pack_start(pheno_label    , True , True , 0 )  
+    pheno_box.pack_start(pheno_cb       , True , True , 0 ) 
+    
+    setup_args_box.pack_start(nsim_box  , True , True , 0  ) 
+    setup_args_box.pack_start(ncore_box , True , True , 0  ) 
+    setup_args_box.pack_start(pheno_box , True , True , 0  ) 
+
+    marker_n_setarg.pack_start(setup_args_box, False , False , 0  ) 
+    marker_n_setarg.pack_start(marker_frame  , True , True , 0  )  
+    
+    log_container   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
-    quit_bnt      : Gtk.Button =  Gtk.Button(label="Quit")  
+    quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
 
-    bnt3  =  Gtk.Button(label="3")
-    log_container.pack_start(bnt3, True , True , 0 )   
+    log_frame       :  Gtk.Frame = Gtk.Frame(label=" Output  Log " )  
     
-    container_box.pack_start(setup_box , False , False , 0 )  
-    container_box.pack_start(choose_box , False, False, 0 ) 
-    container_box.pack_start(tne_box,  False ,  False  , 0 )
-    container_box.pack_start(log_container, True  ,True, 0 )   
+    log_container.pack_start(log_frame, True , True , 0 )   
+    
+    container_box.pack_start(setup_box       ,  False , False , 0 )  
+    container_box.pack_start(choose_box      ,  False , False , 0 ) 
+    container_box.pack_start(tne_box         ,  False , False , 0 )
+    container_box.pack_start(marker_n_setarg ,  False , False , 0 ) 
+    container_box.pack_start(log_container   ,  True  , True  , 0 )   
 
-    main_container.pack_start(file_viewer , False  , True  ,  0 )  
-    main_container.pack_start(container_box , True , True , 0  )  
+    main_container.pack_start(file_viewer    , False  , True  , 0 )  
+    main_container.pack_start(container_box  , True   , True  , 0 )  
     
-    master_container.pack_start(main_container ,  True ,True , 0 )
-    master_container.pack_start(bottombox, False,True ,  0 )  
+    master_container.pack_start(main_container  , True ,True  , 0 )
+    master_container.pack_start(bottombox       , False,True  , 0 )  
 
-    
-    
-
-    
-    
-
-
-    
-    #  ------------  BOX  CONTAINER  LAYOUT -----  )
-    """  
-    
-    choicebox     : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL)
-
-    label         : Gtk.Label        = Gtk.Label(label="Do you want to run Genotype Inference ?")  
-  
-    
-    yes_rbtn  : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,"yes")  
-    yes_rbtn.connect("toggled" , rbtn_on_toggle)
-   
-    no_rbtn      : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(yes_rbtn)  
-    no_rbtn.set_label("no") 
-    no_rbtn.connect("toggled" , rbtn_on_toggle)
-    
-    
-    validate_btn    : Gtk.Button    = Gtk.Button(label=f"Run")  
-    validate_btn.connect("clicked" , even_launch)  
-    
-    #SUB BOX  CONTAINER  THAT'S CONTAINER  FILES LISTER  AND SUMMARY
-    slogbox         : Gtk.Box       = Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)  
-
-    ## SUMMARY SECTION   
+    """
     summary_expender_area  :  Gtk.Expander   =  Gtk.Expander(label="Show Summary")  
     summary_expender_area.set_expanded(True) 
      
@@ -427,32 +445,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 -> bla bla bla again 
             ") 
     summary_expender_area.add(summary)
-    
-    
-    ## FILE LISTER  SECTION  
-    filelistbox   : Gtk.Box    = Gtk.Box(spacing=0x06 ,  orientation=Gtk.Orientation.VERTICAL )
-    dir  =  current_dir_view("/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/")
-    frame_viewer  : Gtk.Frame   =  Gtk.Frame(label=f"{dir}")   
-    
-    slogbox.pack_start(summary_expender_area , True ,True  ,  0 ) 
-    slogbox.pack_start(frame_viewer, True ,True ,  0 )   
-
-
-    # BUTTONS BOX  
-    btnsbox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
-
-    # -------------------
-
-    choicebox.pack_start(label         , True  , True  , 0 ) 
-    choicebox.pack_start(yes_rbtn      , True  , True  , 0 )  
-    choicebox.pack_start(no_rbtn       , True  , True  , 0 )  
-    choicebox.pack_start(validate_btn  , True  , False , 0 ) 
- 
-        
-    main_container.pack_start(choicebox , False, False , 0 ) 
-    main_container.pack_start(slogbox   , True , True , 0 ) 
-    main_container.pack_start(btnsbox   , False, False , 0 ) 
-    """  
+    """
     main_window_frame.add(master_container) 
     
     
