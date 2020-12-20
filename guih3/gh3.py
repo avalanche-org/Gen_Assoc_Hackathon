@@ -116,10 +116,9 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
         entry_widget.set_text( fc_dialog.get_filename())
         abs_path_dir_target =fc_dialog.get_filename()  
         
-        fc_dialog.destroy()
+    
+    fc_dialog.destroy()
         
-    else  : 
-        fc_dialog.destroy()
 
 
  
@@ -157,7 +156,6 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     # buttons   
     startbtn    : Gtk.Button = Gtk.Button(label="Start !")  
     cancelbtn   : Gtk.Button = Gtk.Button(label="Abort x")
-
     
     # events
     #startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
@@ -165,7 +163,6 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     choose_file.connect("clicked", chooser ,  entry ) 
     cancelbtn.connect("clicked"  ,  Gtk.main_quit)
     
-
     # box layer display   
     hbox.pack_start(startbtn    , True , False, 0 ) 
     hbox.pack_start(cancelbtn   , True , False, 0 )
@@ -217,7 +214,7 @@ def  on_timeout (
 
     global call_count  
     call_count+=1 
-    print("0> " ,  call_count  ) 
+    print("0> " ,  call_count  )
     trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
     if trigger : activity_bar.pulse() 
     else  :  
@@ -369,15 +366,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     enable_emperical.connect("notify::active" , switch_sync_inverted ,enable_theorical )  
      
     tne_box.pack_start(emp_label , True , True , 0 )  
-    tne_box.pack_start(enable_emperical , True , True , 0 )  
+    tne_box.pack_start(enable_emperical , False,False, 0 )  
     tne_box.pack_start(th_label , True , True , 0 )  
-    tne_box.pack_start(enable_theorical , True , True , 0 ) 
+    tne_box.pack_start(enable_theorical , False ,False , 0 ) 
     
     marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = 0x006 ,  orientation=Gtk.Orientation.HORIZONTAL)  
 
     marker_frame    :  Gtk.Frame  =   Gtk.Frame(label="Marker Set")   
     
-    setup_args_box  :  Gtk.Box    =   Gtk.Box(spacing =0x006 ,  orientation= Gtk.Orientation.VERTICAL)  
+    setup_args_box  :  Gtk.Box    =   Gtk.Box(spacing =0x0F,  orientation= Gtk.Orientation.VERTICAL)  
     
     nsim_box        :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
     ncore_box       :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
