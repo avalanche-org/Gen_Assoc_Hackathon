@@ -5,8 +5,9 @@ __version__: str  = "1.0.1"
 __stage__  : str  = "alpha"  
 
 """  
- !! DISCLAIMER HERE  !! 
-"""
+This programme require   to use  python3+  
+LICENSE  HERE !!  
+""" 
 import os , sys , gi , argparse    
 gi.require_version("Gtk" , "3.0")  
 from gi.repository import  Gtk , GLib
@@ -17,10 +18,11 @@ from  collections import  namedtuple
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
+BOX_SPACING  : int  =   0x06 
 
-#  THIS  IS GLOBAL SETTING   
-#  EVERY FRAME  IS BASED ON THIS SETTING  
-#  YOU  CAN  ADD PROPERTY  ON THE LIST BELLOW  
+#THIS  IS GLOBAL SETTING   
+#+EVERY FRAME  IS BASED ON THIS SETTING  
+#+YOU  CAN  ADD PROPERTY  ON THE LIST BELLOW  
 
 SETTING_PARAMS  :  List[str]   =  [ 
         "WIDTH", 
@@ -54,10 +56,11 @@ pb   = setting  (
        0x05              # BORDER WIDTH
        ) 
 
+#TODO  : figure out this function  to make  it  more  adptable for each os  
 def  current_dir_view ( actual_path  )  :   
     if sys.platform.__eq__("linux") :  
         p =  os.popen(f"tree {actual_path}").read()  
-        return  p  
+        return  p 
 
 def show_frame  ( mf : Gtk.Window)  ->  None : 
     """ 
@@ -77,7 +80,8 @@ default_file  : str  = str ()
 
 mut_label : str = str () 
 
-abs_path_dir_target  :str  =   str()  
+abs_path_dir_target  :str  =  os.getcwd()  # start where   u'r
+
 def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type  :str  = "directory")  -> None : 
     """ 
     file_chooser  :  file chooser wiget  
@@ -115,16 +119,12 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
         default_file =  fc_dialog.get_filename()  
         entry_widget.set_text( fc_dialog.get_filename())
         abs_path_dir_target =fc_dialog.get_filename()  
-        
-    
     fc_dialog.destroy()
-        
-
 
  
 def dialog_box (main_frame : Gtk.Window)->  None : 
     """
-    dialog_box :  display  little dialog Box  
+    dialog_box :  display  little dialog Box   
     @param  : 
     main_frame  :  Gtk.Window   ( the next frame called  on start event )  
     @return  : 
@@ -135,11 +135,12 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     dialog_frame.set_default_size(dbox.WIDTH , dbox.HEIGHT) 
     dialog_frame.set_resizable(dbox.RESIZABLE)  
      
+   
     #  box  layer  
-    mainbox  : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.VERTICAL) 
+    mainbox  : Gtk.Box  =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.VERTICAL) 
     
-    vbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)  
-    hbox     : Gtk.Box  =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
+    vbox     : Gtk.Box  =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    hbox     : Gtk.Box  =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     # logo  area 
     logo_label  : Gtk.Label  =  Gtk.Label()  
     logo_label.set_markup("<big> Gen  Assoc  </big>")
@@ -150,7 +151,7 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     entry    : Gtk.Entry  =  Gtk.Entry()  
     #  TODO  :
     # [] read default path to   config  file  to file  this area 
-    entry.set_text(os.getcwd()) 
+    entry.set_text(abs_path_dir_target) 
     vbox.pack_start(entry , True , True , 0 )  
     vbox.pack_start(choose_file , False , True , 0 ) 
     # buttons   
@@ -159,8 +160,8 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     
     # events
     #startbtn.connect("clicked"   , main_frame      ,  dialog_frame) 
-    startbtn.connect("clicked"   , middleware_checker , dialog_frame,  os.getcwd() )#     ,  dialog_frame) 
-    choose_file.connect("clicked", chooser ,  entry ) 
+    choose_file.connect("clicked", chooser ,  entry )
+    startbtn.connect("clicked"   , middleware_checker , dialog_frame,  entry )#     ,  dialog_frame) 
     cancelbtn.connect("clicked"  ,  Gtk.main_quit)
     
     # box layer display   
@@ -180,13 +181,11 @@ state  :  str  ="yes"
 def on_togglable_widget ( w_togglable ) ->   None :  
     """ 
     rbtn_on_toggle  :  get  the state  of radio button  on toggle event  
-    max arguments  2   
     @param    : 
     rbt_wiget :   Gtk.RadioButton  
     @return   :  
     None  
     """ 
-
     global state  
     state  =   (w_togglable.get_label() , w_togglable.get_label()) [w_togglable.get_active()]  
     sys.stdout.write("{}\n".format(state)) 
@@ -207,14 +206,15 @@ def even_launch   ( btn_widget :  Gtk.Button)  ->  None  :
 call_count   : int = 0x000  
 def  on_timeout (
         trigger : bool                      , 
-        activity_bar     : Gtk.ProgressBar  , 
+        activity_bar     : Gtk.ProgressBar  ,  
+        dir_size         : int              ,  
         main_container   : Gtk.Window       , 
         dbox_frame       : Gtk.Window  
         )  ->     bool   :   
 
     global call_count  
     call_count+=1 
-    print("0> " ,  call_count  )
+    print("0> " ,  call_count  ) 
     trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
     if trigger : activity_bar.pulse() 
     else  :  
@@ -229,33 +229,60 @@ def  on_timeout (
     return trigger  
 
 
+#  get  the  last folder  name e.g  /home/../../folder_name - >  get  only the  folder_name 
 abriged_path  =  lambda  abs_path  : abs_path.split("/")[-1]  
-
+working_dir   =  abriged_path(abs_path_dir_target)  
+ 
 def middleware_checker ( 
         start_btn_launcher  :  Gtk.Button ,
-        dbox                :  Gtk.Window,
-        abs_path_dir_target :  str )  ->  None   : 
+        dbox                :  Gtk.Window ,
+        entry               :  Gtk.Entry  , 
+        )  ->  None   : 
 
-    """
+    """ 
     check  the integrity of the folder if  it has all requirements available  
     """  
-    main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}://{abs_path_dir_target} {pb.WIDTH}x{pb.HEIGHT}")  
+    global  working_dir  
+    
+    working_dir     = abriged_path(entry.get_text())  
+     
+    main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}: {working_dir} {pb.WIDTH}x{pb.HEIGHT}")  
     main_pb.set_border_width(pb.BORDER_WIDTH)  
     main_pb.set_default_size(pb.WIDTH , pb.HEIGHT)  
     main_pb.set_resizable(pb.RESIZABLE) 
     
-    vbox          : Gtk.Box            =  Gtk.Box (spacing =0x06   , orientation =  Gtk.Orientation.VERTICAL ) 
+    vbox          : Gtk.Box            =  Gtk.Box (spacing =BOX_SPACING   , orientation =  Gtk.Orientation.VERTICAL ) 
     activity_bar  :  Gtk.ProgressBar   =  Gtk.ProgressBar()
     activity_bar.pulse()  
     trigger  =  True
     
-    status: str  =  f"Scanning ... {abs_path_dir_target.split('/')[-1]}" 
+    status: str  =  f"Scanning ... {working_dir}  Directory"  
     activity_bar.set_text(status) 
     activity_bar.set_show_text(True)  
     
-    timout_id    =    GLib.timeout_add(0x64, on_timeout ,trigger ,  activity_bar  ,main_pb ,   dbox) 
+    dir_size   =   0x64    #  TODO  :  do not forget to import  fileOps . get_size_of_directory    
+    timout_id  =    GLib.timeout_add(
+            0x64          ,  # loop call  
+            on_timeout    ,  # callbacck 
+            trigger       ,  
+            activity_bar  ,  
+            dir_size      ,
+            main_pb       ,      
+            dbox
+            )  
 
-    vbox.pack_start(activity_bar  , True ,True , 0  )   
+    logo_label  : Gtk.Label  =  Gtk.Label()  
+    logo_label.set_markup("<big> Gen  Assoc  </big>")
+    logo_label.set_max_width_chars(78)  
+    
+    small_status  :Gtk.Label = Gtk.Label() 
+    small_status.set_markup("<small> Please Wait ... </small>")  
+    small_status.set_max_width_chars(0xa)  
+    
+    vbox.pack_start(logo_label ,  True , True  , 0  )  
+    vbox.pack_start(activity_bar  , True ,True , 0  )
+    vbox.pack_start(small_status, True , True ,  0 ) 
+
     main_pb.add(vbox) 
     show_frame(main_pb) 
      
@@ -278,33 +305,33 @@ def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None :
 
 
 
-#def main_frame  ( open_from_dialog :Gtk.Button  , dbox_frame  : Gtk.Window)  -> None :
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     kill_frame(dbox_frame) 
-
-    main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename} ://  {abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
+    
+    w_d  = abriged_path(abs_path_dir_target)
+    main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename}:{abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
-
-    master_container : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL)  
-    main_container: Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL )  
+     
+    master_container : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL)  
+    main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
 
     
-    file_viewer   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )
+    file_viewer   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )
    
-    _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {abriged_path(os.getcwd())}") #  TODO : replace  wd to  dir name 
+    _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}") #  TODO : replace  wd to  dir name 
     _ff.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)  #  0x004   
     expander      : Gtk.Expander =  Gtk.Expander(label="-----") #  TODO : replace  wd to  dir name
-    current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(os.getcwd())))  
+    current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(abs_path_dir_target)))  
     expander.add(current_dir_content) 
     _ff.add(expander)  
     file_viewer.pack_start (_ff , True , True , 0 ) 
     
     container_box : Gtk.Box    =  Gtk.Box(spacing=0xA   , orientation = Gtk.Orientation.VERTICAL ) 
 
-    setup_box     : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL) 
+    setup_box     : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL) 
     # setup_box  component
     #  combox box 
     #  TODO  :  add   data  inside combo box    
@@ -328,7 +355,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     setup_box.pack_start(phen_cb   , True , True ,  0 )  
     setup_box.pack_start(load_btn  , True , True ,  0 )
 
-    choose_box    : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.HORIZONTAL)  
+    choose_box    : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL)  
     # check box  area 
     run_opts   : Dict[str , str ]    =  {  
             "1" :  "Single Marker" ,
@@ -349,7 +376,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     choose_box.pack_start(run_btn  ,  True , True, 0 )   
 
-    tne_box   :  Gtk.Box  = Gtk.Box(spacing  = 0x06  , orientation = Gtk.Orientation.HORIZONTAL )  
+    tne_box   :  Gtk.Box  = Gtk.Box(spacing  = BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
     
     # emperical  label 
  
@@ -370,15 +397,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     tne_box.pack_start(th_label , True , True , 0 )  
     tne_box.pack_start(enable_theorical , False ,False , 0 ) 
     
-    marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = 0x006 ,  orientation=Gtk.Orientation.HORIZONTAL)  
+    marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = BOX_SPACING ,  orientation=Gtk.Orientation.HORIZONTAL)  
 
     marker_frame    :  Gtk.Frame  =   Gtk.Frame(label="Marker Set")   
     
     setup_args_box  :  Gtk.Box    =   Gtk.Box(spacing =0x0F,  orientation= Gtk.Orientation.VERTICAL)  
     
-    nsim_box        :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
-    ncore_box       :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
-    pheno_box       :  Gtk.Box    =   Gtk.Box(spacing = 0x006 ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    nsim_box        :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    ncore_box       :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
+    pheno_box       :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
     
     nsim_label      :  Gtk.Label  =   Gtk.Label(label= "Nsims    :")  
     ncore_label      :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
@@ -408,9 +435,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_n_setarg.pack_start(setup_args_box, False , False , 0  ) 
     marker_n_setarg.pack_start(marker_frame  , True , True , 0  )  
     
-    log_container   : Gtk.Box    =  Gtk.Box(spacing=0x06  , orientation = Gtk.Orientation.VERTICAL )  
+    log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
 
-    bottombox       : Gtk.Box    =  Gtk.Box(spacing=0x06 ,  orientation= Gtk.Orientation.HORIZONTAL)
+    bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
@@ -431,23 +458,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     master_container.pack_start(main_container  , True ,True  , 0 )
     master_container.pack_start(bottombox       , False,True  , 0 )  
 
-    """
-    summary_expender_area  :  Gtk.Expander   =  Gtk.Expander(label="Show Summary")  
-    summary_expender_area.set_expanded(True) 
-     
-    summary   :  Gtk.Label =  Gtk.Label() 
-    summary.set_text("
--> this  is  a simple  test
--> bla bla  bla 
--> bla bla bla again 
-            ") 
-    summary_expender_area.add(summary)
-    """
     main_window_frame.add(master_container) 
     
-    
     show_frame(main_window_frame)  
-
 
 def main   ()  -> None :  
      

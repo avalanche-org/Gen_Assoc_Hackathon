@@ -79,10 +79,10 @@ class  FileOps  :
         pass  
     
 
-
-
+"""
+#  TESTING  ZONE 
 def  main  () :
-    
+     
     previews_Dir = "../Environment" 
     f  = FileOps("../Environment") 
     print("---> "  , f.get_size_of_directory())
@@ -96,3 +96,4 @@ def  main  () :
 
 if __name__.__eq__("__main__")  :  
      main () 
+"""
