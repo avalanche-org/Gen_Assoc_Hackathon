@@ -9,6 +9,7 @@ from  glob import glob
 
 class  FileOps  : 
       
+    MAX_DEEP =  0X03
     def __init__ ( self , working_directory )  :  
         self.curdir  =  working_directory 
     
@@ -31,11 +32,13 @@ class  FileOps  :
         dir_  = self.curdir if  deep_folder is None else  deep_folder 
         try :  
             for __entry__  in os.scandir(deep_folder)  :  
-                
+                if  self.MAX_DEEP.__eq__(0x00)  :  break 
                 if __entry__.is_file()  : 
                     total_byte+= __entry__.stat().st_size  
                 if __entry__.is_dir()  : 
+                    self.MAX_DEEP-=1  
                     total_byte+=self.get_size_of_directory(deep_folder)  
+                    
 
         except   NotADirectoryError  :
             sys.stderr.write("{} is  not a folder".format(self.curdir)) 

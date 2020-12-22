@@ -14,7 +14,10 @@ from gi.repository import  Gtk , GLib
 
 from time import sleep 
 from  typing  import List , Dict , Tuple  
-from  collections import  namedtuple 
+from  collections import  namedtuple
+
+from  fileOps  import  FileOps  
+
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
@@ -77,8 +80,7 @@ def show_frame  ( mf : Gtk.Window)  ->  None :
     Gtk.main()
 
 default_file  : str  = str ()  
-
-mut_label : str = str () 
+mut_label     : str  = str () 
 
 abs_path_dir_target  :str  =  os.getcwd()  # start where   u'r
 
@@ -231,8 +233,8 @@ def  on_timeout (
 
 #  get  the  last folder  name e.g  /home/../../folder_name - >  get  only the  folder_name 
 abriged_path  =  lambda  abs_path  : abs_path.split("/")[-1]  
-working_dir   =  abriged_path(abs_path_dir_target)  
- 
+working_dir   =  abriged_path(abs_path_dir_target)   
+__fops__      =  None   
 def middleware_checker ( 
         start_btn_launcher  :  Gtk.Button ,
         dbox                :  Gtk.Window ,
@@ -243,9 +245,9 @@ def middleware_checker (
     check  the integrity of the folder if  it has all requirements available  
     """  
     global  working_dir  
-    
-    working_dir     = abriged_path(entry.get_text())  
-     
+    global  __fops__  
+    working_dir     =  abriged_path(entry.get_text())  
+    __fops__        =  FileOps(entry.get_text())  
     main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}: {working_dir} {pb.WIDTH}x{pb.HEIGHT}")  
     main_pb.set_border_width(pb.BORDER_WIDTH)  
     main_pb.set_default_size(pb.WIDTH , pb.HEIGHT)  
@@ -260,7 +262,8 @@ def middleware_checker (
     activity_bar.set_text(status) 
     activity_bar.set_show_text(True)  
     
-    dir_size   =   0x64    #  TODO  :  do not forget to import  fileOps . get_size_of_directory    
+    dir_size   =  __fops__.get_size_of_directory()  # 0x64    #  TODO  :  do not forget to import  fileOps . get_size_of_directory    
+    print("size -  > " , dir_size )  
     timout_id  =    GLib.timeout_add(
             0x64          ,  # loop call  
             on_timeout    ,  # callbacck 
@@ -286,13 +289,9 @@ def middleware_checker (
     main_pb.add(vbox) 
     show_frame(main_pb) 
      
-
-
 def kill_frame  (target_frame  :Gtk.Window )  :  
     target_frame.destroy() 
     Gtk.main_quit()  
-
-
 
 def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None : 
     """
@@ -301,8 +300,19 @@ def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None :
     """
     state  : bool  =  switch_widget.get_active()  
     ss_widget.set_active(not state)  
-  
 
+   
+def iter_stores  (  entry_data  ,  storage_input : Gtk.ListStore  )  -> None : 
+    for data  in entry_data  : 
+        storage_input.append([data])  
+             
+    
+def on_combox_change ( combo_box_wiget  : Gtk.ComboBox  ) -> None  :
+    iter_list  =  combo_box_wiget.get_active_iter() 
+    if iter_list  is not  None :   
+        model      = combo_box_wiget.get_model() 
+        file_type  = model[iter_list][0x00] 
+        print(f"you selected - >  {file_type}") 
 
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
@@ -314,14 +324,13 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
-     
+
     master_container : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL)  
     main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
-
     
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )
    
-    _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}") #  TODO : replace  wd to  dir name 
+    _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}")   
     _ff.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)  #  0x004   
     expander      : Gtk.Expander =  Gtk.Expander(label="-----") #  TODO : replace  wd to  dir name
     current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(abs_path_dir_target)))  
@@ -335,16 +344,52 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     # setup_box  component
     #  combox box 
     #  TODO  :  add   data  inside combo box    
-    ped_label     : Gtk.Label  =  Gtk.Label(label="ped :")  
-    ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
+    ped_files     : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("ped") ]  
+    map_files     : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("map") ] 
+    phen_files    : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("phen")]   
+    # DEBUG  PRINT 
+    print("Debug -  < " ,  ped_files )  
     
-    map_label     : Gtk.Label  =  Gtk.Label(label="map:") 
-    map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText() 
+    #  TODO :   make controlle to ensure  all  required files are present  in the  directory  
+    ext_req  :  List [ str ]   =   [  "ped" , "map",  "phen" ]  
+     
+    for type_ext ,  F  in   enumerate ([  ped_files ,  map_files ,  phen_files ]):  
+        if   F.__len__() == 0  :  
+            sys.stderr.write("missing   .{}  files  \n ".format(ext_req[type_ext]))
+            sys.stderr.write("files requirements are satisfied \n")
+            
+    render_text_tooltip_for_ped  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
+    render_text_tooltip_for_map  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
+    render_text_tooltip_for_phen :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
     
-    phen_label    :  Gtk.Label = Gtk.Label(label ="phen :") 
-    phen_cb        : Gtk.ComboBoxText  =  Gtk.ComboBoxText()
+
+    ped_stores    : Gtk.ListStore     =  Gtk.ListStore(str) 
+    map_stores    : Gtk.ListStore     =  Gtk.ListStore(str)  
+    phen_stores   : Gtk.ListStore     =  Gtk.ListStore(str) 
     
-    load_btn     : Gtk.Button =  Gtk.Button(label="Load")  
+    iter_stores(ped_files ,  ped_stores) 
+    iter_stores(map_files ,  map_stores) 
+    iter_stores(phen_files,  phen_stores) 
+
+    
+    ped_label     : Gtk.Label         =  Gtk.Label(label="ped :")  
+    ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(ped_stores)   
+    ped_cb.pack_start(render_text_tooltip_for_ped , True )  
+    ped_cb.add_attribute (render_text_tooltip_for_ped ,  "text" ,  0 )  
+    
+
+    map_label     : Gtk.Label         =  Gtk.Label(label="map:") 
+    map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(map_stores) 
+    map_cb.pack_start(render_text_tooltip_for_map , True  ) 
+    map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 )  
+    
+    phen_label    :  Gtk.Label        =  Gtk.Label(label ="phen :") 
+    phen_cb       : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(phen_stores)
+    phen_cb.pack_start(render_text_tooltip_for_phen , True) 
+    phen_cb.add_attribute(render_text_tooltip_for_phen ,  "text" , 0 ) 
+
+
+    load_btn      : Gtk.Button        =  Gtk.Button(label="Load")  
     
     
     setup_box.pack_start(ped_label , True , True ,  0 )  
