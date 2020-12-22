@@ -65,6 +65,47 @@ def  current_dir_view ( actual_path  )  :
         p =  os.popen(f"tree {actual_path}").read()  
         return  p 
 
+
+def generic_alert_dialog  ( level_warning ,  mesg   , second_mesg  =   None   ) -> Gtk.ResponseType :  
+    level_warning  =  level_warning.lower()  
+    iweq  : Dict[str, Dict[str ,Gtk] ] =   {  
+            "info":   { 
+                "message_type"  : Gtk.MessageType.INFO , 
+                "buttons"       : Gtk.ButtonsType.OK, 
+                "text"          : mesg
+                } , 
+            "warning" : {  
+                "message_type"  : Gtk.MessageType.WARNING , 
+                "buttons"       : Gtk.ButtonsType.OK_CANCEL, 
+                "text"          : mesg
+                } , 
+            "error"   :   { 
+                "message_type"  : Gtk.MessageType.WARNING , 
+                "buttons"       : Gtk.ButtonsType.CANCEL,
+                "text"          : mesg 
+                } ,
+            "question":{
+                "message_type"  : Gtk.MessageType.WARNING , 
+                "buttons"       : Gtk.ButtonsType.YES_NO,
+                "text"          : mesg  
+                } 
+            }
+                
+    assert  iweq.keys().__contains__(level_warning)  
+    dbmesg  : Gtk.MessageDialog  =   Gtk.MessageDialog ( 
+            transient_for =  None ,  
+            flags         =  0x00 , 
+            message_type  =  iweq[level_warning]["message_type"] , 
+            buttons       =  iweq[level_warning]["buttons"],
+            text          =  iweq[level_warning]["text"]  
+            )
+    if  second_mesg  is not None  :  dbmesg.format_secondary_text(second_mesg) 
+    resp  =  dbmesg.run()
+    dbmesg.destroy()  
+    return resp  #  Gtk.ResponseType.OK CANCEL YES NO   
+    
+
+
 def show_frame  ( mf : Gtk.Window)  ->  None : 
     """ 
     show_frame  : Generic  function do display  frame 
@@ -352,16 +393,22 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     #  TODO :   make controlle to ensure  all  required files are present  in the  directory  
     ext_req  :  List [ str ]   =   [  "ped" , "map",  "phen" ]  
-     
+    
+    not_statified =  False  
     for type_ext ,  F  in   enumerate ([  ped_files ,  map_files ,  phen_files ]):  
         if   F.__len__() == 0  :  
-            sys.stderr.write("missing   .{}  files  \n ".format(ext_req[type_ext]))
-            sys.stderr.write("files requirements are satisfied \n")
+            not_statified  =  True  
+
+    if  not_statified :  
+        generic_alert_dialog(
+                "warning"  , 
+                "Unsatified Files Requierments " ,
+                "Files requirements are not  satisfied"
+                )
             
     render_text_tooltip_for_ped  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_map  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_phen :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
-    
 
     ped_stores    : Gtk.ListStore     =  Gtk.ListStore(str) 
     map_stores    : Gtk.ListStore     =  Gtk.ListStore(str)  
