@@ -38,8 +38,8 @@ setting   = namedtuple("setting" , SETTING_PARAMS)
 
 #  PARAMETER  DEFINITION FOR MAIN WINDOW  
 mw = setting(
-        0x32 << 4  ,     #  WIDTH 
-        0x258      ,     #  HEIGHT 
+        0x3e8      ,     #  WIDTH 
+        0x320      ,     #  HEIGHT 
         False      ,     #  RESIZABLE
         0x0a             #  BORDER  WIDTH  
         )             
@@ -367,8 +367,14 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     main_window_frame.set_resizable(mw.RESIZABLE)
 
     master_container : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL)  
-    main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
+    #  LOGO  TITLE  HEADER  
+    logo_label  : Gtk.Label  =  Gtk.Label()  
+    logo_label.set_markup("<big> Gen  Assoc  </big>")
+    logo_label.set_max_width_chars(78)  
     
+    main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
+
+
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )
    
     _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}")   
@@ -546,7 +552,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 
     main_container.pack_start(file_viewer    , False  , True  , 0 )  
     main_container.pack_start(container_box  , True   , True  , 0 )  
-    
+   
+    master_container.pack_start(logo_label      , False, True , 0 )
     master_container.pack_start(main_container  , True ,True  , 0 )
     master_container.pack_start(bottombox       , False,True  , 0 )  
 
