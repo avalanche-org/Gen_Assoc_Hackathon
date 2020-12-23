@@ -8,13 +8,12 @@
 
 #-------  This is a script to test m-TDT and genotype_inference tools
 
-#    ---  A family-based sample is provided in the GitHub repository: malaria_senegal
-#    ---  Data description: 2000 snps of 481 individuals
+#    ---  Family-based samples are provided in the GitHub repository
+#    ---  in directory: "25markers.zip" | "genotype_inference.zip" | "mTDT.zip" | "summary.R" 
 
 #    ---  If you running script on your own data make sure to have clean data
 #    ---  with 0 mendelian or heterozygous haplotypes errors
-#    ---  in PLINK file format: ped , map, phen
-
+#    ---  input file format: ped , map, phen : cf README.pdf
 
 #         Should a problem occur, contact : NdeyeMarieme.top@pasteur.sn
 
@@ -22,12 +21,19 @@
 rm(list = ls())
 
 
-#-------  FUNCTIONS
-#-------------------------------------------------------------------
 
+path = system("pwd", intern = T)
+setwd(path)
+plink_ = "/home/g4bbm/tools/Plink/plink"
+data_= "25markers"
+
+# Change path to plink in genoInference.R at line 48
+
+#   ---  Functions
 
 merge_out_files <- function(){
-  # --- This function merges genoInference.R's outputs
+  
+  # --- Merge genoInference.R's outputs
   
   merged_files = read.delim(paste0("out1.ped"), header = F, stringsAsFactors = F)
   
@@ -44,7 +50,8 @@ merge_out_files <- function(){
 }
 
 completePedigree <- function(dbwork){
-  # --- This function prepares ped file for m-TDT run
+  
+  # --- Prepare ped file for m-TDT run
   
   fathers = unique(setdiff(unique(dbwork$V3), dbwork$V2))
   fathers = fathers[!(fathers%in%c("0"))]
@@ -65,199 +72,126 @@ completePedigree <- function(dbwork){
   return(dataset)
 }
 
-run_recursive_gi <- function(filename, cutsize, nbcores){
-  #   ----  This function runs Genotype inference on ped file until there is no more snps to infer
-  gain = 1
-  run = 0
-  while (gain != 0){
-    
-    run = run + 1
-    
-    ped = read.delim(paste0(filename,".ped"), header = F, stringsAsFactors = F)
-    
-    cat("\n---- Run n°:", run, "\n","\t Running genotype inference on:", filename, "\n")
-    
-    system(paste0("Rscript genoInference.R --file ", filename, " --cutsize ", cutsize, " --cores ", nbcores), wait = T, intern = F)
-    #system("sleep 20", wait = T, intern = F)
-    
-    cat("Merging files..\n \t Done. \n")
-    ped_gi = merge_out_files()
-    
-    
-    system("rm out*")
-    cat("\n--- Run ",run, " finished", "\n\n")
-    
-    
-    gain = (length(ped[ped == '0 0'])) - (length(ped_gi[ped_gi== '0 0']))
-    
-    cat(" Total number of snps in - malaria_senegal set :\t", nrow(ped)* (ncol(ped)-6), "\n",
-        "Missing Values in 'Before'- malaria_senegal set :\t", length(ped[ped == '0 0']), "\n",
-        "Missing Values in 'After'- malaria_senegal set :\t", length(ped_gi[ped_gi== '0 0']), "\n",
-        '==>  Number of inferred genotype :\t\t\t', gain )
-    
-    if (gain != 0){
-      
-      write.table(ped_gi,file = paste0("sample_",run,".ped"),
-                  quote = F, col.names = F, row.names = F, sep = "\t")
-      
-      cmd = paste0("cp ",filename,".map sample_",run,".map")
-      system(cmd)
-      
-      filename = paste0("sample_",run)
-      cat("\n\nTrying to infer more snps..\n")
-    }
-    
-    else {
-      cat("\n\nReached maximum number of inferred snps. \nBye!")
-    }
-    
-  }
-  
-}
+#   ---  Files
 
+system("unzip mTDT.zip; mkdir mTDT/; mv MTDT_* README.txt README.pdf __MAC* mTDT/; cp -r libs mtdt.R mTDT/;cp -r libs mtdt.R mTDT/")
 
-#-------  PREPARE ENVIRONMENT
-#-------------------------------------------------------------------
+system("mkdir genotype_inference; unzip genotype_inference.zip")   # -- no GI
+system("mv __MACOSX* README.* documentation.* genotype_inference/; cp genoI* mendel* genotype_inference/")
 
-#    ---  set paths
+system(paste0("unzip ", data_,".zip"))
+data_= "sample"
 
-setwd("/home/mtop/gi/")                                 
-plink_ = "/home/g4bbm/tools/Plink/plink"
-  
-# Change path to plink in genoInference.R at line 48
+ped = read.delim(paste0(data_,".ped"), header = F , stringsAsFactors = F)
+map = read.delim(paste0(data_,".map"), header = F , stringsAsFactors = F)
+phen = read.delim(paste0(data_,".phen"), header = F , stringsAsFactors = F)
 
-#   --- unzip files
-
-system("unzip genotype_inference.zip")
-system("unzip mTDT.zip")
-system("unzip malaria_senegal")
-
-system("mv malaria_senegal/* .")
-system("cp genotype_inference/mendel_table* .; cp genotype_inference/g* .")
 
 #    ---  Check for Mendelian errors
 
-system(paste0(plink_ ," --file malaria_senegal --mendel --out malaria_senegal_check"))
-system("rm *check*")
+#system(paste0(plink_ ," --file ", data_," --mendel --out ", data_,"_check"))
+#system("rm *check*")
+
+#   ---   Summary 
+
+system(paste0("Rscript summary.R --pedfile ", data_,".ped --mapfile ", data_,".map --phenfile ", data_,".phen"))
 
 
-malaria_senegal_ped = read.delim("malaria_senegal.ped", header = F , stringsAsFactors = F)
+#   ---   Genotype inference option
 
+system(paste0("Rscript genoInference.R --file ", data_," --cutsize 10 --cores 4")) 
 
-#-------  RUN GENOTYPE INFERENCE: single or recursively
-#--------------------------------------------------------------------------------
-
-# OPT1   ---  Recursive GI
-# run_recursive_gi("malaria_senegal", 100, 4)
-# malaria_senegal_gi_ped = read.delim("sample_1.ped", header = F , stringsAsFactors = F)
-
-# OPT2   ---  Single run
-
-system("Rscript genoInference.R --file malaria_senegal --cutsize 100 --cores 4")
-malaria_senegal_gi_ped = merge_out_files()
+gi_ped = merge_out_files()
 system(("rm out*"))
 
-#    ---  SUMMARY 
-sum(malaria_senegal_ped$V2 == malaria_senegal_gi_ped$V2)
 
-n_miss_before_1= length(malaria_senegal_ped[malaria_senegal_ped == '0 0'])
-n_miss_after_1  = length(malaria_senegal_gi_ped[malaria_senegal_gi_ped == '0 0'])
-tot_snps = nrow(malaria_senegal_ped)* (ncol(malaria_senegal_ped)-6)
+# ---   SUMMARY_GI  -----------------------------------------------
+
+sum(ped$V2 == gi_ped$V2)
 
 
-cat(" Total number of snps in - malaria_senegal set :\t", tot_snps, "\n",
-    "Missing Values in 'Before'- malaria_senegal set :\t", n_miss_before_1, "\n",
-    "Missing Values in 'After'- malaria_senegal set :\t", n_miss_after_1, "\n",
-    '==>  Number of inferred genotype :\t\t\t', n_miss_before_1 - n_miss_after_1 )
+cat(" Total number of snps in - ", data_," set :\t", nrow(ped)* (ncol(ped)-6), "\n",
+    "Missing Values in 'Before'- ", data_," set :\t", length(ped[ped == '0 0']), "\n",
+    "Missing Values in 'After'- ", data_," set :\t", length(gi_ped[gi_ped == '0 0']), "\n",
+    '==>  Number of inferred genotype :\t\t', (length(ped[ped == '0 0'])) - (length(gi_ped[gi_ped == '0 0'])) )
 
-sum((malaria_senegal_ped[,7:ncol(malaria_senegal_ped)] != malaria_senegal_gi_ped[,7:ncol(malaria_senegal_gi_ped)])) 
+write.table(gi_ped, paste0(data_,"_gi.ped"),
+            sep = "\t", quote = F, col.names = F, row.names = F)
+write.table(map, paste0(data_,"_gi.map"),
+            sep = "\t", quote = F, col.names = F, row.names = F)
+
+#    ---  Check for Mendelian errors
+
+system(paste0(plink_ ," --file ", data_,"_gi --mendel --out ", data_,"_check"))
+#system("rm *check*")
+#-------------------------------------------------------------------
 
 
 #-------  RUN m-TDT
 #-------------------------------------------------------------------
 
-#   We will perform two runs:
-#   => only m-TDT : initial ped file malaria_senegal_ped
-#   => GI + m-TDT : infered ped file malaria_senegal_gi_ped
+# --- Complete Pedigree
 
-#    ---  Prepare files for m-TDT run
+mtdt_ped = rbind(ped, completePedigree(ped))
+mtdt_map = paste0("M", (7:ncol(mtdt_ped)-6))
+
+# -- gi
+mtdt_gi_ped = rbind(ped, completePedigree(ped))
 
 
-# - CompletePedigree
+# --- write files
 
-#make sure the column names match
-colnames(malaria_senegal_gi_ped) = paste0("V", 1:ncol(malaria_senegal_gi_ped))
-colnames(malaria_senegal_ped)    = paste0("V", 1:ncol(malaria_senegal_ped))
-
-malaria_senegal_gi_mtdt_ped = rbind(malaria_senegal_gi_ped, 
-                                    completePedigree(malaria_senegal_gi_ped))
-
-malaria_senegal_mtdt_ped = rbind(malaria_senegal_ped,
-                                 completePedigree(malaria_senegal_ped))
-
-# - write files
-
-malaria_senegal_gi_mtdt_map = paste0("M", (7:ncol(malaria_senegal_gi_mtdt_ped)-6))
-
-malaria_senegal_mtdt_map = paste0("M", (7:ncol(malaria_senegal_mtdt_ped)-6))
-
-write.table(malaria_senegal_gi_mtdt_ped, "malaria_senegal_gi_mtdt.ped",
+write.table(mtdt_ped, paste0(data_,"_CP.ped"),
             sep = "\t", quote = F, col.names = F, row.names = F)
 
-write.table(malaria_senegal_gi_mtdt_map, "malaria_senegal_gi_mtdt.map",
+write.table(mtdt_map, paste0(data_,"_CP.map"),
             sep = "\t", quote = F, col.names = F, row.names = F)
 
-write.table(malaria_senegal_mtdt_ped, "malaria_senegal_mtdt.ped",
-            sep = "\t", quote = F, col.names = F, row.names = F)
-
-write.table(malaria_senegal_mtdt_map, "malaria_senegal_mtdt.map",
+# -- gi
+write.table(mtdt_gi_ped, paste0(data_,"_gi_CP.ped"),
             sep = "\t", quote = F, col.names = F, row.names = F)
 
 
-#    ---  
+#-------  RUN 
+#-------
 
-system("mkdir mtdt_gi; mv *gi_mtdt* mtdt_gi")
+# --  Single marker
 
-system("mkdir mtdt; mv *mtdt.* mtdt")
+# -
 
-system("cp -r libs mtdt")
-system("cp -r libs mtdt_gi")
+system(paste0("Rscript mtdt.R --nbcores 20  --pedfile ", data_,"_CP.ped --phenfile ", data_,".phen --phen 1 --mapfile  ", data_,"_CP.map "))
+
+system("mkdir single_marker_results; mv weighted* single_marker_results")
+
+# - gi
+
+system(paste0("Rscript mtdt.R --nbcores 20  --pedfile ", data_,"_gi_CP.ped --phenfile ", data_,".phen --phen 1 --mapfile  ", data_,"_CP.map "))
+
+system("mkdir single_marker_gi_results; mv weighted* single_marker_gi_results")
+
+# --  Multi-marker
+
+# - 
+
+system(paste0("Rscript mtdt.R --nbcores 20 --nbsim 5 --markerset 1,2,3 --pedfile ", data_,"_CP.ped --phenfile ", data_,".phen --phen 1 --mapfile  ", data_,"_CP.map "))
+
+system("mkdir multi_marker_results; mv weighted* multi_marker_results")
+
+# - gi
+
+system(paste0("Rscript mtdt.R --nbcores 20 --nbsim 5 --markerset 1,2,3 --pedfile ", data_,"_gi_CP.ped --phenfile ", data_,".phen --phen 1 --mapfile  ", data_,"_CP.map "))
+
+system("mkdir multi_marker_gi_results; mv weighted* multi_marker_gi_results")
 
 
+#   --------------------------------------------------------------------------
 
-#    ---  
+mtdt_sm = read.table(paste0(path,"/single_marker_results/weighted_res_multilocus.csv"), sep = ";", header = T, stringsAsFactors = F, dec = ",")
+mtdt_sm_gi = read.table(paste0(path,"/single_marker_gi_results/weighted_res_multilocus.csv"), sep = ";", header = T, stringsAsFactors  = F, dec = ",")
 
-system("rm ou*")
+length(intersect(mtdt_sm$models, mtdt_sm_gi$models))
+setdiff(mtdt_sm$models, mtdt_sm_gi$models)
 
-malaria_senegal_autosome_samp_clean_gi_mtdt_phen = cbind(malaria_senegal_autosome_samp_clean_gi_mtdt[,1:2], 
-                                                         round(rnorm(nrow(malaria_senegal_autosome_samp_clean_gi_mtdt), sd = 0.51, mean = 0.51), 2))
-
-write.table(malaria_senegal_autosome_samp_clean_gi_mtdt_phen, 
-            "mtdt/malaria_senegal_autosome_samp_clean_mtdt.phen",
-            sep = "\t", quote = F, col.names = F, row.names = F)
-
-write.table(malaria_senegal_autosome_samp_clean_gi_mtdt_phen, 
-            "mtdt_gi/malaria_senegal_autosome_samp_clean_gi_mtdt.phen",
-            sep = "\t", quote = F, col.names = F, row.names = F)
-
-#system("Rscript mtdt.R --nbcores 20  --pedfile malaria_senegal_autosome_samp_clean_mtdt.ped --phenfile malaria_senegal_autosome_samp_clean_mtdt.phen --phen 1 --mapfile  malaria_senegal_autosome_samp_clean_mtdt.map ")
-#system("Rscript mtdt.R --nbcores 20  --pedfile malaria_senegal_autosome_samp_clean_mtdt.ped --phenfile malaria_senegal_autosome_samp_clean_mtdt.phen --phen 1 --mapfile  malaria_senegal_autosome_samp_clean_mtdt.map ")
-
-# Check : wether inferred genotypes were 'correctely inferred'
-write.table(malaria_senegal_autosome_samp_clean_gi, 
-            file = "malaria_senegal_autosome_samp_clean_gi.ped",
-            quote = F, col.names = F, row.names = F, sep = "\t")
-
-system("cp malaria_senegal_autosome_samp_clean.map malaria_senegal_autosome_samp_clean_gi.map")
-
-system(paste0(plink_ ," --file malaria_senegal_autosome_samp_clean_gi --mendel --out malaria_senegal_autosome_samp_clean_gi"))
-
-mtdt_gi = read.table("/home/share/malaria_senegal/test_geno_inference/mtdt_gi/weighted_res_multilocus.csv", sep = ";", header = T, stringsAsFactors  = F, dec = ",")
-mtdt = read.table("/home/share/malaria_senegal/test_geno_inference/mtdt/weighted_res_multilocus.csv", sep = ";", header = T, stringsAsFactors = F, dec = ",")
-
-length(intersect(mtdt$models, mtdt_gi$models))
-
-setdiff(mtdt_gi$models, mtdt$models)
 
 #STOP
 mtdt_gi2 = mtdt_gi[mtdt_gi$models != "M357", ]
