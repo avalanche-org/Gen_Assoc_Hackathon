@@ -22,7 +22,10 @@ class  Utils  () :
             sys.exit (1)   
             
     def stream_stdout  ( self  ,   cmdline_instruction  ,  io_redirect = None )  :  
-        _io   = os.popen(cmdline_instruction).read() 
+        _io   = os.popen(cmdline_instruction).read()  
         if io_redirect is not  None  :  # io_redirect   should be a file   
             with open ( io_redirect , "w" )  as  log_register  :  
                 log_register.write(_io) 
+               
+            return  
+        return  _io 

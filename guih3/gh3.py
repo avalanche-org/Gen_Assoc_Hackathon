@@ -16,8 +16,8 @@ from time import sleep
 from  typing  import List , Dict , Tuple  
 from  collections import  namedtuple
 
-from  fileOps  import  FileOps  
-
+from  fileOps  import  FileOps 
+from  utils    import Utils 
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
@@ -352,18 +352,43 @@ def iter_stores  (  entry_data  ,  storage_input : Gtk.ListStore  )  -> None :
     for data  in entry_data  : 
         storage_input.append([data])  
              
-    
-def on_combox_change ( combo_box_wiget  : Gtk.ComboBox  ) -> None  :
+ 
+pmp  = namedtuple("pmp",  [
+    "selected_pedfile",
+    "selected_mapfile",
+    "selected_phenfile"
+    ])
+
+_pmp_ =  pmp( 
+        selected_pedfile = None  ,  
+        selected_mapfile = None  , 
+        selected_phenfile= None  
+        )  
+ped_data   =  str () 
+map_data   =  str () 
+phen_data  =  str () 
+def on_combox_change ( combo_box_wiget  : Gtk.ComboBox) -> str  :
+    global ped_data 
+    global map_data 
+    global phen_data   
     iter_list  =  combo_box_wiget.get_active_iter() 
     if iter_list  is not  None :   
         model      = combo_box_wiget.get_model() 
         file_type  = model[iter_list][0x00] 
-        print(f"you selected - >  {file_type}") 
+        _ext    =  file_type.split(".")[1]
+        
+        if _ext.__eq__("map")   :  map_data = file_type    
+        if _ext.__eq__("ped")   :  ped_data = file_type 
+        if _ext.__eq__("phen")  :  phen_data= file_type  
+        
+        
 
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     kill_frame(dbox_frame) 
+    # load  utils   libs  
+    _u_  =  Utils()  
     
     w_d  = abriged_path(abs_path_dir_target)
     main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename}:{abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
@@ -446,21 +471,22 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(ped_stores)   
     ped_cb.pack_start(render_text_tooltip_for_ped , True )  
     ped_cb.add_attribute (render_text_tooltip_for_ped ,  "text" ,  0 )  
-    
+    ped_cb.connect("changed" ,on_combox_change)  
 
     map_label     : Gtk.Label         =  Gtk.Label(label="map:") 
     map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(map_stores) 
     map_cb.pack_start(render_text_tooltip_for_map , True  ) 
-    map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 )  
+    map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 ) 
+    map_cb.connect("changed" ,  on_combox_change)  
     
     phen_label    :  Gtk.Label        =  Gtk.Label(label ="phen :") 
     phen_cb       : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(phen_stores)
     phen_cb.pack_start(render_text_tooltip_for_phen , True) 
     phen_cb.add_attribute(render_text_tooltip_for_phen ,  "text" , 0 ) 
-
+    phen_cb.connect("changed" ,  on_combox_change)
 
     load_btn      : Gtk.Button        =  Gtk.Button(label="Load") 
-    # TODO  : ADD EVENT  ON  LOAD  _bTN  
+ 
     
     
     setup_box.pack_start(ped_label , True , True ,  0 )  
@@ -539,7 +565,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     nsim_box.pack_start(nsim_cb         , True , True , 0 ) 
     
     ncore_box.pack_start(ncore_label    , True , True , 0 ) 
-    ncore_box.pack_start(ncore_cb       , True , True , 0 ) 
+    ncore_box.pack_start(ncore_cb       , True , True , 0 )    # TODO  : ADD EVENT  ON  LOAD  _bTN   
+        
     
     pheno_box.pack_start(pheno_label    , True , True , 0 )  
     pheno_box.pack_start(pheno_cb       , True , True , 0 ) 
@@ -561,7 +588,22 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     logview.set_buffer(logbuffering) 
     scrollog.add(logview) 
     
+    # TODO  : ADD EVENT  ON  LOAD  _bTN   
+    def launch_summary   (  widget : Gtk.Button   ,  b_log  : Gtk.TextBuffer ): 
+        # TODO  : ADD CONTROL  TO ENSURE   ALL 3 VARIABLE ARE  NOT EMPTY
+        # TODO  : MAKE STATIC PATH  FOR  SUMMARY.R SCRIPT
+        
+        source  = f"{abs_path_dir_target}/summary.R" 
+        ped_  = f"{abs_path_dir_target}/{ped_data}" 
+        map_  = f"{abs_path_dir_target}/{map_data}" 
+        phen_ = f"{abs_path_dir_target}/{phen_data}" 
+        
+        exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
+                
+        b_log.set_text(exec) 
 
+    a= load_btn.connect("clicked" , launch_summary ,  logbuffering )  #  ...) 
+    
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
