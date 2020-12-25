@@ -66,7 +66,7 @@ def  current_dir_view ( actual_path  )  :
         return  p 
 
 
-def generic_alert_dialog  ( level_warning ,  mesg   , second_mesg  =   None   ) -> Gtk.ResponseType :  
+def generic_alert_dialog  (level_warning ,  mesg   , second_mesg  =   None   ) -> Gtk.ResponseType :  
     level_warning  =  level_warning.lower()  
     iweq  : Dict[str, Dict[str ,Gtk] ] =   {  
             "info":   { 
@@ -93,7 +93,7 @@ def generic_alert_dialog  ( level_warning ,  mesg   , second_mesg  =   None   ) 
                 
     assert  iweq.keys().__contains__(level_warning)  
     dbmesg  : Gtk.MessageDialog  =   Gtk.MessageDialog ( 
-            transient_for =  None ,  
+            transient_for =  None,  
             flags         =  0x00 , 
             message_type  =  iweq[level_warning]["message_type"] , 
             buttons       =  iweq[level_warning]["buttons"],
@@ -101,7 +101,10 @@ def generic_alert_dialog  ( level_warning ,  mesg   , second_mesg  =   None   ) 
             )
     if  second_mesg  is not None  :  dbmesg.format_secondary_text(second_mesg) 
     resp  =  dbmesg.run()
-    dbmesg.destroy()  
+    if   resp.__eq__(Gtk.ResponseType.OK)  :  
+        print("oK Clicked ")  
+        
+    dbmesg.destroy()   
     return resp  #  Gtk.ResponseType.OK CANCEL YES NO   
     
 
@@ -289,6 +292,8 @@ def middleware_checker (
     global  __fops__  
     working_dir     =  abriged_path(entry.get_text())  
     __fops__        =  FileOps(entry.get_text())  
+    # TODO  : Looking require files before 
+    
     main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}: {working_dir} {pb.WIDTH}x{pb.HEIGHT}")  
     main_pb.set_border_width(pb.BORDER_WIDTH)  
     main_pb.set_default_size(pb.WIDTH , pb.HEIGHT)  
@@ -301,8 +306,8 @@ def middleware_checker (
     
     status: str  =  f"Scanning ... {working_dir}  Directory"  
     activity_bar.set_text(status) 
-    activity_bar.set_show_text(True)  
-    
+    activity_bar.set_show_text(True)
+
     dir_size   =  __fops__.get_size_of_directory()  # 0x64    #  TODO  :  do not forget to import  fileOps . get_size_of_directory    
     print("size -  > " , dir_size )  
     timout_id  =    GLib.timeout_add(
@@ -366,6 +371,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     main_window_frame.set_default_size(mw.WIDTH ,  mw.HEIGHT)  
     main_window_frame.set_resizable(mw.RESIZABLE)
 
+    #  HEADER BAR  
+    headB  : Gtk.HeaderBar  = Gtk.HeaderBar()  
+    headB.set_show_close_button(True) 
+    headB.props.title= f"{basename}:{abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}"
+    main_window_frame.set_titlebar(headB)  
+
     master_container : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL)  
     #  LOGO  TITLE  HEADER  
     logo_label  : Gtk.Label  =  Gtk.Label()  
@@ -390,18 +401,24 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     setup_box     : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL) 
     # setup_box  component
     #  combox box 
-    #  TODO  :  add   data  inside combo box    
-    ped_files     : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("ped") ]  
-    map_files     : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("map") ] 
-    phen_files    : List[str]         =  [  abriged_path(f)  for f in  __fops__.list_files("phen")]   
+    #  TODO  :  add   data  inside combo box   
+    files_requirements  = [
+            ped_files     ,  
+            map_files     , 
+            phen_files     
+            ]=(
+                    [  abriged_path(f)  for f in  __fops__.list_files("ped") ]  , 
+                    [  abriged_path(f)  for f in  __fops__.list_files("map") ]  ,
+                    [  abriged_path(f)  for f in  __fops__.list_files("phen")] 
+                    ) 
+
     # DEBUG  PRINT 
     print("Debug -  < " ,  ped_files )  
-    
     #  TODO :   make controlle to ensure  all  required files are present  in the  directory  
     ext_req  :  List [ str ]   =   [  "ped" , "map",  "phen" ]  
     
     not_statified =  False  
-    for type_ext ,  F  in   enumerate ([  ped_files ,  map_files ,  phen_files ]):  
+    for type_ext ,  F  in   enumerate(files_requirements):   
         if   F.__len__() == 0  :  
             not_statified  =  True  
 
@@ -410,8 +427,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
                 "warning"  , 
                 "Unsatified Files Requierments " ,
                 "Files requirements are not  satisfied"
-                )
-            
+                ) 
+
     render_text_tooltip_for_ped  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_map  :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_phen :  Gtk.CellRendererText  =  Gtk.CellRendererText() 
@@ -442,7 +459,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     phen_cb.add_attribute(render_text_tooltip_for_phen ,  "text" , 0 ) 
 
 
-    load_btn      : Gtk.Button        =  Gtk.Button(label="Load")  
+    load_btn      : Gtk.Button        =  Gtk.Button(label="Load") 
+    # TODO  : ADD EVENT  ON  LOAD  _bTN  
     
     
     setup_box.pack_start(ped_label , True , True ,  0 )  
@@ -534,13 +552,23 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_n_setarg.pack_start(marker_frame  , True , True , 0  )  
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
+    
+    scrollog        : Gtk.ScrolledWindow = Gtk.ScrolledWindow() 
+    logview         : Gkt.TextView  = Gtk.TextView()
+    logview.set_editable(False) 
+    logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
+    logbuffering.set_text("this  is  a log ") 
+    logview.set_buffer(logbuffering) 
+    scrollog.add(logview) 
+    
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
 
-    log_frame       :  Gtk.Frame = Gtk.Frame(label=" Output  Log " )  
+    log_frame       :  Gtk.Frame = Gtk.Frame(label="CONSOLE" )   
+    log_frame.add(scrollog)  
     
     log_container.pack_start(log_frame, True , True , 0 )   
     
