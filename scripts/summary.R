@@ -11,6 +11,11 @@ args = commandArgs(trailingOnly = TRUE)
 #-------  ped, map and phen files given as arguments
 #         Should a problem occur, contact : NdeyeMarieme.top@pasteur.sn
 
+
+if(("optparse" %in% rownames(installed.packages())) == F){
+  install.packages("optparse", dependencies=TRUE, repos="http://cran.r-project.org")
+} 
+
 #-------  Functions
 
 # -- [count the number of family the individual is implicated in]
