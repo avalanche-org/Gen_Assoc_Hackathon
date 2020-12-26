@@ -364,21 +364,51 @@ _pmp_ =  pmp(
         selected_mapfile = None  , 
         selected_phenfile= None  
         )  
+def sync_ped_to_map_vice_versa   (file_data_type)  :
+    # autodetect  extention   
+    allowed_ext      : List[str,str] =  [".ped" , ".map"]  
+    filename_no_ext  :str  =    file_data_type[:-4]   
+    ext              :str  =    file_data_type[-4:]
+    assert  allowed_ext.__contains__(ext) 
+    if ext.__eq__(allowed_ext[0])   :   filename_no_ext+=allowed_ext[1]  
+    if ext.__eq__(allowed_ext[1])   :   filename_no_ext+=allowed_ext[0] 
+    return  filename_no_ext  
+    
+
 ped_data   =  str () 
 map_data   =  str () 
 phen_data  =  str () 
-def on_combox_change ( combo_box_wiget  : Gtk.ComboBox) -> str  :
+def on_combox_change ( 
+        combo_box_wiget  : Gtk.ComboBox,    
+        payload      =  None  , 
+        sync_cb      =  None 
+        ) -> str  :
+
     global ped_data 
     global map_data 
-    global phen_data   
+    global phen_data     
+     
+    actual_dir   : str  = abs_path_dir_target  
     iter_list  =  combo_box_wiget.get_active_iter() 
     if iter_list  is not  None :   
         model      = combo_box_wiget.get_model() 
         file_type  = model[iter_list][0x00] 
         _ext    =  file_type.split(".")[1]
         
-        if _ext.__eq__("map")   :  map_data = file_type    
-        if _ext.__eq__("ped")   :  ped_data = file_type 
+        if _ext.__eq__("map")   : 
+            map_data = file_type
+            pedfile_name   : str  =  sync_ped_to_map_vice_versa(map_data)  
+            if os.path.exists (f"{actual_dir}/{pedfile_name}")   and  sync_cb: 
+                equivalent_pos_index =   payload.index(pedfile_name)  
+                sync_cb.set_active(equivalent_pos_index) 
+                
+        if _ext.__eq__("ped")   :  
+            ped_data = file_type
+            mapfile_name   : str  =  sync_ped_to_map_vice_versa(ped_data)  
+            if os.path.exists (f"{actual_dir}/{mapfile_name}")  and sync_cb:
+                equivalent_pos_index  =  payload.index(mapfile_name)  
+                sync_cb.set_active(equivalent_pos_index)  
+        
         if _ext.__eq__("phen")  :  phen_data= file_type  
         
         
@@ -471,13 +501,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(ped_stores)   
     ped_cb.pack_start(render_text_tooltip_for_ped , True )  
     ped_cb.add_attribute (render_text_tooltip_for_ped ,  "text" ,  0 )  
-    ped_cb.connect("changed" ,on_combox_change)  
 
     map_label     : Gtk.Label         =  Gtk.Label(label="map:") 
     map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(map_stores) 
     map_cb.pack_start(render_text_tooltip_for_map , True  ) 
     map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 ) 
-    map_cb.connect("changed" ,  on_combox_change)  
+    # TODO  :  syncronise   ped and  map   
+    
+    map_cb.connect("changed" ,  on_combox_change  ,   ped_files , ped_cb)  
+    ped_cb.connect("changed" ,on_combox_change    ,   map_files , map_cb)  
     
     phen_label    :  Gtk.Label        =  Gtk.Label(label ="phen :") 
     phen_cb       : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(phen_stores)
