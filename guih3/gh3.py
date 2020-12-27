@@ -392,9 +392,10 @@ def on_combox_change (
     iter_list  =  combo_box_wiget.get_active_iter() 
     if iter_list  is not  None :   
         model      = combo_box_wiget.get_model() 
-        file_type  = model[iter_list][0x00] 
-        _ext  =  file_type.split(chr(0x2e))[1]  if chr(0x2e) in file_type \
-                                                else   None  
+        file_type  = model[iter_list][0x00]
+        if  paylaod  : _ext  =  file_type.split(chr(0x2e))[1]
+        else         : _ext  = str()  
+
         if _ext.__eq__("map")   : 
             map_data = file_type
             pedfile_name   : str  =  sync_ped_to_map_vice_versa(map_data)  
@@ -540,13 +541,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
     multiple_marker_rbtn.connect("toggled" , on_togglable_widget)
 
-    run_btn       : Gtk.Button =  Gtk.Button(label="Run Analysis")
   
 
     choose_box.pack_start(single_marker_rbtn , True, False  , 0  )  
     choose_box.pack_start(multiple_marker_rbtn, True ,False, 0  )
     
-    choose_box.pack_start(run_btn  ,  True , True, 0 )   
+    #choose_box.pack_start(run_btn  ,  True , True, 0 )   
 
     tne_box   :  Gtk.Box  = Gtk.Box(spacing  = BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
     
@@ -558,21 +558,40 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     # by default  the emperical is desable   
     enable_emperical.set_active(False)    
      
-    th_label   : Gtk.Label =  Gtk.Label(label="Enable Theorical")   
+    th_label   : Gtk.Label =  Gtk.Label(label="Enable Theorical :")   
     enable_theorical  : Gtk.Switch()   =  Gtk.Switch()  
     enable_theorical.set_active(True)  
     enable_theorical.connect("notify::active" , switch_sync_inverted ,enable_emperical ) 
     enable_emperical.connect("notify::active" , switch_sync_inverted ,enable_theorical )  
      
-    tne_box.pack_start(emp_label , True , True , 0 )  
-    tne_box.pack_start(enable_emperical , False,False, 0 )  
+    tne_box.pack_start(emp_label , True, True , 0 )  
+    tne_box.pack_start(enable_emperical ,False , True, 0 )  
     tne_box.pack_start(th_label , True , True , 0 )  
-    tne_box.pack_start(enable_theorical , False ,False , 0 ) 
+    tne_box.pack_start(enable_theorical , False,  True , 0 ) 
     
-    marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = BOX_SPACING ,  orientation=Gtk.Orientation.HORIZONTAL)  
+    marker_n_setarg :  Gtk.Box    =  Gtk.Box(spacing = 0x00F ,  orientation=Gtk.Orientation.HORIZONTAL)  
 
-    marker_frame    :  Gtk.Frame  =   Gtk.Frame(label="Marker Set")   
+    #  TODO  : 
+    #  preload  marker  if they are available  
+    marker_zone     :  Gtk.Box    = Gtk.Box(spacing  = 0x00f  , orientation=Gtk.Orientation.HORIZONTAL)
+    analysis_zone   :  Gtk.Box    = Gtk.Box(spacing  = 0x00f  , orientation=Gtk.Orientation.HORIZONTAL) 
     
+    marker_payload  :  Gtk.ListStore =  Gtk.ListStore(int) 
+    marker_label    :  Gtk.Label     = Gtk.Label(label="MarkerSet :")  
+    marker_set      :  Gtk.ComboBox = Gtk.ComboBox.new_with_model_and_entry(marker_payload)
+    marker_set.connect("changed"   , on_combox_change)  
+    
+    marker_zone.pack_start(marker_label  , False , True ,  0 )  
+    marker_zone.pack_start(marker_set    , True , True ,  0 )
+    
+    run_btn            : Gtk.Button =  Gtk.Button(label="Run Analysis")
+    analysis_zone.pack_start(run_btn ,True , False  , 0 )
+    
+    run_n_marker_zone  : Gtk.Box    =  Gtk.Box( spacing = 0x00f , orientation = Gtk.Orientation.VERTICAL) 
+    run_n_marker_zone.pack_start(marker_zone   , True , True  ,  0 ) 
+    run_n_marker_zone.pack_start(analysis_zone , True , False   ,  0 ) 
+
+
     setup_args_box  :  Gtk.Box    =   Gtk.Box(spacing =0x0F,  orientation= Gtk.Orientation.VERTICAL)  
     
     nsim_box        :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
@@ -614,7 +633,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     nsim_box.pack_start(nsim_cb         , True , True , 0 ) 
     
     ncore_box.pack_start(ncore_label    , True , True , 0 ) 
-    ncore_box.pack_start(ncore_cb       , True , True , 0 )    # TODO  : ADD EVENT  ON  LOAD  _bTN   
+    ncore_box.pack_start(ncore_cb       , True , True , 0 )  
         
     
     pheno_box.pack_start(pheno_label    , True , True , 0 )  
@@ -625,7 +644,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     setup_args_box.pack_start(pheno_box , True , True , 0  ) 
 
     marker_n_setarg.pack_start(setup_args_box, True , True  , 0 ) 
-    marker_n_setarg.pack_start(marker_frame  , True , True  , 0 ) 
+    
+    marker_n_setarg.pack_start(run_n_marker_zone, True , True  , 0 ) 
 
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
