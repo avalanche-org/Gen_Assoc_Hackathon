@@ -393,8 +393,8 @@ def on_combox_change (
     if iter_list  is not  None :   
         model      = combo_box_wiget.get_model() 
         file_type  = model[iter_list][0x00] 
-        _ext    =  file_type.split(".")[1]
-        
+        _ext  =  file_type.split(chr(0x2e))[1]  if chr(0x2e) in file_type \
+                                                else   None  
         if _ext.__eq__("map")   : 
             map_data = file_type
             pedfile_name   : str  =  sync_ped_to_map_vice_versa(map_data)  
@@ -518,8 +518,6 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     phen_cb.connect("changed" ,  on_combox_change)
 
     load_btn      : Gtk.Button        =  Gtk.Button(label="Load") 
- 
-    
     
     setup_box.pack_start(ped_label , True , True ,  0 )  
     setup_box.pack_start(ped_cb    , True , True ,  0 )  
@@ -582,16 +580,35 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     pheno_box       :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
     
     nsim_label      :  Gtk.Label  =   Gtk.Label(label= "Nsims    :")  
-    ncore_label      :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
+    ncore_label     :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
     pheno_label     :  Gkt.Label  =   Gtk.Label(label= "Phenotype:")
     
+ 
     available_data  :  Gtk.ListStore = Gtk.ListStore(int , int )  
-
+    
+    #iter_stores ( range(0  , 0xa)  ,   available_data )   
+    
     for    i ,  iA_  in  enumerate( range(0 ,10)) : available_data.append ([i  , iA_])  
+    
+    render_text_tooltip_for_nsim    : Gtk.CellRendererText  =  Gtk.CellRendererText() 
+    render_text_tooltip_for_ncore   : Gtk.CellRendererText  =  Gtk.CellRendererText() 
+    render_text_tooltip_for_pheno   : Gtk.CellRendererText  =  Gtk.CellRendererText()
 
-    nsim_cb         :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))    
-    ncore_cb        :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))   
-    pheno_cb        :  Gtk.ComboBox  = Gtk.ComboBox.new_with_model_and_entry(Gtk.ListStore(available_data))   
+    nsim_cb         :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)    
+    nsim_cb.pack_start(render_text_tooltip_for_nsim , True )  
+    nsim_cb.add_attribute(render_text_tooltip_for_nsim,   "text" ,  0 ) 
+    nsim_cb.connect("changed" ,  on_combox_change  ) 
+    
+    ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)   
+    ncore_cb.pack_start(render_text_tooltip_for_ncore , True )  
+    ncore_cb.add_attribute(render_text_tooltip_for_ncore , "text" , 0 ) 
+    ncore_cb.connect("changed" ,  on_combox_change  ) 
+    
+    pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)  
+    pheno_cb.pack_start(render_text_tooltip_for_pheno , True ) 
+    pheno_cb.add_attribute(render_text_tooltip_for_pheno , "text" , 0 )  
+    pheno_cb.connect("changed" ,  on_combox_change  ) 
+    
     
     nsim_box.pack_start(nsim_label      , True , True , 0 ) 
     nsim_box.pack_start(nsim_cb         , True , True , 0 ) 
@@ -607,8 +624,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     setup_args_box.pack_start(ncore_box , True , True , 0  ) 
     setup_args_box.pack_start(pheno_box , True , True , 0  ) 
 
-    marker_n_setarg.pack_start(setup_args_box, False , False , 0  ) 
-    marker_n_setarg.pack_start(marker_frame  , True , True , 0  )  
+    marker_n_setarg.pack_start(setup_args_box, True , True  , 0 ) 
+    marker_n_setarg.pack_start(marker_frame  , True , True  , 0 ) 
+
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
     
