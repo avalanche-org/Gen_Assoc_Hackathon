@@ -378,26 +378,35 @@ def sync_ped_to_map_vice_versa   (file_data_type)  :
     return  filename_no_ext  
     
 
-ped_data   =  str () 
-map_data   =  str () 
-phen_data  =  str () 
+ped_data      =  str () 
+map_data      =  str () 
+phen_data     =  str () 
+nsims_chosed   =  int ()  
+ncores_chosed =  int () 
 def on_combox_change ( 
         combo_box_wiget  : Gtk.ComboBox,    
         payload      =  None  , 
-        sync_cb      =  None 
+        sync_cb      =  None  , 
+        nsim_select  =  False , 
+        ncore_select =  False  
         ) -> str  :
 
     global ped_data 
     global map_data 
-    global phen_data     
+    global phen_data    
+    global nsims_chosed  
+    global ncores_chosed   
      
     actual_dir   : str  = abs_path_dir_target  
     iter_list  =  combo_box_wiget.get_active_iter() 
     if iter_list  is not  None :   
         model      = combo_box_wiget.get_model() 
         file_type  = model[iter_list][0x00]
-        if  paylaod  : _ext  =  file_type.split(chr(0x2e))[1]
-        else         : _ext  = str()  
+        _ext       = str () 
+        if  type(payload) is not None and type(file_type) is not int: _ext  =  file_type.split(chr(0x2e))[1]
+        else         :  
+            if  nsim_select  :  nsims_chosed    =  file_type  
+            if  ncore_select :  ncores_chosed  =  file_type     
 
         if _ext.__eq__("map")   : 
             map_data = file_type
@@ -623,12 +632,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     nsim_cb         :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(nsim_preset_list)    
     nsim_cb.pack_start(render_text_tooltip_for_nsim , True )  
     nsim_cb.add_attribute(render_text_tooltip_for_nsim,   "text" ,  0 ) 
-    nsim_cb.connect("changed" ,  on_combox_change  ) 
+    nsim_cb.connect("changed" ,  on_combox_change  ,   None , None , True) 
     
     ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(ncore_preset_list)  
     ncore_cb.pack_start(render_text_tooltip_for_ncore , True )  
     ncore_cb.add_attribute(render_text_tooltip_for_ncore , "text" , 0 ) 
-    ncore_cb.connect("changed" ,  on_combox_change  ) 
+    ncore_cb.connect("changed" ,  on_combox_change  , None , None , False , True ) 
     
     pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(pheno_preset_list)  
     pheno_cb.pack_start(render_text_tooltip_for_pheno , True ) 
@@ -678,9 +687,22 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
                 
         b_log.set_text(exec) 
+        
+    def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
+        source  = f"{abs_path_dir_target}/wrapper.R" 
+        ped_    = f"{abs_path_dir_target}/{ped_data}" 
+        map_    = f"{abs_path_dir_target}/{map_data}" 
+        phen_   = f"{abs_path_dir_target}/{phen_data}" 
 
-    a= load_btn.connect("clicked" , launch_summary ,  logbuffering )  #  ...) 
-    
+        cmd  = f"Rscript  wrapper.R --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
+        exec = _u_.stream_stdout(cmd)  
+        b_log.set_text(exec) 
+
+
+
+    load_btn.connect("clicked" , launch_summary ,  logbuffering )  #  ...) 
+    run_btn.connect ("clicked" ,  run_analysis  ,  logbuffering )  
+
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
     quit_bnt.connect("clicked" , Gtk.main_quit)  
