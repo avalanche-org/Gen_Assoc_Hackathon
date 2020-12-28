@@ -11,6 +11,7 @@ LICENSE  HERE !!
 import os , sys , gi , argparse    
 gi.require_version("Gtk" , "3.0")  
 from gi.repository import  Gtk , GLib
+import  multiprocessing  
 
 from time import sleep 
 from  typing  import List , Dict , Tuple  
@@ -57,7 +58,9 @@ pb   = setting  (
        0x64  >> 2  ,     # HEIGHT  
        False       ,     # RESIZABLE 
        0x05              # BORDER WIDTH
-       ) 
+       )
+NSIM_LIMIT         : int  = 0x00a
+NCORES_AVAILABLE   : int  =  multiprocessing.cpu_count()  
 
 #TODO  : figure out this function  to make  it  more  adptable for each os  
 def  current_dir_view ( actual_path  )  :   
@@ -598,32 +601,36 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ncore_box       :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
     pheno_box       :  Gtk.Box    =   Gtk.Box(spacing = BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)  
     
-    nsim_label      :  Gtk.Label  =   Gtk.Label(label= "Nsims    :")  
+    nsim_label      :  Gtk.Label  =   Gtk.Label(label="Nsims    :")  
     ncore_label     :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
-    pheno_label     :  Gkt.Label  =   Gtk.Label(label= "Phenotype:")
+    pheno_label     :  Gkt.Label  =   Gtk.Label(label="Phenotype:")
     
  
-    available_data  :  Gtk.ListStore = Gtk.ListStore(int , int )  
     
-    #iter_stores ( range(0  , 0xa)  ,   available_data )   
+    nsim_preset_list :    Gtk.ListStore = Gtk.ListStore(int)   
+    ncore_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
+    pheno_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
+     
+    iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
+    iter_stores ( range(1  , NCORES_AVAILABLE)  ,  ncore_preset_list)   
+    iter_stores ( range(1  , 1000)  ,pheno_preset_list)   
     
-    for    i ,  iA_  in  enumerate( range(0 ,10)) : available_data.append ([i  , iA_])  
     
     render_text_tooltip_for_nsim    : Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_ncore   : Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_pheno   : Gtk.CellRendererText  =  Gtk.CellRendererText()
 
-    nsim_cb         :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)    
+    nsim_cb         :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(nsim_preset_list)    
     nsim_cb.pack_start(render_text_tooltip_for_nsim , True )  
     nsim_cb.add_attribute(render_text_tooltip_for_nsim,   "text" ,  0 ) 
     nsim_cb.connect("changed" ,  on_combox_change  ) 
     
-    ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)   
+    ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(ncore_preset_list)  
     ncore_cb.pack_start(render_text_tooltip_for_ncore , True )  
     ncore_cb.add_attribute(render_text_tooltip_for_ncore , "text" , 0 ) 
     ncore_cb.connect("changed" ,  on_combox_change  ) 
     
-    pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(available_data)  
+    pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(pheno_preset_list)  
     pheno_cb.pack_start(render_text_tooltip_for_pheno , True ) 
     pheno_cb.add_attribute(render_text_tooltip_for_pheno , "text" , 0 )  
     pheno_cb.connect("changed" ,  on_combox_change  ) 
