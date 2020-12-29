@@ -94,9 +94,13 @@ for (i in 1:length(flag)){
 
 # --- Basenames
 
-ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], " "))[2]
-map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], " "))[2]
-phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], " "))[2]
+# --- Basenames
+
+ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/")))]
+map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")) [length(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")))]
+phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))]
+
+
 
 
 # --- Read Files
