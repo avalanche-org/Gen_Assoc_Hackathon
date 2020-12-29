@@ -381,7 +381,7 @@ def sync_ped_to_map_vice_versa   (file_data_type)  :
 ped_data      =  str () 
 map_data      =  str () 
 phen_data     =  str () 
-nsims_chosed   =  int ()  
+nsims_chosed  =  int ()  
 ncores_chosed =  int () 
 def on_combox_change ( 
         combo_box_wiget  : Gtk.ComboBox,    
@@ -689,7 +689,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         b_log.set_text(exec) 
         
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
-        source  = f"{abs_path_dir_target}/wrapper.R" 
+        source  = f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{abs_path_dir_target}/{ped_data}" 
         map_    = f"{abs_path_dir_target}/{map_data}" 
         phen_   = f"{abs_path_dir_target}/{phen_data}" 

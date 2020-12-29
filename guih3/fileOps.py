@@ -3,9 +3,12 @@
 __author__="Umar <j_umar@outlook.com>" 
 
 
-import os , sys  
+import os , sys   
+# TODO  :  MAKE  IMPORT CONTROL  
+import  pandas  as  pd 
 from  typing import  Dict ,  Tuple , List  
 from  glob import glob  
+
 
 class  FileOps  : 
       
@@ -73,7 +76,12 @@ class  FileOps  :
 
 
         pass
-    
+     
+    def pedfile_colrow ( self, pedfile,def_sep="\t" ) : 
+        dataframe  =  pd.read_csv(pedfile ,  sep=def_sep)  
+        return  dataframe.columns.tolist()   
+   
+
     def draw_tree  ( self )  : 
         """
         draw tree  of the folder content 

@@ -1,0 +1,5 @@
+{  
+    "summary_script" :  "summary.R",
+    "analysis_script":  "Wrapper.R"
+} 
+
