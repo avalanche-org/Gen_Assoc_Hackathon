@@ -694,7 +694,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         map_    = f"{abs_path_dir_target}/{map_data}" 
         phen_   = f"{abs_path_dir_target}/{phen_data}" 
 
-        cmd  = f"Rscript  wrapper.R --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
+        cmd  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
         exec = _u_.stream_stdout(cmd)  
         b_log.set_text(exec) 
 
