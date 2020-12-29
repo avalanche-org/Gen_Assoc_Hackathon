@@ -2,13 +2,26 @@
 #coding :  utf-8  
 __author__="Umar <j_umar@outlook.com>" 
 
-
 import os , sys   
-# TODO  :  MAKE  IMPORT CONTROL  
-import  pandas  as  pd 
 from  typing import  Dict ,  Tuple , List  
 from  glob import glob  
 
+try  :   
+    import pip  
+except  :  
+    sys.stderr.write("pip module  is  require to  install  automaticly the deps\n")
+    sys.exit(1)  
+else  :  
+    try  : 
+        import  pandas  as  pd
+    except  ImportError  :   
+        try : 
+            pip.main(["install" ,  "pandas"])  
+            pip.main(["install" ,  "xlrd"])   
+        except  :  
+            sys.stderr.write("fail to install  internal  libs ")  
+        else :  
+            sys.stdout.write("NOTE:  if  the  program  doesn't run \nplease relaunch it!\n THANKS!!!!" )  
 
 class  FileOps  : 
       
