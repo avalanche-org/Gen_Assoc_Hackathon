@@ -19,6 +19,22 @@ from  collections import  namedtuple
 
 from  fileOps  import  FileOps 
 from  utils    import Utils 
+try : 
+    import pip  
+except  :  
+    sys.stderr.write("pip module  is  require to  install  automaticly the deps\n")
+    sys.exit(1)  
+else  :  
+    try  : 
+        import  pandas as pd    
+    except  ImportError  :   
+        try : 
+            pip.main(["install" ,  "pandas"])  
+            pip.main(["install" ,  "xlrd"])   
+        except  :  
+            sys.stderr.write("fail to install  internal  libs ")  
+        else :  
+            sys.stdout.write("NOTE:  if  the  program  doesn't run \nplease relaunch it!\n THANKS!!!!" )  
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
@@ -111,7 +127,7 @@ def generic_alert_dialog  (level_warning ,  mesg   , second_mesg  =   None   ) -
     return resp  #  Gtk.ResponseType.OK CANCEL YES NO   
     
 
-
+ 
 def show_frame  ( mf : Gtk.Window)  ->  None : 
     """ 
     show_frame  : Generic  function do display  frame 
@@ -382,20 +398,24 @@ ped_data      =  str ()
 map_data      =  str () 
 phen_data     =  str () 
 nsims_chosed  =  int ()  
-ncores_chosed =  int () 
+ncores_chosed =  int ()
+phen_chosed   =  int ()  
+
 def on_combox_change ( 
         combo_box_wiget  : Gtk.ComboBox,    
         payload      =  None  , 
         sync_cb      =  None  , 
         nsim_select  =  False , 
-        ncore_select =  False  
+        ncore_select =  False , 
+        phen_select  =  False  
         ) -> str  :
 
     global ped_data 
     global map_data 
     global phen_data    
     global nsims_chosed  
-    global ncores_chosed   
+    global ncores_chosed
+    global phen_chosed 
      
     actual_dir   : str  = abs_path_dir_target  
     iter_list  =  combo_box_wiget.get_active_iter() 
@@ -405,8 +425,10 @@ def on_combox_change (
         _ext       = str () 
         if  type(payload) is not None and type(file_type) is not int: _ext  =  file_type.split(chr(0x2e))[1]
         else         :  
+            #@NOTE :  file type here  is  int  
             if  nsim_select  :  nsims_chosed    =  file_type  
-            if  ncore_select :  ncores_chosed  =  file_type     
+            if  ncore_select :  ncores_chosed   =  file_type  
+            if  phen_select  :  phen_chosed     =  file_type  
 
         if _ext.__eq__("map")   : 
             map_data = file_type
@@ -424,7 +446,11 @@ def on_combox_change (
         
         if _ext.__eq__("phen")  :  phen_data= file_type  
         
-        
+
+def phen_rowcol ( phenotype_file  , def_sep="\t")   -> List[str]  :  
+    dataframe   = pd.read_csv(phenotype_file ,  sep = def_sep) 
+    return  dataframe.columns.tolist()  
+
 
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
@@ -621,8 +647,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     pheno_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
      
     iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
-    iter_stores ( range(1  , NCORES_AVAILABLE)  ,  ncore_preset_list)   
-    iter_stores ( range(1  , 1000)  ,pheno_preset_list)   
+    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(0,NCORES_AVAILABLE)  ,  ncore_preset_list)   
+    phenotype_rowcol = phen_rowcol(phen_data)
+    iter_stores ( range(0  ,   phenotype_rowcol.__len__()  -  0x02)  ,pheno_preset_list)   
     
     
     render_text_tooltip_for_nsim    : Gtk.CellRendererText  =  Gtk.CellRendererText() 
@@ -637,12 +664,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(ncore_preset_list)  
     ncore_cb.pack_start(render_text_tooltip_for_ncore , True )  
     ncore_cb.add_attribute(render_text_tooltip_for_ncore , "text" , 0 ) 
-    ncore_cb.connect("changed" ,  on_combox_change  , None , None , False , True ) 
+    ncore_cb.connect("changed" ,  on_combox_change  , None , None , False , True) 
     
     pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(pheno_preset_list)  
     pheno_cb.pack_start(render_text_tooltip_for_pheno , True ) 
     pheno_cb.add_attribute(render_text_tooltip_for_pheno , "text" , 0 )  
-    pheno_cb.connect("changed" ,  on_combox_change  ) 
+    pheno_cb.connect("changed" ,  on_combox_change  , None , None  ,False , False  , True ) 
     
     
     nsim_box.pack_start(nsim_label      , True , True , 0 ) 
