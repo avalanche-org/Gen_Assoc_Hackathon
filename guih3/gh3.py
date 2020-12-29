@@ -649,7 +649,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     pheno_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
      
     iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
-    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(0,NCORES_AVAILABLE)  ,  ncore_preset_list)   
+    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(1,NCORES_AVAILABLE)  ,  ncore_preset_list)   
     #phenotype_rowcol = phen_rowcol(phen_data)
     iter_stores ( range(0  ,   10)  ,pheno_preset_list)   
     
