@@ -9,14 +9,14 @@ args = commandArgs(trailingOnly = TRUE)
 #   /Gen_Assoc
 
 #-------  run_analysis.R
-#-------  Receive all arguments to run analysis
+#-------  Receive all arguments to run mTDT 
 
 path = system("pwd", intern = T)
 setwd(path)
 
 plink_ = "/home/g4bbm/tools/Plink/plink"
 
-#   --- Packages
+#   --- Install Required Packages
 
 if(("optparse" %in% rownames(installed.packages())) == F){
   install.packages("optparse", dependencies=TRUE, repos="http://cran.r-project.org")
@@ -70,10 +70,12 @@ opt = parse_args(opt_parser)
 
 
 library(stringr)
+
+
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
 " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
 
-# --- Flags selected
+# --- Detect selected flags and write command
 
 flag <- unlist(str_split(c(cmd),"--"))[-1]
 positions= NULL
@@ -85,6 +87,7 @@ if (length(positions)>0){
   flag = flag[-positions]
 }
 
+
 cat("Selected flags: \n")
 for (i in 1:length(flag)){
   cat(paste0("--",flag[i], "\n"))
@@ -94,13 +97,11 @@ for (i in 1:length(flag)){
 
 # --- Basenames
 
-# --- Basenames
+ped_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/")))], " "))[2]
+map_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")))], " "))[2]
+phen_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))], " "))[2]
 
-ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/")))]
-map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")) [length(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")))]
-phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))]
-
-
+# phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))]
 
 
 # --- Read Files
@@ -123,16 +124,18 @@ write.table(mtdt_ped, paste0(ped_basename,"_CP.ped"),
 write.table(mtdt_map, paste0(map_basename,"_CP.map"),
             sep = "\t", quote = F, col.names = F, row.names = F)
 
+# ---  run command
 
-cmd = paste0("Rscript mtdt.R --pedfile ", ped_basename,"_CP.ped --mapfile ", map_basename,"_CP.map --phenfile ", phen_basename,".phen")
+cmd = paste0("Rscript ",path,"/mtdt.R --pedfile ", ped_basename,"_CP.ped --mapfile ", map_basename,"_CP.map --phenfile ", phen_basename,".phen")
 
 for (i in 4:length(flag)){
   cmd = paste0(cmd," --",flag[i])
 }
 
-cmd
-
 system(cmd)
+
+# --- Output 
+
 cmd = paste0("mkdir ", ped_basename,"_results; mv weighted* ", ped_basename,"_results/ ; mv *_CP.* ", ped_basename,"_results/")
 system(cmd)
 
