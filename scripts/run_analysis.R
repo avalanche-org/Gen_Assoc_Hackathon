@@ -8,7 +8,7 @@ args = commandArgs(trailingOnly = TRUE)
 
 #   /Gen_Assoc
 
-#-------  Wrapper.R
+#-------  run_analysis.R
 #-------  Receive all arguments to run analysis
 
 path = system("pwd", intern = T)
@@ -50,9 +50,9 @@ completePedigree <- function(dbwork){
   return(dataset)
 }
 
-#-------  Collect arguments
+#   ---  Collect arguments
 
-# Options
+# --- Options
 
 library(optparse)
 
@@ -73,22 +73,33 @@ library(stringr)
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
 " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
 
-flag <- unlist(str_split(c(cmd),"--"))
+# --- Flags selected
 
+flag <- unlist(str_split(c(cmd),"--"))[-1]
+positions= NULL
+
+for (i in 1:length(flag)){
+  if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}
+}
+if (length(positions)>0){
+  flag = flag[-positions]
+}
 
 cat("Selected flags: \n")
 for (i in 1:length(flag)){
   cat(paste0("--",flag[i], "\n"))
 }
 
+#   ---  File management
 
-ped_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".ped"))[1], " "))[2]
-map_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".map"))[1], " "))[2]
-phen_basename = unlist(str_split(unlist(str_split(c(flag[4]), ".phen"))[1], " "))[2]
+# --- Basenames
+
+ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], " "))[2]
+map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], " "))[2]
+phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], " "))[2]
 
 
-
-# --- Files
+# --- Read Files
 
 cat("Reading files... \n")
 
@@ -96,7 +107,7 @@ ped = read.delim(paste0(ped_basename,".ped"), header = F , stringsAsFactors = F)
 map = read.delim(paste0(map_basename,".map"), header = F , stringsAsFactors = F)
 phen = read.delim(paste0(phen_basename, ".phen"), header = F , stringsAsFactors = F)
 
-# --- Complete Pedigree
+# --- Process files with Complete Pedigree function
 
 mtdt_ped = rbind(ped, completePedigree(ped))
 mtdt_map = paste0("M", (7:ncol(mtdt_ped)-6))
@@ -111,7 +122,7 @@ write.table(mtdt_map, paste0(map_basename,"_CP.map"),
 
 cmd = paste0("Rscript mtdt.R --pedfile ", ped_basename,"_CP.ped --mapfile ", map_basename,"_CP.map --phenfile ", phen_basename,".phen")
 
-for (i in 5:length(flag)){
+for (i in 4:length(flag)){
   cmd = paste0(cmd," --",flag[i])
 }
 
