@@ -81,8 +81,9 @@ positions= NULL
 for (i in 1:length(flag)){
   if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}
 }
-
-flag = flag[-positions]
+if (length(positions)>0){
+  flag = flag[-positions]
+}
 
 cat("Selected flags: \n")
 for (i in 1:length(flag)){
