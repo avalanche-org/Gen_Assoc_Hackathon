@@ -19,6 +19,7 @@ from  collections import  namedtuple
 
 from  fileOps  import  FileOps 
 from  utils    import Utils 
+"""
 try : 
     import pip  
 except  :  
@@ -35,6 +36,7 @@ else  :
             sys.stderr.write("fail to install  internal  libs ")  
         else :  
             sys.stdout.write("NOTE:  if  the  program  doesn't run \nplease relaunch it!\n THANKS!!!!" )  
+""" 
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
@@ -446,11 +448,11 @@ def on_combox_change (
         
         if _ext.__eq__("phen")  :  phen_data= file_type  
         
-
+""" 
 def phen_rowcol ( phenotype_file  , def_sep="\t")   -> List[str]  :  
     dataframe   = pd.read_csv(phenotype_file ,  sep = def_sep) 
     return  dataframe.columns.tolist()  
-
+"""
 
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
@@ -648,8 +650,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
      
     iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
     iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(0,NCORES_AVAILABLE)  ,  ncore_preset_list)   
-    phenotype_rowcol = phen_rowcol(phen_data)
-    iter_stores ( range(0  ,   phenotype_rowcol.__len__()  -  0x02)  ,pheno_preset_list)   
+    #phenotype_rowcol = phen_rowcol(phen_data)
+    iter_stores ( range(0  ,   10)  ,pheno_preset_list)   
     
     
     render_text_tooltip_for_nsim    : Gtk.CellRendererText  =  Gtk.CellRendererText() 
