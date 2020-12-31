@@ -19,6 +19,7 @@ from  collections import  namedtuple
 
 from  fileOps  import  FileOps 
 from  utils    import Utils 
+import pandas as pd  
 """
 try : 
     import pip  
@@ -77,7 +78,7 @@ pb   = setting  (
        False       ,     # RESIZABLE 
        0x05              # BORDER WIDTH
        )
-NSIM_LIMIT         : int  = 0x00a
+NSIM_LIMIT         : int  = 0x00B
 NCORES_AVAILABLE   : int  = multiprocessing.cpu_count()  
 
 #TODO  : figure out this function  to make  it  more  adptable for each os  
@@ -457,11 +458,9 @@ def on_combox_change (
                 
 
         
-""" 
 def phen_rowcol ( phenotype_file  , def_sep="\t")   -> List[str]  :  
     dataframe   = pd.read_csv(phenotype_file ,  sep = def_sep) 
     return  dataframe.columns.tolist()  
-"""
 
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
@@ -589,7 +588,6 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     multiple_marker_rbtn     : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(single_marker_rbtn)  
     multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
     multiple_marker_rbtn.connect("toggled" , on_togglable_widget)
-
   
 
     choose_box.pack_start(single_marker_rbtn , True, False  , 0  )  
@@ -660,10 +658,45 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     pheno_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
      
     iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
-    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(1,NCORES_AVAILABLE+1)  ,  ncore_preset_list)   
-    #phenotype_rowcol = phen_rowcol(phen_data)
-    iter_stores ( range(0  ,   10)  ,pheno_preset_list)   
+    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(1,NCORES_AVAILABLE+1)  ,  ncore_preset_list)
     
+    scrollog        : Gtk.ScrolledWindow = Gtk.ScrolledWindow() 
+    logview         : Gkt.TextView  = Gtk.TextView()
+    logview.set_editable(False) 
+    logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
+    logbuffering.set_text("this  is  a log ") 
+    logview.set_buffer(logbuffering) 
+    scrollog.add(logview) 
+
+    def launch_summary   (  
+            widget         : Gtk.Button      ,  
+            b_log          : Gtk.TextBuffer  , 
+            run_btn_widget : Gtk.Button      , 
+            plist          : Gtk.ListStore
+            ): 
+        # TODO  : ADD CONTROL  TO ENSURE   ALL 3 VARIABLE ARE  NOT EMPTY
+        # TODO  : MAKE STATIC PATH  FOR  SUMMARY.R SCRIPT
+        
+        source  = f"{abs_path_dir_target}/summary.R" 
+        ped_  = f"{abs_path_dir_target}/{ped_data}" 
+        map_  = f"{abs_path_dir_target}/{map_data}" 
+        phen_ = f"{abs_path_dir_target}/{phen_data}" 
+        
+        exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
+                
+        b_log.set_text(exec) 
+        # TODO  : Chech if  some errors are not occured to generate alert message 
+        # if everything  is Ok  enable  the run_btn_widget 
+        # otherwise  , maintain the  disable state  
+       
+        # auto fill phenotype cbox  on load 
+        phenotype_rowcol = phen_rowcol(f"{abs_path_dir_target}/{phen_data}")  
+        iter_stores ( range(1 ,  phenotype_rowcol.__len__() -0x001)  ,plist)   
+        run_btn_widget.set_sensitive(True)   
+
+    
+    #iter_stores ( range(0   , 1003)  ,pheno_preset_list)   
+    load_btn.connect("clicked" , launch_summary ,  logbuffering  , run_btn,  pheno_preset_list )  #  ...) 
     
     render_text_tooltip_for_nsim    : Gtk.CellRendererText  =  Gtk.CellRendererText() 
     render_text_tooltip_for_ncore   : Gtk.CellRendererText  =  Gtk.CellRendererText() 
@@ -706,33 +739,10 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
     
-    scrollog        : Gtk.ScrolledWindow = Gtk.ScrolledWindow() 
-    logview         : Gkt.TextView  = Gtk.TextView()
-    logview.set_editable(False) 
-    logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
-    logbuffering.set_text("this  is  a log ") 
-    logview.set_buffer(logbuffering) 
-    scrollog.add(logview) 
+
     
     # TODO  : ADD EVENT  ON  LOAD  _bTN   
-    def launch_summary   (  widget : Gtk.Button   ,  b_log  : Gtk.TextBuffer  , run_btn_widget : Gtk.Button ): 
-        # TODO  : ADD CONTROL  TO ENSURE   ALL 3 VARIABLE ARE  NOT EMPTY
-        # TODO  : MAKE STATIC PATH  FOR  SUMMARY.R SCRIPT
-        
-        source  = f"{abs_path_dir_target}/summary.R" 
-        ped_  = f"{abs_path_dir_target}/{ped_data}" 
-        map_  = f"{abs_path_dir_target}/{map_data}" 
-        phen_ = f"{abs_path_dir_target}/{phen_data}" 
-        
-        exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
-                
-        b_log.set_text(exec) 
-        # TODO  : Chech if  some errors are not occured to generate alert message 
-        # if everything  is Ok  enable  the run_btn_widget 
-        # otherwise  , maintain the  disable state  
-
-        run_btn_widget.set_sensitive(True)   
-
+   
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
         source  = f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{abs_path_dir_target}/{ped_data}" 
@@ -746,7 +756,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 
 
     run_btn.connect ("clicked" ,  run_analysis  ,  logbuffering )  
-    load_btn.connect("clicked" , launch_summary ,  logbuffering  , run_btn)  #  ...) 
+  
    
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
