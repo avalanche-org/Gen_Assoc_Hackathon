@@ -59,7 +59,7 @@ setting   = namedtuple("setting" , SETTING_PARAMS)
 mw = setting(
         0x3e8      ,     #  WIDTH 
         0x320      ,     #  HEIGHT 
-        False      ,     #  RESIZABLE
+        True       ,     #  RESIZABLE
         0x0a             #  BORDER  WIDTH  
         )             
 #  PARAMETER FOR  START UP  DIALOG  BOX   
@@ -282,7 +282,7 @@ def  on_timeout (
     global call_count  
     call_count+=1 
     print("0> " ,  call_count  ) 
-    trigger   =  (True , False)[call_count  >=  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
+    trigger   =  (True , False)[call_count  >= 2 ] #  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
@@ -405,11 +405,12 @@ phen_chosed   =  int ()
 
 def on_combox_change ( 
         combo_box_wiget  : Gtk.ComboBox,    
+        load_btn_widget  : Gtk.Button =  None,  
         payload      =  None  , 
         sync_cb      =  None  , 
         nsim_select  =  False , 
         ncore_select =  False , 
-        phen_select  =  False  
+        phen_select  =  False   
         ) -> str  :
 
     global ped_data 
@@ -446,7 +447,15 @@ def on_combox_change (
                 equivalent_pos_index  =  payload.index(mapfile_name)  
                 sync_cb.set_active(equivalent_pos_index)  
         
-        if _ext.__eq__("phen")  :  phen_data= file_type  
+        if _ext.__eq__("phen")  :  phen_data= file_type
+
+        if  load_btn_widget and  phen_data  and  ped_data  and map_data  : 
+            load_btn_widget.set_sensitive(True)
+        else  :    
+            if  load_btn_widget  :
+                load_btn_widget.set_sensitive(False)
+                
+
         
 """ 
 def phen_rowcol ( phenotype_file  , def_sep="\t")   -> List[str]  :  
@@ -537,6 +546,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     iter_stores(map_files ,  map_stores) 
     iter_stores(phen_files,  phen_stores) 
 
+    load_btn      : Gtk.Button        =  Gtk.Button(label="Load") 
+    load_btn.set_sensitive(False) 
     
     ped_label     : Gtk.Label         =  Gtk.Label(label="ped :")  
     ped_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(ped_stores)   
@@ -549,17 +560,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 ) 
     # TODO  :  syncronise   ped and  map   
     
-    map_cb.connect("changed" ,  on_combox_change  ,   ped_files , ped_cb)  
-    ped_cb.connect("changed" ,on_combox_change    ,   map_files , map_cb)  
+    map_cb.connect("changed" ,  on_combox_change  ,load_btn, ped_files , ped_cb)  
+    ped_cb.connect("changed" ,on_combox_change    ,load_btn, map_files , map_cb)  
     
     phen_label    :  Gtk.Label        =  Gtk.Label(label ="phen :") 
     phen_cb       : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(phen_stores)
     phen_cb.pack_start(render_text_tooltip_for_phen , True) 
     phen_cb.add_attribute(render_text_tooltip_for_phen ,  "text" , 0 ) 
-    phen_cb.connect("changed" ,  on_combox_change)
+    phen_cb.connect("changed" ,  on_combox_change , load_btn)
 
-    load_btn      : Gtk.Button        =  Gtk.Button(label="Load") 
-    
     setup_box.pack_start(ped_label , True , True ,  0 )  
     setup_box.pack_start(ped_cb    , True , True ,  0 )  
     setup_box.pack_start(map_label , True , True ,  0 )  
@@ -625,6 +634,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_zone.pack_start(marker_set    , True , True ,  0 )
     
     run_btn            : Gtk.Button =  Gtk.Button(label="Run Analysis")
+    run_btn.set_sensitive(False) 
+    
     analysis_zone.pack_start(run_btn ,True , False  , 0 )
     
     run_n_marker_zone  : Gtk.Box    =  Gtk.Box( spacing = 0x00f , orientation = Gtk.Orientation.VERTICAL) 
@@ -661,17 +672,17 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     nsim_cb         :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(nsim_preset_list)    
     nsim_cb.pack_start(render_text_tooltip_for_nsim , True )  
     nsim_cb.add_attribute(render_text_tooltip_for_nsim,   "text" ,  0 ) 
-    nsim_cb.connect("changed" ,  on_combox_change  ,   None , None , True) 
+    nsim_cb.connect("changed" ,  on_combox_change  , None,None , None , True) 
     
     ncore_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(ncore_preset_list)  
     ncore_cb.pack_start(render_text_tooltip_for_ncore , True )  
     ncore_cb.add_attribute(render_text_tooltip_for_ncore , "text" , 0 ) 
-    ncore_cb.connect("changed" ,  on_combox_change  , None , None , False , True) 
+    ncore_cb.connect("changed" ,  on_combox_change  ,None, None , None , False , True) 
     
     pheno_cb        :  Gtk.ComboBoxText  = Gtk.ComboBox.new_with_model(pheno_preset_list)  
     pheno_cb.pack_start(render_text_tooltip_for_pheno , True ) 
     pheno_cb.add_attribute(render_text_tooltip_for_pheno , "text" , 0 )  
-    pheno_cb.connect("changed" ,  on_combox_change  , None , None  ,False , False  , True ) 
+    pheno_cb.connect("changed" ,  on_combox_change  ,None, None , None  ,False , False  , True ) 
     
     
     nsim_box.pack_start(nsim_label      , True , True , 0 ) 
