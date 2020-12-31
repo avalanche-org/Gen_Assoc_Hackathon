@@ -715,7 +715,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     scrollog.add(logview) 
     
     # TODO  : ADD EVENT  ON  LOAD  _bTN   
-    def launch_summary   (  widget : Gtk.Button   ,  b_log  : Gtk.TextBuffer ): 
+    def launch_summary   (  widget : Gtk.Button   ,  b_log  : Gtk.TextBuffer  , run_btn_widget : Gtk.Button ): 
         # TODO  : ADD CONTROL  TO ENSURE   ALL 3 VARIABLE ARE  NOT EMPTY
         # TODO  : MAKE STATIC PATH  FOR  SUMMARY.R SCRIPT
         
@@ -727,7 +727,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
                 
         b_log.set_text(exec) 
-        
+        # TODO  : Chech if  some errors are not occured to generate alert message 
+        # if everything  is Ok  enable  the run_btn_widget 
+        # otherwise  , maintain the  disable state  
+
+        run_btn_widget.set_sensitive(True)   
+
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
         source  = f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{abs_path_dir_target}/{ped_data}" 
@@ -740,8 +745,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
 
 
 
-    load_btn.connect("clicked" , launch_summary ,  logbuffering )  #  ...) 
     run_btn.connect ("clicked" ,  run_analysis  ,  logbuffering )  
+    load_btn.connect("clicked" , launch_summary ,  logbuffering  , run_btn)  #  ...) 
+   
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
