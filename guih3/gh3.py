@@ -19,25 +19,7 @@ from  collections import  namedtuple
 
 from  fileOps  import  FileOps 
 from  utils    import Utils 
-import pandas as pd  
-"""
-try : 
-    import pip  
-except  :  
-    sys.stderr.write("pip module  is  require to  install  automaticly the deps\n")
-    sys.exit(1)  
-else  :  
-    try  : 
-        import  pandas as pd    
-    except  ImportError  :   
-        try : 
-            pip.main(["install" ,  "pandas"])  
-            pip.main(["install" ,  "xlrd"])   
-        except  :  
-            sys.stderr.write("fail to install  internal  libs ")  
-        else :  
-            sys.stdout.write("NOTE:  if  the  program  doesn't run \nplease relaunch it!\n THANKS!!!!" )  
-""" 
+
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
 
@@ -457,18 +439,13 @@ def on_combox_change (
                 load_btn_widget.set_sensitive(False)
                 
 
-        
-def phen_rowcol ( phenotype_file  , def_sep="\t")   -> List[str]  :  
-    dataframe   = pd.read_csv(phenotype_file ,  sep = def_sep) 
-    return  dataframe.columns.tolist()  
-
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     kill_frame(dbox_frame) 
     # load  utils   libs  
     _u_  =  Utils()  
-    
+
     w_d  = abriged_path(abs_path_dir_target)
     main_window_frame  : Gtk.Window =  Gtk.Window( title=f"{basename}:{abs_path_dir_target}  {mw.WIDTH}x{mw.HEIGHT}")  
     main_window_frame.set_border_width(mw.BORDER_WIDTH) 
@@ -690,7 +667,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         # otherwise  , maintain the  disable state  
        
         # auto fill phenotype cbox  on load 
-        phenotype_rowcol = phen_rowcol(f"{abs_path_dir_target}/{phen_data}")  
+        phenotype_rowcol = __fops__.phen_rowcol(f"{abs_path_dir_target}/{phen_data}")  
         iter_stores ( range(1 ,  phenotype_rowcol.__len__() -0x001)  ,plist)   
         run_btn_widget.set_sensitive(True)   
 

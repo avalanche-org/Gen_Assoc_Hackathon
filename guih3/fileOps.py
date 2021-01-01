@@ -4,7 +4,25 @@ __author__="Umar <j_umar@outlook.com>"
 
 import os , sys   
 from  typing import  Dict ,  Tuple , List  
-from  glob import glob  
+from  glob import glob
+
+try : 
+    import pip  
+except  :  
+    sys.stderr.write("pip module  is  require to  install  automaticly the deps\n")
+    sys.exit(1)  
+else  :  
+    try  : 
+        import  pandas as pd    
+    except  ImportError  :   
+        try : 
+            pip.main(["install" ,  "pandas"])  
+            pip.main(["install" ,  "xlrd"])   
+        except  :  
+            sys.stderr.write("fail to install  internal  libs ")  
+        else :  
+            sys.stdout.write("NOTE:  if  the  program  doesn't run \nplease relaunch it!\n THANKS!!!!" )  
+
 
 
 class  FileOps  : 
@@ -72,34 +90,7 @@ class  FileOps  :
         return  glob(f"{self.curdir}/*.{filter_by_extension}")
 
 
-        pass
-     
- 
-   
+    def  phen_rowcol ( self  , phenotype_file  ,def_sep=chr(0x009) ) :  
+        dataframe  =  pd.read_csv(phenotype_file , sep= def_sep)  
+        return dataframe.columns.tolist()  
 
-    def draw_tree  ( self )  : 
-        """
-        draw tree  of the folder content 
-        pass
-        """  
-        pass  
-    
-
-"""
-#  TESTING  ZONE 
-def  main  () :
-     
-    previews_Dir = "../Environment" 
-    f  = FileOps("../Environment") 
-    print("---> "  , f.get_size_of_directory())
-    
-    print(f.list_files("py")) 
-
-
-
-
-
-
-if __name__.__eq__("__main__")  :  
-     main () 
-"""
