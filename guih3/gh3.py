@@ -602,8 +602,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     marker_payload  :  Gtk.ListStore =  Gtk.ListStore(int) 
     marker_label    :  Gtk.Label     = Gtk.Label(label="MarkerSet :")  
-    marker_set      :  Gtk.ComboBox = Gtk.ComboBox.new_with_model_and_entry(marker_payload)
-    marker_set.connect("changed"   , on_combox_change)  
+    marker_set      :  Gtk.Entry     = Gtk.Entry()  # Gtk.ComboBox.new_with_model_and_entry(marker_payload)
+    marker_set.set_text("e.g  1,2,3")
+    # marker_set.connect("changed"   , on_combox_change)  
     
     marker_zone.pack_start(marker_label  , False , True ,  0 )  
     marker_zone.pack_start(marker_set    , True , True ,  0 )
