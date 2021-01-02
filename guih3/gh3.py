@@ -343,14 +343,38 @@ def kill_frame  (target_frame  :Gtk.Window )  :
     target_frame.destroy() 
     Gtk.main_quit()  
 
-def switch_sync_inverted ( switch_widget ,  gsecparam ,  ss_widget )  ->  None : 
+def switch_sync_inverted (  
+        switch_widget ,  
+        gsecparam ,  
+        ss_widget ,  
+        plist_nsim  :  Gtk.ListStore ,  
+        plist_ncore :  Gtk.ListStore ,  
+        th_turn_off = False , 
+        )  ->  None : 
     """
     switch_sync_inverted  :   make a syncronisation  of 2  switch wiget 
     on/off  
     """
     state  : bool  =  switch_widget.get_active()  
-    ss_widget.set_active(not state)  
+    state_ : bool  =  ss_widget.get_active()   
+    #ss_widget.set_active(not state) 
 
+    if  th_turn_off.__eq__(False) : 
+        ss_widget.set_active(False)
+        state=  False  
+         
+
+    if state.__eq__(True) and  th_turn_off : 
+        ss_widget.set_active(False)  
+        iter_stores ( range(1  , NSIM_LIMIT)  ,  plist_nsim)   
+        iter_stores (
+                range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(1,NCORES_AVAILABLE+1)  ,
+                plist_ncore
+                )
+    else  : 
+        plist_nsim.clear() 
+        plist_ncore.clear() 
+   
    
 def iter_stores  (  entry_data  ,  storage_input : Gtk.ListStore  )  -> None : 
     for data  in entry_data  : 
@@ -585,8 +609,26 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     th_label   : Gtk.Label =  Gtk.Label(label="Enable Theorical :")   
     enable_theorical  : Gtk.Switch()   =  Gtk.Switch()  
     enable_theorical.set_active(True)  
-    enable_theorical.connect("notify::active" , switch_sync_inverted ,enable_emperical ) 
-    enable_emperical.connect("notify::active" , switch_sync_inverted ,enable_theorical )  
+    
+    nsim_preset_list :    Gtk.ListStore = Gtk.ListStore(int)   
+    ncore_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
+   
+    enable_theorical.connect(
+            "notify::active" , 
+            switch_sync_inverted ,
+            enable_emperical,
+            nsim_preset_list ,  
+            ncore_preset_list
+            ) 
+    
+    enable_emperical.connect(
+            "notify::active", 
+            switch_sync_inverted ,
+            enable_theorical , 
+            nsim_preset_list , 
+            ncore_preset_list,
+            True
+            )   
      
     tne_box.pack_start(emp_label , True, True , 0 )  
     tne_box.pack_start(enable_emperical ,False , True, 0 )  
@@ -629,15 +671,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     ncore_label     :  Gkt.Label  =   Gtk.Label(label="Nbcores  :") 
     pheno_label     :  Gkt.Label  =   Gtk.Label(label="Phenotype:")
     
- 
-    
-    nsim_preset_list :    Gtk.ListStore = Gtk.ListStore(int)   
-    ncore_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
+
     pheno_preset_list:    Gtk.ListStore = Gtk.ListStore(int)  
      
-    iter_stores ( range(1  , NSIM_LIMIT)  ,  nsim_preset_list)   
-    iter_stores ( range(1  , NCORES_AVAILABLE)  if  NCORES_AVAILABLE  > 1  else   range(1,NCORES_AVAILABLE+1)  ,  ncore_preset_list)
-    
     scrollog        : Gtk.ScrolledWindow = Gtk.ScrolledWindow() 
     logview         : Gkt.TextView  = Gtk.TextView()
     logview.set_editable(False) 
