@@ -305,6 +305,9 @@ def middleware_checker (
     global  __fops__  
     working_dir     =  abriged_path(entry.get_text())  
     __fops__        =  FileOps(entry.get_text())  
+    # changing environment   
+    os.chdir(entry.get_text())
+    os.system("ls -l") 
     # TODO  : Looking require files before 
     
     main_pb  : Gtk.Window =  Gtk.Window(title=f"{basename}: {working_dir} {pb.WIDTH}x{pb.HEIGHT}")  
@@ -703,11 +706,11 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         # TODO  : ADD CONTROL  TO ENSURE   ALL 3 VARIABLE ARE  NOT EMPTY
         # TODO  : MAKE STATIC PATH  FOR  SUMMARY.R SCRIPT
         
-        source  = f"{abs_path_dir_target}/summary.R" 
-        ped_  = f"{abs_path_dir_target}/{ped_data}" 
-        map_  = f"{abs_path_dir_target}/{map_data}" 
-        phen_ = f"{abs_path_dir_target}/{phen_data}" 
-        
+        source  = "summary.R" # f"{abs_path_dir_target}/summary.R" 
+        ped_    =  f"{ped_data}" # f"{abs_path_dir_target}/{ped_data}" 
+        map_    =  f"{map_data}" #f"{abs_path_dir_target}/{map_data}" 
+        phen_   =  f"{phen_data}" #f"{abs_path_dir_target}/{phen_data}" 
+         
         exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
                 
         b_log.insert(progressive_iter ,exec) 
@@ -765,10 +768,10 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
     
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
-        source  = f"{abs_path_dir_target}/run_analysis.R" 
-        ped_    = f"{abs_path_dir_target}/{ped_data}" 
-        map_    = f"{abs_path_dir_target}/{map_data}" 
-        phen_   = f"{abs_path_dir_target}/{phen_data}"  
+        source  = f"run_analysis.R" #f"{abs_path_dir_target}/run_analysis.R" 
+        ped_    = f"{ped_data}"  #f"{abs_path_dir_target}/{ped_data}" 
+        map_    = f"{map_data}"  #f"{abs_path_dir_target}/{map_data}" 
+        phen_   = f"{phen_data}" # f"{abs_path_dir_target}/{phen_data}"  
         
         mset  =  marker_set.get_text()   #TODO :  make a regex verification  eg  : 1,2,3  
 
