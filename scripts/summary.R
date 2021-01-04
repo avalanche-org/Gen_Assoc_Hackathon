@@ -32,9 +32,17 @@ NucFam <- function(i, dataset) {
   return(n)
 }
 
+
+#-------  Paths
+path = getwd()
+plink_ = "/home/g4bbm/tools/Plink/plink"
+
 #-------  Collect arguments
 
 library(optparse)
+
+cat("_____________________________")
+cat("\n*** Working directory: ",path,"\n")
 
 # Options
 option_list = list(
@@ -51,12 +59,18 @@ if(is.null(opt$pedfile)) stop("Option --pedfile is required.")
 if(is.null(opt$mapfile)) stop("Option --mapfile is required.")
 if(is.null(opt$phenfile)) stop("Option --phenfile is required.")
 
-plink_ = "/home/g4bbm/tools/Plink/plink"
-
 # --- Files
-ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
-map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
-phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
+ped = read.delim(paste0(path,"/",opt$pedfile), header = F , stringsAsFactors = F)
+map = read.delim(paste0(path,"/",opt$mapfile), header = F , stringsAsFactors = F)
+phen = read.delim(paste0(path,"/",opt$phenfile), header = F , stringsAsFactors = F)
+
+# --- File Control
+
+if (( nrow(map) != ncol(ped)-6) | nrow(phen)!=nrow(ped) ) stop(
+  cat("\n /!\ Files do not match. \n"),
+  cat("**", ncol(ped)-6 ," markers for ped file \n"),
+  cat("**", nrow(map) ," markers for map file \n")
+)
 
 # --- Variables
 numb_snps = nrow(ped)* (ncol(ped)-6)
