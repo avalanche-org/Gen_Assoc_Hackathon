@@ -184,7 +184,6 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     dialog_frame.set_border_width(dbox.BORDER_WIDTH) 
     dialog_frame.set_default_size(dbox.WIDTH , dbox.HEIGHT) 
     dialog_frame.set_resizable(dbox.RESIZABLE)  
-     
    
     #  box  layer  
     mainbox  : Gtk.Box  =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.VERTICAL) 
@@ -265,8 +264,9 @@ def  on_timeout (
 
     global call_count  
     call_count+=1 
-    print("0> " ,  call_count  ) 
-    trigger   =  (True , False)[call_count  >= 2 ] #  0x64 >> 1  ]  # TODO :  replace  0x64 by the  size of the folder  !  
+    print("0> " ,  call_count  )
+    dir_size  = int( dir_size)   
+    trigger   =  (True , False)[call_count  >=  dir_size ]  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
@@ -363,7 +363,6 @@ def switch_sync_inverted (
     if  th_turn_off.__eq__(False) : 
         ss_widget.set_active(False)
         state=  False  
-         
 
     if state.__eq__(True) and  th_turn_off : 
         ss_widget.set_active(False)  
@@ -491,12 +490,11 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
 
-
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )
    
     _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}")   
     _ff.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)  #  0x004   
-    expander      : Gtk.Expander =  Gtk.Expander(label="-----") #  TODO : replace  wd to  dir name
+    expander      : Gtk.Expander =  Gtk.Expander(label="-----")
     current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(abs_path_dir_target)))  
     expander.add(current_dir_content) 
     _ff.add(expander)  
@@ -599,8 +597,6 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
     multiple_marker_rbtn.connect("toggled" , on_togglable_widget , marker_set)
 
-  
-
     choose_box.pack_start(single_marker_rbtn , True, False  , 0 )  
     choose_box.pack_start(multiple_marker_rbtn, True ,False, 0)
     
@@ -684,7 +680,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     logview         : Gkt.TextView  = Gtk.TextView()
     logview.set_editable(False) 
     logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
-    logbuffering.set_text("this  is  a log ") 
+    progressive_iter  =  logbuffering.get_end_iter()
+    logbuffering.insert(progressive_iter , "this is a simple log" )  
+    #logbuffering.set_text("this  is  a log ") 
     logview.set_buffer(logbuffering) 
     scrollog.add(logview) 
 
@@ -704,7 +702,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         
         exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
                 
-        b_log.set_text(exec) 
+        b_log.insert(progressive_iter ,exec) 
         # TODO  : Chech if  some errors are not occured to generate alert message 
         # if everything  is Ok  enable  the run_btn_widget 
         # otherwise  , maintain the  disable state  
@@ -755,29 +753,23 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_n_setarg.pack_start(setup_args_box, True , True  , 0 ) 
     
     marker_n_setarg.pack_start(run_n_marker_zone, True , True  , 0 ) 
-
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
     
-
-    
-    # TODO  : ADD EVENT  ON  LOAD  _bTN   
-   
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
         source  = f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{abs_path_dir_target}/{ped_data}" 
         map_    = f"{abs_path_dir_target}/{map_data}" 
         phen_   = f"{abs_path_dir_target}/{phen_data}" 
 
+        #print("ms txt "  , marker_set.get_text() )  
+
         cmd  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
         exec = _u_.stream_stdout(cmd)  
-        b_log.set_text(exec) 
-
+        b_log.insert(progressive_iter, exec) 
 
 
     run_btn.connect ("clicked" ,  run_analysis  ,  logbuffering )  
-  
-   
 
     bottombox       : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING ,  orientation= Gtk.Orientation.HORIZONTAL)
     quit_bnt        : Gtk.Button =  Gtk.Button(label="Quit")  
