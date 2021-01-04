@@ -278,7 +278,7 @@ def  on_timeout (
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
-        activity_bar.set_show_text(True)  
+        activity_bar.set_show_text(True)   
         #sleep(2) 
         main_container.destroy()
         Gtk.main_quit()
@@ -770,11 +770,15 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         map_    = f"{abs_path_dir_target}/{map_data}" 
         phen_   = f"{abs_path_dir_target}/{phen_data}"  
         
-        cmd  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
-        
-        print("ms txt "  , marker_set.get_text() )  
+        mset  =  marker_set.get_text()   #TODO :  make a regex verification  eg  : 1,2,3  
 
-        exec = _u_.stream_stdout(cmd)  
+        cmd_mmset =f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --phen {phen_chosed} --markerset {mset} --nbsim {nsims_chosed} --nbcores {ncores_chosed}" 
+        cmd_no_mmset  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_}  --phen {phen_chosed} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"
+
+        exec  : str  = ""  
+        if  is_mm_set  :   exec = _u_.stream_stdout(cmd_mmset)  
+        else :             exec = _u_.stream_stdout(cmd_no_mmset) 
+        
         b_log.insert(progressive_iter, exec) 
 
 
