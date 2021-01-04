@@ -22,6 +22,7 @@ from  utils    import Utils
 
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
+PRODUCTION_READY  =   False  
 
 BOX_SPACING  : int  =   0x06 
 
@@ -226,6 +227,7 @@ def dialog_box (main_frame : Gtk.Window)->  None :
     show_frame(dialog_frame)  
 
 state  :  str  ="yes"   
+is_mm_set  :  bool  =   False   
 
 def on_togglable_widget ( w_togglable , field_entry  : Gtk.Entry ) ->   None :  
     """ 
@@ -236,9 +238,14 @@ def on_togglable_widget ( w_togglable , field_entry  : Gtk.Entry ) ->   None :
     None  
     """ 
     global state  
+    global is_mm_set  
     state  =   (w_togglable.get_label() , w_togglable.get_label()) [w_togglable.get_active()]
-    if state.lower().__eq__("multiple marker")  : field_entry.set_editable(True)   
-    if state.lower().__eq__("single marker")    : field_entry.set_editable(False)    
+    if state.lower().__eq__("multiple marker")  :   
+        is_mm_set = True  
+        field_entry.set_editable(True)   
+    if state.lower().__eq__("single marker")    : 
+        is_mm_set  = False  
+        field_entry.set_editable(False)    
  
 
 def even_launch   ( btn_widget :  Gtk.Button)  ->  None  :  
@@ -265,13 +272,14 @@ def  on_timeout (
     global call_count  
     call_count+=1 
     print("0> " ,  call_count  )
-    dir_size  = int( dir_size)   
+    if  PRODUCTION_READY : dir_size  = int( dir_size)  
+    else : dir_size = 1   
     trigger   =  (True , False)[call_count  >=  dir_size ]  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
         activity_bar.set_show_text(True)  
-        sleep(2) 
+        #sleep(2) 
         main_container.destroy()
         Gtk.main_quit()
 
@@ -681,7 +689,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     logview.set_editable(False) 
     logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
     progressive_iter  =  logbuffering.get_end_iter()
-    logbuffering.insert(progressive_iter , "this is a simple log" )  
+    #logbuffering.insert(progressive_iter , "this is a simple log" )  
     #logbuffering.set_text("this  is  a log ") 
     logview.set_buffer(logbuffering) 
     scrollog.add(logview) 
@@ -760,11 +768,12 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         source  = f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{abs_path_dir_target}/{ped_data}" 
         map_    = f"{abs_path_dir_target}/{map_data}" 
-        phen_   = f"{abs_path_dir_target}/{phen_data}" 
-
-        #print("ms txt "  , marker_set.get_text() )  
-
+        phen_   = f"{abs_path_dir_target}/{phen_data}"  
+        
         cmd  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"  
+        
+        print("ms txt "  , marker_set.get_text() )  
+
         exec = _u_.stream_stdout(cmd)  
         b_log.insert(progressive_iter, exec) 
 
