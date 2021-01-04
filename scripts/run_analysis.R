@@ -95,22 +95,13 @@ for (i in 1:length(flag)){
 
 #   ---  File management
 
-# --- Basenames
-
-ped_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], "/")))], " "))[2]
-map_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], "/")))], " "))[2]
-phen_basename = unlist(str_split(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))], " "))[2]
-
-# phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/"))[length(unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], "/")))]
-
-
 # --- Read Files
 
 cat("Reading files... \n")
 
-ped = read.delim(paste0(ped_basename,".ped"), header = F , stringsAsFactors = F)
-map = read.delim(paste0(map_basename,".map"), header = F , stringsAsFactors = F)
-phen = read.delim(paste0(phen_basename, ".phen"), header = F , stringsAsFactors = F)
+ped = read.delim(unlist(str_split(flag[1], " "))[2], header = F , stringsAsFactors = F)
+map = read.delim(unlist(str_split(flag[2], " "))[2], header = F , stringsAsFactors = F)
+phen = read.delim(unlist(str_split(flag[3], " "))[2], header = F , stringsAsFactors = F)
 
 # --- Process files with Complete Pedigree function
 
