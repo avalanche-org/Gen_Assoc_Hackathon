@@ -228,7 +228,7 @@ def dialog_box (main_frame : Gtk.Window)->  None :
 
 state  :  str  ="yes"   
 
-def on_togglable_widget ( w_togglable ) ->   None :  
+def on_togglable_widget ( w_togglable , field_entry  : Gtk.Entry ) ->   None :  
     """ 
     rbtn_on_toggle  :  get  the state  of radio button  on toggle event  
     @param    : 
@@ -237,8 +237,9 @@ def on_togglable_widget ( w_togglable ) ->   None :
     None  
     """ 
     global state  
-    state  =   (w_togglable.get_label() , w_togglable.get_label()) [w_togglable.get_active()]  
-    sys.stdout.write("{}\n".format(state)) 
+    state  =   (w_togglable.get_label() , w_togglable.get_label()) [w_togglable.get_active()]
+    if state.lower().__eq__("multiple marker")  : field_entry.set_editable(True)   
+    if state.lower().__eq__("single marker")    : field_entry.set_editable(False)    
  
 
 def even_launch   ( btn_widget :  Gtk.Button)  ->  None  :  
@@ -578,21 +579,30 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     setup_box.pack_start(load_btn  , True , True ,  0 )
 
     choose_box    : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL)  
+
+    #  the radio button  is related  to  marker set  entry  point 
+    marker_payload  :  Gtk.ListStore =  Gtk.ListStore(int) 
+    marker_label    :  Gtk.Label     = Gtk.Label(label="MarkerSet :")  
+    marker_set      :  Gtk.Entry     = Gtk.Entry()  # Gtk.ComboBox.new_with_model_and_entry(marker_payload)
+    marker_set.set_editable(False)  
+    #marker_set.set_text()
+    # marker_set.connect("changed"   , on_combox_change)  
     # check box  area 
     run_opts   : Dict[str , str ]    =  {  
             "1" :  "Single Marker" ,
             "2" :  "Multiple Marker"
             }  
     single_marker_rbtn       : Gtk.RadioButton  =  Gtk.RadioButton.new_with_label_from_widget(None,f"{run_opts['1']}")  
-    single_marker_rbtn.connect("toggled" , on_togglable_widget)
+    single_marker_rbtn.connect("toggled" , on_togglable_widget  , marker_set)
    
     multiple_marker_rbtn     : Gtk.RadioButton  =  Gtk.RadioButton.new_from_widget(single_marker_rbtn)  
     multiple_marker_rbtn.set_label(f"{run_opts['2']}")   
-    multiple_marker_rbtn.connect("toggled" , on_togglable_widget)
+    multiple_marker_rbtn.connect("toggled" , on_togglable_widget , marker_set)
+
   
 
-    choose_box.pack_start(single_marker_rbtn , True, False  , 0  )  
-    choose_box.pack_start(multiple_marker_rbtn, True ,False, 0  )
+    choose_box.pack_start(single_marker_rbtn , True, False  , 0 )  
+    choose_box.pack_start(multiple_marker_rbtn, True ,False, 0)
     
     #choose_box.pack_start(run_btn  ,  True , True, 0 )   
 
@@ -642,11 +652,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_zone     :  Gtk.Box    = Gtk.Box(spacing  = 0x00f  , orientation=Gtk.Orientation.HORIZONTAL)
     analysis_zone   :  Gtk.Box    = Gtk.Box(spacing  = 0x00f  , orientation=Gtk.Orientation.HORIZONTAL) 
     
-    marker_payload  :  Gtk.ListStore =  Gtk.ListStore(int) 
-    marker_label    :  Gtk.Label     = Gtk.Label(label="MarkerSet :")  
-    marker_set      :  Gtk.Entry     = Gtk.Entry()  # Gtk.ComboBox.new_with_model_and_entry(marker_payload)
-    marker_set.set_text("e.g  1,2,3")
-    # marker_set.connect("changed"   , on_combox_change)  
+
     
     marker_zone.pack_start(marker_label  , False , True ,  0 )  
     marker_zone.pack_start(marker_set    , True , True ,  0 )
