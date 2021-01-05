@@ -110,9 +110,16 @@ for (i in 1:length(flag)){
 # map_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[2]), "/"))[length(unlist(str_split(c(flag[2]), "/")))],side = "both"),".map"))[1]
 # phen_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[3]), "/"))[length(unlist(str_split(c(flag[3]), "/")))],side = "both"),".phen"))[1]
 
-ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], " "))[2]
-map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], " "))[2]
-phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], " "))[2]
+
+pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
+mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
+phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
+
+
+ped_basename = unlist(str_split(pedfile, ".ped"))[1]
+map_basename = unlist(str_split(mapfile, ".map"))[1]
+phen_basename = unlist(str_split(phenfile, ".phen"))[1]
+
 
 # --- Read Files
 
@@ -123,9 +130,10 @@ cat("Reading files... \n")
 # phen = read.delim(unlist(str_split(flag[3], " "))[2], header = F , stringsAsFactors = F)
 
 
-ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
-map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
-phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
+ped = read.delim(pedfile, header = F , stringsAsFactors = F)
+map = read.delim(mapfile, header = F , stringsAsFactors = F)
+phen = read.delim(phenfile, header = F , stringsAsFactors = F)
+
 cat('Done. \n')
 
 # --- Process files with Complete Pedigree function
@@ -156,3 +164,4 @@ cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv w
 system(cmd)
 
 rm(list=ls())
+
