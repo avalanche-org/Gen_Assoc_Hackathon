@@ -82,7 +82,7 @@ phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
 
 #if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
 
-if (( nrow(map) != ncol(ped)-6)) stop(
+if (( nrow(map) != ncol(ped)-6)) stop(  #The MAP file must contain as many markers as are in the PED file
   cat("\n /!\ Files do not match. \n"),
   cat("**", ncol(ped)-6 ," markers for ped file \n"),
   cat("**", nrow(map) ," markers for map file \n"),
