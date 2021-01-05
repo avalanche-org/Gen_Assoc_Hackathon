@@ -60,9 +60,9 @@ library(stringr)
 
 #path= (unlist(str_split(opt$pedfile,unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))])))[1]
 
-opt$pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
-opt$mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
-opt$phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
+#opt$pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
+#opt$mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
+#opt$phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
 
 
 if(is.null(opt$pedfile)) {cat("Option --pedfile is required. \n Execution stopped.")}
@@ -80,13 +80,14 @@ phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
 
 # --- File Control
 
-if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
+#if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
+
+if (( nrow(map) != ncol(ped)-6)) stop(
   cat("\n /!\ Files do not match. \n"),
   cat("**", ncol(ped)-6 ," markers for ped file \n"),
   cat("**", nrow(map) ," markers for map file \n"),
   cat("**", nrow(phen) ," phenotypes for phen file \n")
 )
-
 
 # --- Variables
 numb_snps = nrow(ped)* (ncol(ped)-6)
