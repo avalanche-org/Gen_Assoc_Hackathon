@@ -11,8 +11,6 @@ args = commandArgs(trailingOnly = TRUE)
 #-------  run_analysis.R
 #-------  Receive all arguments to run mTDT 
 
-path = system("pwd", intern = T)
-setwd(path)
 
 plink_ = "/home/g4bbm/tools/Plink/plink"
 
@@ -71,14 +69,16 @@ opt = parse_args(opt_parser)
 
 library(stringr)
 
+cat(getwd(), "\n")
 
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
-" --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
+            " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
 
 # --- Detect selected flags and write command
 
 flag <- unlist(str_split(c(cmd),"--"))[-1]
 positions= NULL
+
 
 for (i in 1:length(flag)){
   if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}
@@ -87,7 +87,6 @@ if (length(positions)>0){
   flag = flag[-positions]
 }
 
-
 cat("Selected flags: \n")
 for (i in 1:length(flag)){
   cat(paste0("--",flag[i], "\n"))
@@ -95,13 +94,39 @@ for (i in 1:length(flag)){
 
 #   ---  File management
 
+# --- Path
+
+# path = "/"
+# if (length(unlist(str_split(c(flag[1]), "/")))){
+#   for (i in 2:(length(unlist(str_split(c(flag[1]), "/")))-1)){
+#     path = paste0(path,unlist(str_split(c(flag[1]), "/"))[i],"/")
+#   }
+# } else {path= ""}
+
+
+# --- Basenames
+
+# ped_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[1]), "/"))[length(unlist(str_split(c(flag[1]), "/")))],side = "both"),".ped"))[1]
+# map_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[2]), "/"))[length(unlist(str_split(c(flag[2]), "/")))],side = "both"),".map"))[1]
+# phen_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[3]), "/"))[length(unlist(str_split(c(flag[3]), "/")))],side = "both"),".phen"))[1]
+
+ped_basename = unlist(str_split(unlist(str_split(c(flag[1]), ".ped"))[1], " "))[2]
+map_basename = unlist(str_split(unlist(str_split(c(flag[2]), ".map"))[1], " "))[2]
+phen_basename = unlist(str_split(unlist(str_split(c(flag[3]), ".phen"))[1], " "))[2]
+
 # --- Read Files
 
 cat("Reading files... \n")
 
-ped = read.delim(unlist(str_split(flag[1], " "))[2], header = F , stringsAsFactors = F)
-map = read.delim(unlist(str_split(flag[2], " "))[2], header = F , stringsAsFactors = F)
-phen = read.delim(unlist(str_split(flag[3], " "))[2], header = F , stringsAsFactors = F)
+# ped = read.delim(unlist(str_split(flag[1], " "))[2], header = F , stringsAsFactors = F)
+# map = read.delim(unlist(str_split(flag[2], " "))[2], header = F , stringsAsFactors = F)
+# phen = read.delim(unlist(str_split(flag[3], " "))[2], header = F , stringsAsFactors = F)
+
+
+ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
+map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
+phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
+cat('Done. \n')
 
 # --- Process files with Complete Pedigree function
 
@@ -110,16 +135,16 @@ mtdt_map = paste0("M", (7:ncol(mtdt_ped)-6))
 
 # --- write files
 
-write.table(mtdt_ped, paste0(ped_basename,"_CP.ped"),
+write.table(mtdt_ped, paste0(unlist(str_split(ped_basename,".ped"))[1],"_CP.ped"),
             sep = "\t", quote = F, col.names = F, row.names = F)
-write.table(mtdt_map, paste0(map_basename,"_CP.map"),
+write.table(mtdt_map, paste0(unlist(str_split(map_basename,".map"))[1],"_CP.map"),
             sep = "\t", quote = F, col.names = F, row.names = F)
 
 # ---  run command
 
-cmd = paste0("Rscript ",path,"/mtdt.R --pedfile ", ped_basename,"_CP.ped --mapfile ", map_basename,"_CP.map --phenfile ", phen_basename,".phen")
+cmd = paste0("Rscript mtdt.R --pedfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", unlist(str_split(phen_basename,".phen"))[1],".phen ")
 
-for (i in 4:length(flag)){
+for (i in 4:length(flag)){    # complete cmd
   cmd = paste0(cmd," --",flag[i])
 }
 
@@ -127,8 +152,7 @@ system(cmd)
 
 # --- Output 
 
-cmd = paste0("mkdir ", ped_basename,"_results; mv weighted* ", ped_basename,"_results/ ; mv *_CP.* ", ped_basename,"_results/")
+cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/")
 system(cmd)
 
 rm(list=ls())
-
