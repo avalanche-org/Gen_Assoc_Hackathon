@@ -12,7 +12,7 @@ import os , sys , gi , argparse
 gi.require_version("Gtk" , "3.0")  
 from gi.repository import  Gtk , GLib
 import  multiprocessing  
-
+import  re
 from time import sleep 
 from  typing  import List , Dict , Tuple  
 from  collections import  namedtuple
@@ -774,8 +774,48 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         phen_   = f"{phen_data}" # f"{abs_path_dir_target}/{phen_data}"  
         
         mset  =  marker_set.get_text()   #TODO :  make a regex verification  eg  : 1,2,3  
+        mset_patern =  re.search(r'^[0-9].+' ,mset) 
+        
+        if  mset.__len__() <  2  :  
+            try :  
+                int(mset) 
+                generic_alert_dialog ("error" , "marker set  error " , "need 2 markers  at least")  
+            except :  
+                generic_alert_dialog ("error" , "marker set  error " , "require  numerical number")  
+            
 
-        cmd_mmset =f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --phen {phen_chosed} --markerset {mset} --nbsim {nsims_chosed} --nbcores {ncores_chosed}" 
+        if  mset_patern is   None   : # mset_patern.group().__eq__(mset) : 
+            b_log.insert(progressive_iter ,  "your  market set  is  wrong eg 1,2,3")
+            return
+                 
+        if  mset_patern  is not None  and mset_patern.group().__len__()  > 1 :
+            allowed_sep  : List[str] =  [   chr(0x2e) , chr(0x2d) , chr(0x2c) ,  chr(0x20) ]   #  . - ,   "space" 
+            
+            #TODO :  get  dynamicly  the  separtor  
+            marker_size    =  str(mset_patern.group()).split(allowed_sep[0x02])   # by default  it's use comma separator
+                       
+            if  marker_size[-1].__eq__("")   :del marker_size[-1]  
+                 
+            error_occured  =  False 
+            marker_indexes =  list()  
+            for  i_marker in marker_size :  
+                try :
+                    int(i_marker)
+                    marker_indexes.append(i_marker)  
+                except : 
+                    error_occured = True  
+
+            if error_occured  :         
+                generic_alert_dialog ("warning" , "marker set  warning" , "only  numbers w'll be taken sorry !\n eg  1,2,3")   
+                error_occured = False 
+
+            if marker_indexes.__len__() >=  2 :  
+                mset  =  allowed_sep[2].join(marker_indexes) 
+                
+            if  marker_indexes.__len__()  >  3  :  
+                generic_alert_dialog ("warning" , "Marker Set  Warning" , "Max Marker Set recommanded is 3 " )  
+
+        cmd_mmset =f"Rscript {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_} --phen {phen_chosed} --markerset {mset} --nbsim {nsims_chosed} --nbcores {ncores_chosed}" 
         cmd_no_mmset  = f"Rscript   {source} --pedfile  {ped_} --mapfile {map_}  --phenfile {phen_}  --phen {phen_chosed} --nbsim {nsims_chosed} --nbcores {ncores_chosed}"
 
         exec  : str  = ""  
