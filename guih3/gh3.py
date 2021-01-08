@@ -271,14 +271,13 @@ def  on_timeout (
     global call_count  
     call_count+=1 
     #print("0> " ,  call_count  
-    dir_size  = int( dir_size)  
-   
+    dir_size  = int(dir_size)   
     trigger   =  (True , False)[call_count  >=  dir_size ]  
     if trigger : activity_bar.pulse() 
     else  :  
         activity_bar.set_text("laoding data ")  
         activity_bar.set_show_text(True)   
-        #sleep(2) 
+        sleep(2) 
         main_container.destroy()
         Gtk.main_quit()
 
