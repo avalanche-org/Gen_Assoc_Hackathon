@@ -40,7 +40,11 @@ class  FileOps  :
         if  byte_size <  b_factor  :  
             return  byte_size   
         byte_size /= b_factor  
-        return   byte_size  
+        return   byte_size
+
+
+    def   set_new_entry  ( self  ,  abs_path  )   :  
+        self.curdir  =  abs_path  
 
     def  get_size_of_directory   (self  ,  deep_folder = None ) ->  int  : 
         """  

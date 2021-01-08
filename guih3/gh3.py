@@ -10,7 +10,7 @@ LICENSE  HERE !!
 """ 
 import os , sys , gi , argparse    
 gi.require_version("Gtk" , "3.0")  
-from gi.repository import  Gtk , GLib
+from gi.repository import  Gtk , GLib, Gdk
 import  multiprocessing  
 import  re
 from time import sleep 
@@ -133,7 +133,7 @@ mut_label     : str  = str ()
 
 abs_path_dir_target  :str  =  os.getcwd()  # start where   u'r
 
-def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type  :str  = "directory")  -> None : 
+def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type  :str  = "directory" , default_dir = os.getcwd())  -> None : 
     """ 
     file_chooser  :  file chooser wiget  
     give the way to choose file
@@ -158,7 +158,7 @@ def chooser  ( btn_wiget: Gtk.Button  ,  entry_widget : Gtk.Entry , chooser_type
             parent =   None ,   
             action =   def_attr 
             )
-
+    fc_dialog.set_current_folder(default_dir) 
     fc_dialog.add_button(f"_{mut_label}" ,Gtk.ResponseType.OK) 
     fc_dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL) 
     fc_dialog.set_default_response(Gtk.ResponseType.OK) 
@@ -475,6 +475,61 @@ def on_combox_change (
                 
 
 
+def  load_new_file  (  btn_widget   , entry  :Gtk.Entry   , main_entity :  Gtk.Window)  :  
+    global   abs_path_dir_target  
+    abs_path_dir_target  =  entry.get_text ()
+    #changing new  environment path 
+    try  :  os.chdir(abs_path_dir_target)  
+    except  FileNotFoundError  :  
+        generic_alert_dialog("info", "Directory not found" , "Please Browse your Directory")  
+
+    #initialize new   files   
+    __fops__.set_new_entry(abs_path_dir_target)   
+    
+    Gtk.main_quit()  
+    # reload  the  main frame  entity  
+    main_frame(main_entity)     # TODO   : Figure out this   without  reloading only  load the required files  
+    
+
+cli_composer = []  
+def  enter_key_press (  widget_txt_view ,  evt  , logbuff, _u_)  : 
+    global  cli_composer 
+    # TODO  : MAKE A TRANSLATION  OF  COMMANDE  IMPROVE !!! 
+    cli_composer.append(Gdk.keyval_name(evt.keyval))  # .__eq__("Return") :
+    
+    if Gdk.keyval_name(evt.keyval).__eq__("Return") : 
+        cli_composer=  cli_composer[:-1]
+        cmd = "".join(cli_composer)  
+        print(cmd) 
+        cli_composer = []
+        if  cmd.__eq__("clear")  :  
+            clean_console( Gtk.Button() ,logbuff)
+        exec =  _u_.stream_stdout(cmd)
+        cmd =  "" 
+        progressive_iter  =  logbuff.get_end_iter()
+        logbuff.insert(progressive_iter , f"\n{exec}" )  
+        widget_txt_view.set_buffer(logbuff) 
+
+        
+
+def  console_action  ( widget  : Gtk.ToggleButton  ,  txt_viwer :  Gtk.TextView , logbuff ,_u_)  : 
+
+    if  widget.get_active() :  
+        widget.set_label("Interactive Mode") 
+        txt_viwer.set_editable(True)
+        progressive_iter  =  logbuff.get_end_iter()
+        logbuff.insert(progressive_iter , "> " )  
+        txt_viwer.connect("key-press-event" , enter_key_press  ,  logbuff,  _u_) # ,  logbuff) ) 
+        txt_viwer.set_buffer(logbuff) 
+         
+    else  :  
+        widget.set_label("Read Only locked")
+        txt_viwer.set_editable(False) 
+    
+def  clean_console ( widget  : Gtk.Button  ,  logbuff) :  
+    logbuff.set_text("") 
+    
+
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
     kill_frame(dbox_frame) 
@@ -502,10 +557,34 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     main_container: Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.HORIZONTAL )  
 
     file_viewer   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )
+    
+    #TODO  :  ADD  INPUT  FIELD  TO CHOSE   DIRECTORY  TO  LOAD  
+    mf_dir_select    : Gtk.Box   = Gtk.Box(spacing=BOX_SPACING  , orientation =Gtk.Orientation.VERTICAL)
+    
+    dir_input_field  : Gtk.Entry = Gtk.Entry()  
+    dir_input_field.set_text(abs_path_dir_target) 
+
+    browse_n_go      : Gtk.Box  = Gtk.Box(spacing = BOX_SPACING ,  orientation = Gtk.Orientation.HORIZONTAL)
+
+    load_new_dir     : Gtk.Button = Gtk.Button(label="Browse") 
+    load_new_dir.connect("clicked" , chooser , dir_input_field , "directory" , abs_path_dir_target)
+
+    go  : Gtk.Button  =  Gtk.Button(label ="Go")
+    # TODO  :  LOAD  NEW  FILE  WITHOUT CLOSE  THE  MAIN  FRAME   
+    go.connect("clicked",  load_new_file ,dir_input_field  , main_window_frame)
+
+    #go.connect("clicked" , middleware_checker , main_window_frame ,  dir_input_field)
+    
+    mf_dir_select.pack_start(dir_input_field ,  True  , True  ,  0 ) 
+    browse_n_go.pack_start(go                ,  True  , True  ,  0 ) 
+    browse_n_go.pack_start(load_new_dir      ,  True  , True  ,  0 )  
+    mf_dir_select.pack_start(browse_n_go     ,  False , False ,  0 )  
+    file_viewer.pack_start(mf_dir_select     ,  False , False ,  0 ) 
    
     _ff       : Gtk.Frame =  Gtk.Frame(label=f"Current Working Path {w_d}")   
     _ff.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)  #  0x004   
     expander      : Gtk.Expander =  Gtk.Expander(label="-----")
+    expander.set_border_width(10) 
     current_dir_content   : Gtk.Label  = Gtk.Label(label = abriged_path(current_dir_view(abs_path_dir_target)))  
     expander.add(current_dir_content) 
     _ff.add(expander)  
@@ -690,6 +769,10 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     scrollog        : Gtk.ScrolledWindow = Gtk.ScrolledWindow() 
     logview         : Gkt.TextView  = Gtk.TextView()
     logview.set_editable(False) 
+    logview.set_border_width(10) 
+    #TODO  :   make terminal emulator  
+    # when  user  click  on terminal 
+    
     logbuffering    : Gtk.TextBuffer = Gtk.TextBuffer() 
     progressive_iter  =  logbuffering.get_end_iter()
     #logbuffering.insert(progressive_iter , "this is a simple log" )  
@@ -766,7 +849,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     marker_n_setarg.pack_start(run_n_marker_zone, True , True  , 0 ) 
     
     log_container   : Gtk.Box    =  Gtk.Box(spacing=BOX_SPACING  , orientation = Gtk.Orientation.VERTICAL )  
-    
+    log_container.set_border_width(0x0b)  
     def run_analysis  ( wiget : Gtk.Button  , b_log  : Gtk.TextBuffer )   : 
         source  = f"run_analysis.R" #f"{abs_path_dir_target}/run_analysis.R" 
         ped_    = f"{ped_data}"  #f"{abs_path_dir_target}/{ped_data}" 
@@ -832,10 +915,22 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     quit_bnt.connect("clicked" , Gtk.main_quit)  
     bottombox.pack_start(quit_bnt ,  True , False,0 )  
 
-    log_frame       :  Gtk.Frame = Gtk.Frame(label="CONSOLE" )   
+    log_frame       :  Gtk.Frame = Gtk.Frame(label="CONSOLE" )  
     log_frame.add(scrollog)  
+   
     
-    log_container.pack_start(log_frame, True , True , 0 )   
+    terminal_action_area  : Gtk.Box =  Gtk.Box(spacing=BOX_SPACING , orientation=Gtk.Orientation.HORIZONTAL) 
+    term_switch   : Gtk.ToggleButton =  Gtk.ToggleButton(label="Read Only locked") 
+    clear_console : Gtk.Button       =  Gtk.Button(label="Clear  Console") 
+
+    term_switch.connect("toggled", console_action, logview   , logbuffering  , _u_)
+    clear_console.connect("clicked", clean_console ,logbuffering) 
+    
+    terminal_action_area.pack_start(term_switch , True , False , 0 )  
+    terminal_action_area.pack_start(clear_console , True , False , 0 )  
+
+    log_container.pack_start(log_frame, True , True , 0 )
+    log_container.pack_start(terminal_action_area , False ,False , 0 ) 
     
     container_box.pack_start(setup_box       ,  False , False , 0 )  
     container_box.pack_start(choose_box      ,  False , False , 0 ) 
