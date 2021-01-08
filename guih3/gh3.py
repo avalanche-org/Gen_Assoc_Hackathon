@@ -22,7 +22,6 @@ from  utils    import Utils
 
 
 basename  :  str  = f"mTDT {__stage__} v{__version__}" 
-PRODUCTION_READY  =   False  
 
 BOX_SPACING  : int  =   0x06 
 
@@ -271,9 +270,9 @@ def  on_timeout (
 
     global call_count  
     call_count+=1 
-    print("0> " ,  call_count  )
-    if  PRODUCTION_READY : dir_size  = int( dir_size)  
-    else : dir_size = 1   
+    #print("0> " ,  call_count  
+    dir_size  = int( dir_size)  
+   
     trigger   =  (True , False)[call_count  >=  dir_size ]  
     if trigger : activity_bar.pulse() 
     else  :  
