@@ -1,8 +1,8 @@
 #!/usr/bin/env python3  
 #coding: utf-8  
 __author__ : str  = "Umar <j_umar@outlook.com>  "
-__version__: str  = "1.0.1" 
-__stage__  : str  = "alpha"  
+__version__: str  = "2.2.4" 
+__stage__  : str  = "Beta"  
 
 """  
 This programme require   to use  python3+  
@@ -489,7 +489,8 @@ def  load_new_file  (  btn_widget   , entry  :Gtk.Entry   , main_entity :  Gtk.W
     main_frame(main_entity)     # TODO   : Figure out this   without  reloading only  load the required files  
     
 
-cli_composer = []  
+cli_composer   =  list() 
+
 def  enter_key_press (  widget_txt_view ,  evt  , logbuff, _u_)  : 
     global  cli_composer 
     # TODO  : MAKE A TRANSLATION  OF  COMMANDE  IMPROVE !!! 
@@ -498,12 +499,20 @@ def  enter_key_press (  widget_txt_view ,  evt  , logbuff, _u_)  :
     if Gdk.keyval_name(evt.keyval).__eq__("Return") : 
         cli_composer=  cli_composer[:-1]
         cmd = "".join(cli_composer)  
+        # TODO  :  make  a parser  to parse command  line instruction  
         print(cmd) 
+
         cli_composer = []
-        if  cmd.__eq__("clear")  :  
-            clean_console( Gtk.Button() ,logbuff)
+
+        if  cmd.__eq__("clear")  :  clean_console( Gtk.Button() ,logbuff)
+          
         exec =  _u_.stream_stdout(cmd)
-        cmd =  "" 
+        cmd =  ""
+        #logbuff.insert_at_cursor(">")  
+        #mark = logbuff.get_mark("insert")  
+        #iterator =  logbuff.get_iter_at_mark(mark) 
+        #iterator.backward_cursor_position() 
+        #logbuff.place_cursor(iterator) 
         progressive_iter  =  logbuff.get_end_iter()
         logbuff.insert(progressive_iter , f"\n{exec}" )  
         widget_txt_view.set_buffer(logbuff) 
@@ -517,16 +526,36 @@ def  console_action  ( widget  : Gtk.ToggleButton  ,  txt_viwer :  Gtk.TextView 
         txt_viwer.set_editable(True)
         progressive_iter  =  logbuff.get_end_iter()
         logbuff.insert(progressive_iter , "> " )  
-        txt_viwer.connect("key-press-event" , enter_key_press  ,  logbuff,  _u_) # ,  logbuff) ) 
+        txt_viwer.connect("key-press-event" , enter_key_press  ,  logbuff,  _u_)  
         txt_viwer.set_buffer(logbuff) 
          
     else  :  
         widget.set_label("Read Only locked")
-        txt_viwer.set_editable(False) 
+        txt_viwer.set_editable(False)
+
+def  buffer_handler  ( mem_buffer , cmd_str ,  swob = True) : 
+
+    mem_buffer.insert_at_cursor(">")  
+    mark  = mem_buffer.get_mark("insert")  
+    iter_ = mem_buffer.get_iter_at_mark(mark) 
+    iter_.backward_cursor_positions(0) 
+    mem_buffer.place_cursor(iter_)  
+    if  swob : mem_buffer.set_text("")
+    else   :  
+        p_iter =mem_buffer.get_end_iter() 
+        mem_buffer.insert(p_iter,cmd_str)
     
-def  clean_console ( widget  : Gtk.Button  ,  logbuff) :  
-    logbuff.set_text("") 
-    
+def clean_console ( widget  : Gtk.Button  ,  buff) :
+    buffer_handler(buff ,  "")
+    """
+    #logbuff.delete(Gtk.TextIter()  , Gtk.TextIter())
+    buff.insert_at_cursor(')')  # This invalidates existing iterators.
+    mark = buff.get_mark('insert')
+    iter = buff.get_iter_at_mark(mark)  # New iterator
+    iter.backward_cursor_positions(1)
+    buff.place_cursor(iter)
+    buff.set_text("") 
+    """
 
 def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     
@@ -645,7 +674,6 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
     map_cb        : Gtk.ComboBoxText  =  Gtk.ComboBox.new_with_model(map_stores) 
     map_cb.pack_start(render_text_tooltip_for_map , True  ) 
     map_cb.add_attribute(render_text_tooltip_for_map , "text" , 0 ) 
-    # TODO  :  syncronise   ped and  map   
     
     map_cb.connect("changed" ,  on_combox_change  ,load_btn, ped_files , ped_cb)  
     ped_cb.connect("changed" ,on_combox_change    ,load_btn, map_files , map_cb)  
@@ -793,8 +821,9 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         phen_   =  f"{phen_data}" #f"{abs_path_dir_target}/{phen_data}" 
          
         exec =  _u_.stream_stdout(f"Rscript  {source} --pedfile {ped_} --mapfile {map_}  --phenfile {phen_}")
-                
-        b_log.insert(progressive_iter ,exec) 
+        buffer_handler(b_log ,  exec ,  False)  
+
+        #b_log.insert(progressive_iter ,exec) 
         # TODO  : Chech if  some errors are not occured to generate alert message 
         # if everything  is Ok  enable  the run_btn_widget 
         # otherwise  , maintain the  disable state  
@@ -865,8 +894,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
                 generic_alert_dialog ("error" , "marker set  error " , "require  numerical number")  
             
 
-        if  mset_patern is   None   : # mset_patern.group().__eq__(mset) : 
-            b_log.insert(progressive_iter ,  "your  market set  is  wrong eg 1,2,3")
+        if  mset_patern is   None   :
+            buffer_handler(b_log  , "Your marker set is wrong  e.g  1,2,3", False ) 
             return
                  
         if  mset_patern  is not None  and mset_patern.group().__len__()  > 1 :
@@ -902,8 +931,8 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         exec  : str  = ""  
         if  is_mm_set  :   exec = _u_.stream_stdout(cmd_mmset)  
         else :             exec = _u_.stream_stdout(cmd_no_mmset) 
+        buffer_handler(b_log  ,exec , False )  
         
-        b_log.insert(progressive_iter, exec) 
 
 
     run_btn.connect ("clicked" ,  run_analysis  ,  logbuffering )  
