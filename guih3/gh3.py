@@ -1,7 +1,7 @@
 #!/usr/bin/env python3  
 #coding: utf-8  
 __author__ : str  = "Umar <j_umar@outlook.com>  "
-__version__: str  = "2.2.4" 
+__version__: str  = "2.3.5" 
 __stage__  : str  = "Beta"  
 
 """  
@@ -491,18 +491,43 @@ def  load_new_file  (  btn_widget   , entry  :Gtk.Entry   , main_entity :  Gtk.W
 
 cli_composer   =  list() 
 
+
+# special  character ascii code  
+special_ascii_chars  : Dict[str , str]  =  {  
+        "space" :  chr(0x20) , "minus" :  chr(0x2d)               ,
+        "period":  chr(0x2e) , "comma" :  chr(0x2c)               ,  
+        "Shift_Rasterisk": chr(0x2a) ,"Shift_Rparenleft":chr(0x28),
+        "Shift_Rparenright":chr(0x29),  
+        "semicolon" : chr(0x3b) 
+        } 
+
+key_chars =  [ char_call  for char_call  in  special_ascii_chars.keys()  ]  
+
+bs_count  =  0  
 def  enter_key_press (  widget_txt_view ,  evt  , logbuff, _u_)  : 
-    global  cli_composer 
+    global  cli_composer
+    global  bs_count  
     # TODO  : MAKE A TRANSLATION  OF  COMMANDE  IMPROVE !!! 
-    cli_composer.append(Gdk.keyval_name(evt.keyval))  # .__eq__("Return") :
+    key  = Gdk.keyval_name(evt.keyval) 
+
+    if  key_chars.__contains__(key) : 
+        if key.__eq__("BackSpace") and  cli_composer.__len__() >=1 : 
+            bs_count+=1
+            cli_composer  =  cli_composer[:-1] #bs_count]
+            print(cli_composer) 
+        key  = key.replace(key ,special_ascii_chars[key])
     
+    if not key.__eq__("BackSpace") :
+        cli_composer.append(key) 
+
     if Gdk.keyval_name(evt.keyval).__eq__("Return") : 
         cli_composer=  cli_composer[:-1]
         cmd = "".join(cli_composer)  
         # TODO  :  make  a parser  to parse command  line instruction  
-        print(cmd) 
 
-        cli_composer = []
+        print(cmd)
+        cli_composer = [] 
+        
 
         if  cmd.__eq__("clear")  :  clean_console( Gtk.Button() ,logbuff)
           
