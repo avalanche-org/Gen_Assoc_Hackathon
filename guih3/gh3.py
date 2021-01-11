@@ -911,7 +911,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
         mset  =  marker_set.get_text()   #TODO :  make a regex verification  eg  : 1,2,3  
         mset_patern =  re.search(r'^[0-9].+' ,mset) 
         
-        if  mset.__len__() <  2  :  
+        if  mset.__len__() <  2 and   is_mm_set :  
             try :  
                 int(mset) 
                 generic_alert_dialog ("error" , "marker set  error " , "need 2 markers  at least")  
@@ -919,7 +919,7 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
                 generic_alert_dialog ("error" , "marker set  error " , "require  numerical number")  
             
 
-        if  mset_patern is   None   :
+        if  mset_patern is   None  and  is_mm_set:
             buffer_handler(b_log  , "Your marker set is wrong  e.g  1,2,3", False ) 
             return
                  
@@ -972,14 +972,14 @@ def main_frame  (dbox_frame  : Gtk.Window)  -> None :
    
     
     terminal_action_area  : Gtk.Box =  Gtk.Box(spacing=BOX_SPACING , orientation=Gtk.Orientation.HORIZONTAL) 
-    term_switch   : Gtk.ToggleButton =  Gtk.ToggleButton(label="Read Only locked") 
+    #term_switch   : Gtk.ToggleButton =  Gtk.ToggleButton(label="Read Only locked") 
     clear_console : Gtk.Button       =  Gtk.Button(label="Clear  Console") 
 
-    term_switch.connect("toggled", console_action, logview   , logbuffering  , _u_)
+    #term_switch.connect("toggled", console_action, logview   , logbuffering  , _u_)
     clear_console.connect("clicked", clean_console ,logbuffering) 
     
-    terminal_action_area.pack_start(term_switch , True , False , 0 )  
-    terminal_action_area.pack_start(clear_console , True , False , 0 )  
+    #terminal_action_area.pack_start(term_switch , True , False , 0 )  
+    terminal_action_area.pack_start(clear_console , False, False , 0 )  
 
     log_container.pack_start(log_frame, True , True , 0 )
     log_container.pack_start(terminal_action_area , False ,False , 0 ) 
