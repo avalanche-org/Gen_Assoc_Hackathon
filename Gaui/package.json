@@ -1,0 +1,28 @@
+{
+  "name": "gaui",
+  "version": "1.0.0",
+  "description": "Gen Assoc  Graphical User Interface",
+  "main": "gh3.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"electron . --no-sandbox" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avalanche-org/Gen_Assoc.git"
+  },
+  "keywords": [
+    "Gen",
+    "Assoc",
+    "Genotype"
+  ],
+  "author": "jukoo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avalanche-org/Gen_Assoc/issues"
+  },
+  "homepage": "https://github.com/avalanche-org/Gen_Assoc#readme",
+  "dependencies": {
+    "electron": "^11.2.3"
+  }
+}

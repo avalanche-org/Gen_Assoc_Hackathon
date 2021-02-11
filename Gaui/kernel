@@ -1,0 +1,20 @@
+#!/usr/bin/env node 
+ 
+//author     :  Umar aka jukoo  
+
+__KERNEL__v1 :   
+module 
+["exports"] =  {
+    
+    ["@libs"]  :  {} , 
+    ["@node_module"] : { 
+        _ejs_  : require("electron"),
+        url    : require("url"), 
+        path   : require("path"), 
+        fs     : require("fs"),
+        os     : require("os") 
+    },
+    ["@config"]: {
+        defconf : require("./config") 
+        } 
+}
