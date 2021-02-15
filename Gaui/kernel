@@ -6,7 +6,9 @@ __KERNEL__v1 :
 module 
 ["exports"] =  {
     
-    ["@libs"]  :  {} , 
+    ["@libs"]  :  { 
+         menu  : require("./libs/menu") , 
+    } , 
     ["@node_module"] : { 
         _ejs_  : require("electron"),
         url    : require("url"), 
