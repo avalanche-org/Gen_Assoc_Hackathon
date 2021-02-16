@@ -1,8 +1,8 @@
 #!/usr/bin/env  node  
 //author  :  Umar  aka jukoo 
-__stage__  : { process.env["STAGE"] = "development" }  
-__kernel__ : {  core  = require("./kernel") }  
-
+__stage__  : {  process.env["STAGE"] = "development"          }  
+__kernel__ : {  core                 = require("./kernel")    } 
+__static__ : {  htm_static_path      = "template/index.html"  } 
 const
 {   log  }  = console , 
 {   path , 
@@ -17,6 +17,7 @@ const
 const 
 { app , BrowserWindow  , Menu , dialog } = _ejs_  
 
+let mw  =  null  
 const  {  
     main_frame , 
     ctrl 
@@ -61,16 +62,20 @@ const  {
            dialog.showMessageBox(null ,  defopts)
        }
        
-    }, 
+    },
     ["main_frame"]  :  ()  => {    
-        const  mw  =  new BrowserWindow({...defconf})
+        mw  =  new BrowserWindow({...defconf})
         const { tfile  , mt_load }  =  _start 
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
-        mw.loadURL(url.format(tfile("template/mw_template.html")))
+        mw.loadURL(url.format(tfile(htm_static_path)))
         Menu.setApplicationMenu(mt_load(menu))  
     }
+    
 }
 
 app.on("ready",  main_frame)  
-app.on("close" ,  app_closed  => app.quit())  
+app.on("close" ,  app_closed  => { 
+    mw =  null  //! free memory  
+    app.quit()
+})  
 process.on("exit" ,  code_status  =>  log(`Exit with :${code_status}`))

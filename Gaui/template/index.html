@@ -79,7 +79,7 @@
                             <div class="u-form-group u-form-select u-form-group-1">
                               <label for="select-30ab" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-30ab" name="select" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="ped" name="select" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                                   <option value="Item 1">pedfile</option>
                                   <option value="Item 2">Item 2</option>
                                   <option value="Item 3">Item 3</option>
@@ -90,7 +90,7 @@
                             <div class="u-form-group u-form-select u-form-group-2">
                               <label for="select-68f0" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-68f0" name="select-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="map" name="select-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                                   <option value="Item 1">mapfile</option>
                                   <option value="Item 2">Item 2</option>
                                   <option value="Item 3">Item 3</option>
@@ -101,7 +101,7 @@
                             <div class="u-form-group u-form-select u-form-group-3">
                               <label for="select-f55a" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-f55a" name="select-2" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="phen" name="select-2" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                                   <option value="Item 1">phenfile</option>
                                   <option value="Item 2">Item 2</option>
                                   <option value="Item 3">Item 3</option>
@@ -132,11 +132,11 @@
                               <div class="u-form-radio-button-wrapper">
                                 <br>
 
-                                <input type="radio" name="radiobutton" value="Item 1">
-                                <label class="u-label" for="radiobutton">Single-Marker &nbsp; &nbsp; &nbsp; &nbsp;</label>
+                                <input type="radio" name="smradiobutton" id="single_marker" value="Item 1">
+                                <label class="u-label" for="smradiobutton">Single-Marker &nbsp; &nbsp; &nbsp; &nbsp;</label>
                                 
-                                <input type="radio" name="radiobutton" value="Item 2">
-                                <label class="u-label" for="radiobutton">Multi-Marker</label>
+                                <input type="radio" name="mmradiobutton"  id="multi_marker"  value="Item 2">
+                                <label class="u-label" for="mmradiobutton">Multi-Marker</labxel>
 
                                 <br>
                                 
@@ -148,12 +148,12 @@
 
                                 <p> Retrieve missing genotypes? (not available yet)  </p>
 
-                                <input type="radio" name="radiobutton" value="run_GI">
+                                <input type="radio" name="radiobutton"  id="yes" value="run_GI">
                                 <label class="u-label" for="radiobutton">Yes &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                                 </label>
                                 
-                                <input type="radio" name="radiobutton" value="no_GI">
+                                <input type="radio" name="radiobutton"  id="no" value="no_GI">
                                 <label class="u-label" for="radiobutton">No</label>
 
                                 <br>
@@ -166,7 +166,7 @@
                             <div class="u-form-group u-form-select u-form-group-6">
                               <label for="select-1cd4" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-1cd4" name="phenotype" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="phenotype" name="phenotype" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                                   <option value="none">-- Choose a phenotype (column number) -- </option>     <!--phenotype columns -->
                                   <option value="Item 1">1</option>
                                   <option value="Item 2">2</option>
@@ -177,7 +177,7 @@
                             <div class="u-form-group u-form-select u-form-group-7">
                               <label for="select-4e3d" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-4e3d" name="select-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="nbsim" name="select-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
 
                                   <option value="none">-- Choose the number of simulations --</option>           <!--number of simulations -->
                                   <option value="Item 1">1</option>
@@ -198,7 +198,7 @@
                             <div class="u-form-group u-form-select u-form-group-8">
                               <label for="select-0c1c" class="u-form-control-hidden u-label">Select</label>
                               <div class="u-form-select-wrapper">
-                                <select id="select-0c1c" name="select-2" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                                <select id="nbcores" name="select-2" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                                   <option value="none">-- Choose the number of nbcores --</option>           <!--number of cores -->
                                   <option value="Item 1">1</option>
                                   <option value="Item 2">2</option>

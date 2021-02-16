@@ -7,8 +7,9 @@ module
 ["exports"] =  {
     
     ["@libs"]  :  { 
-         menu  : require("./libs/menu") , 
-    } , 
+         menu  : require("./menu") , 
+    } ,
+    utils      : require("./utils") , 
     ["@node_module"] : { 
         _ejs_  : require("electron"),
         url    : require("url"), 
