@@ -1,0 +1,23 @@
+Rules & restrictions for the m-TDT tool
+
+*****
+
+* Load files 
+
+- The Load button runs summary.R
+- Detect all ped, map, phen files extensions (done)
+- cannot run analysis if you did not load your files first
+- automatically suggest the corresponding map file when a ped file is selected
+
+
+* Chooose options
+
+- When Single-Marker is enabled -> disable nbsim
+- detect number of columns for the phenfile (nc) and propose from 1 to (nc-2)
+- detect number of cores (n) and propose from 1 to (n-1) cores
+- nbsim from 1 to 10 (is there a rule for this option?)
+- Run Analysis button runs run_analysis.R
+
+* Output 
+
+- Clear console button 
