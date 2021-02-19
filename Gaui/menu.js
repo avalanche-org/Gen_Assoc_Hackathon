@@ -1,10 +1,11 @@
 #!/usr/bin/env node 
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 
-const {  dialog  ,  ipcMain } = require("electron") 
-const fs = require("fs") 
-const  utils = require("./utils")
-console.log(utils) 
+const {dialog  ,  ipcMain } = require("electron") ,
+    fs                      = require("fs")       ,
+    utils                   = require("./utils")
+
+
 __Menu_Template__ :  
 
 is_osx           = process.platform === "darwin" 

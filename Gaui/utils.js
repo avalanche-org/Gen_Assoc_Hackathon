@@ -3,7 +3,8 @@
 
 const    
     fs =  require("fs") , 
-    os =  require("os")  
+    os =  require("os") ,  
+    {execSync ,exec , spawn}  = require("child_process")  
 
 module
 ["exports"]  =  {
@@ -45,9 +46,25 @@ module
     } ,
    
     //!  TODO  :  execute shell statement  ...   
-    execute_cmd  : () => {} 
+    execmd  : (main_cmd  ,  ...options)=> {
+        const  output_ =  spawn(main_cmd , options)   
+        return  new Promise( (resolve ,  reject)   => {
+            output_.stdout.on("data"  ,  data      => resolve(data.toString())) 
+            output_.stderr.on("data"  ,  e_data    => reject(e_data.toString()))
+            output_.on("error"        ,  err       => reject(err.message))  
+            output_.on("close"        ,  exit_code =>  console.log(`exited with ${exit_code}`)) 
+        }) 
+      }, 
+   execmd_ :  command => {
+       const  buffer  =  execSync(command)  
+       return buffer.toString()  
+   }
     //! TODO :  check file extsion ped map phen  ->  menu.js
 }
+__TEST_MODULE__:  
+
+//console.log(module.exports.execmd_("ls -la")) 
+module.exports.execmd("ls" ,"-la").then(res  => console.log(res))
 
 //console.log(module.exports.cpus_core(true)) 
 //module.exports.scan_directory( "/home/juko/Desktop/Pasteur/Sandbox/Gen_Assoc/test","ped","map", "phen") 

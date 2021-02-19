@@ -17,3 +17,4 @@ guih3/__pycache__/
 Gaui/node_modules/
 Gaui/.*.sw*
 Gaui/script/.*.sw*
+Gaui/template/.*.sw*

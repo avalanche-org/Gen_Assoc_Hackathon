@@ -13,7 +13,7 @@ const  [
     mm  , yes ,
     no  , phenotype ,
     nbsim , nbcores ,
-    markerset ]=[
+    markerset  ,  term ]=[
         _.querySelector("#ped"),   
         _.querySelector("#map")  ,
         _.querySelector("#phen") , 
@@ -24,8 +24,11 @@ const  [
         _.querySelector("#phenotype") , 
         _.querySelector("#nbsim") , 
         _.querySelector("#nbcores"),
-        _.querySelector("#marker_set") 
+        _.querySelector("#marker_set"), 
+        _.querySelector("#term") 
     ] 
+term.innerText = "[Gen Assoc@ABC:]$"
+term.setEditable =  false 
 ipcRenderer.send("init",0x000) 
 
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
@@ -93,4 +96,6 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
         } 
     })
 }
-sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)  
+sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)
+
+
