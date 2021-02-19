@@ -1,8 +1,10 @@
 #!/usr/bin/env node 
-//author  : Umar aka jukoo  j_umar@outlook.com   <
+//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 
-const {  dialog } = require("electron")    
-
+const {  dialog  ,  ipcMain } = require("electron") 
+const fs = require("fs") 
+const  utils = require("./utils")
+console.log(utils) 
 __Menu_Template__ :  
 
 is_osx           = process.platform === "darwin" 
@@ -32,14 +34,22 @@ module
                     .then( res =>{  
                         //res?.canceled
                         const  actions  =  res?.filePaths
-                        // load on directory  
+                        //! when user choose one file  it related to path  
                         if  ( actions.length == 1 )  {
                             let  abs_path =  actions[0].split(slash_orientaion)
                             //! TODO : don't forget to use ipc rendering  to send path  
                             abs_path = abs_path.slice(1 , -1).join(slash_orientaion)
                             //! TODO :  load  all required file  ped map phen 
-                            console.log(abs_path) 
+                            console.log("-> " , abs_path) 
+                            const { scan_directory} = utils 
+                            scan_directory(`${slash_orientaion}${abs_path}` , "ped","map","phen")
+                            .then(res => {
+                                console.log(res) 
+                                wintarget.webContents.send("Browse" , res ) 
+                            })
+                            .catch(err => console.log(err)) 
                         }
+                        //!  when user  decide to  request multiple choice  .... 
                         if  (actions.length > 1  ) {
                             let  path_location     = []   
                             let files_collections  = [...actions.map(file  =>   { 

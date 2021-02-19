@@ -1,6 +1,6 @@
 #!/usr/bin/env node 
  
-//author     :  Umar aka jukoo  
+//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 
 __KERNEL__v1 :   
 module 
@@ -8,8 +8,8 @@ module
     
     ["@libs"]  :  { 
          menu  : require("./menu") , 
+         utils : require("./utils") 
     } ,
-    utils      : require("./utils") , 
     ["@node_module"] : { 
         _ejs_  : require("electron"),
         url    : require("url"), 

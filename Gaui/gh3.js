@@ -1,5 +1,6 @@
 #!/usr/bin/env  node  
-//author  :  Umar  aka jukoo 
+
+//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 __stage__  : {  process.env["STAGE"] = "development"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/index.html"  } 
@@ -12,10 +13,10 @@ const
     _ejs_
 }         = core["@node_module"] , 
 {defconf} = core["@config"], 
-{menu}    = core["@libs"] 
+{menu ,  utils}    = core["@libs"] 
 
 const 
-{ app , BrowserWindow  , Menu , dialog } = _ejs_  
+{ app , BrowserWindow  , Menu , dialog , ipcMain } = _ejs_  
 
 let mw  =  null  
 const  {  
@@ -69,6 +70,14 @@ const  {
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
         mw.loadURL(url.format(tfile(htm_static_path)))
         Menu.setApplicationMenu(mt_load(menu))  
+        //! TODO : preload  default value  
+        const  { cpus_core } = utils 
+        ipcMain.on("init" ,  ( evt , data )  => {
+            log(data) 
+            evt.reply("cpus::core" ,  cpus_core())   
+        })
+    
+        //ipcMain.on("wc" ,  (e,d) => log(e , "=" , d) ) 
     }
     
 }
