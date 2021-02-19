@@ -26,7 +26,7 @@ const  [
         _.querySelector("#nbcores"),
         _.querySelector("#marker_set") 
     ] 
-ipcRenderer.send("init",0) 
+ipcRenderer.send("init",0x000) 
 
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
     for  ( let i of   range(data-1) ) { 
@@ -34,14 +34,11 @@ ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
     }
-   
 })
-
-ipcRenderer.on("Browse",  (evt ,browse_data)  => {
-     browse_data.forEach(data => {
+const  optsfeed  =  gdata   => {
+    gdata.forEach(data => {
         let _d  = data.split(".") 
         let ext = _d[_d.length -1]  
-        log(ext) 
         switch  (ext) { 
             case  "ped" : 
                 const  ped_opts =  _.createElement("option") 
@@ -63,11 +60,23 @@ ipcRenderer.on("Browse",  (evt ,browse_data)  => {
                 break;  
         }
      })
+
+}
+ipcRenderer.on("Browse::single"   , (evt , browse_data) =>   { 
+    //! NOTE :  i'll probably  need the absolute path   to make link 
+    optsfeed(browse_data)
+}) 
+
+ipcRenderer.on("Browse::multiple" , (evt , mbrowse_data )  =>{
+    const request_files =  Object.keys(mbrowse_data)   
+    for ( let  htm_elmt  of  [ ped  , map , phen ]  )  htm_elmt.innerHTML= ""   
+    optsfeed(request_files)
 })
 const get_prefix_filename =  ( file , separator = ".")  => {
-    let  file_prefix  = file.split(separator)  
+    let file_prefix       =  file.split(separator)  
     return  file_prefix.slice(0 ,-1)  
 }
+
 //! sync select action  between  ped and maps
 const sync_select_action =  (s_elmt1 , s_elmt2) => {
     s_elmt1.addEventListener("change" , evt =>{ 
@@ -84,4 +93,4 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
         } 
     })
 }
-sync_select_action(ped , map);sync_select_action(map, ped)  
+sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)  

@@ -45,7 +45,7 @@ module
                             scan_directory(`${slash_orientaion}${abs_path}` , "ped","map","phen")
                             .then(res => {
                                 console.log(res) 
-                                wintarget.webContents.send("Browse" , res ) 
+                                wintarget.webContents.send("Browse::single" , res ) 
                             })
                             .catch(err => console.log(err)) 
                         }
@@ -61,7 +61,9 @@ module
                             })] 
                             const tree_signature  = {} 
                             files_collections.forEach((file, index) =>{ tree_signature[file] = path_location[index]})
-                            //console.log(tree_signature)console.log(path_location) console.log(files_collections)  
+                            console.log(tree_signature) //console.log(path_location) console.log(files_collections)  
+                            //!  send  the related data  to renderer process 
+                            wintarget.webContents.send("Browse::multiple" ,  tree_signature) 
 
                         }
                         
