@@ -15,3 +15,5 @@ guih3/.fileOps.py.*
 mtdt_test/
 guih3/__pycache__/
 Gaui/node_modules/
+Gaui/.*.sw*
+Gaui/script/.*.sw*

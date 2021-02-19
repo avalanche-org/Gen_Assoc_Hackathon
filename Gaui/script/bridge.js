@@ -46,20 +46,42 @@ ipcRenderer.on("Browse",  (evt ,browse_data)  => {
             case  "ped" : 
                 const  ped_opts =  _.createElement("option") 
                 ped_opts.text   = data  
+                ped_opts.value  = data  
                 ped.add(ped_opts)  
                 break ; 
             case  "map" : 
                 const  map_opts =  _.createElement("option") 
                 map_opts.text   = data  
+                map_opts.value  = data  
                 map.add(map_opts)  
                 break ; 
             case  "phen" : 
                 const  phen_opts =  _.createElement("option") 
                 phen_opts.text   = data  
+                phen_opts.value  = data  
                 phen.add(phen_opts)   
                 break;  
         }
      })
 })
-
-
+const get_prefix_filename =  ( file , separator = ".")  => {
+    let  file_prefix  = file.split(separator)  
+    return  file_prefix.slice(0 ,-1)  
+}
+//! sync select action  between  ped and maps
+const sync_select_action =  (s_elmt1 , s_elmt2) => {
+    s_elmt1.addEventListener("change" , evt =>{ 
+        const  file_name      = get_prefix_filename(evt.target.value)  
+        let    map_elmts_opts =  [...s_elmt2.options]  
+        map_elmts_opts        =  map_elmts_opts.map(opts =>  opts.value)  
+        const  match          = map_elmts_opts.filter( element => {
+            let f_prefix =  get_prefix_filename(element)  
+            if (file_name[0]  == f_prefix[0] )  return  element  
+        })
+        if (match) {
+            let data_index  = map_elmts_opts.indexOf(match[0])  
+            s_elmt2.options[data_index].selected= true  
+        } 
+    })
+}
+sync_select_action(ped , map);sync_select_action(map, ped)  

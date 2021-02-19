@@ -8,11 +8,12 @@ Object.prototype["range"]  = v_   =>   {
         }  
         return [...t]   
 }
-
-Object.prototype["createTag"] =  (htm_tag , txt , cb=false/* cb should be a  function*/   _=documen) => {
+/*
+Object.prototype["createTag"] =  (htm_tag , txt , cb=false/* cb should be a  function  _=documen) => {
     const  new_elmt =  _.createElement(htm_tag)   
     if ( new_elmt.ELEMENT_NODE !=  Node.ElEMENT_NODE) throw new  Error("not allowed to create this tag")
     new_elmt.text =  txt  ||  ""   
     if  (cb) cb(new_elmt) 
     return  new_elmt  
 }
+*/
