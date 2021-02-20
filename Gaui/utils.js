@@ -4,17 +4,34 @@
 const    
     fs =  require("fs") , 
     os =  require("os") ,  
-    {execSync ,exec , spawn}  = require("child_process")  
+    {execSync ,exec , spawn}  = require("child_process"), 
+    {fromCharCode}            = String 
 
 module
 ["exports"]  =  {
-    // TODO  :  read  file  and extrate data ... 
-    rsv_file :  (  file  , default_delimiter = "," )   => {  // rsv_file  aka  read separed value file like csv  , tsv  ...
-        fs.readFile(file ,  "utf8" , (e , d ) => {
-            if (e)  throw e   
-            return  d.split(default_delimiter) 
+    //! TODO  : improve this function to manage correctly  csv or tsv  file ...  
+    rsv_file :  (  file  , default_delimiter = "," )  => {
+        return new Promise  ( (resolve , reject )  => {
+            fs.readFile(file ,  "utf8" , (e , file_data ) => {
+                if (e) reject(e.code)
+                const headers = []  
+                const endcc   =  fromCharCode(0xa)   
+                for ( head  of  file_data.split(default_delimiter))  {
+                    if (head.includes(endcc))  {
+                        let last_head =  head.split(endcc)[0] 
+                        headers.push(last_head) 
+                        break 
+                    }
+                    headers.push(head)
+                }
+
+            console.log(headers)  
+            resolve(headers.length)  
         })  
-    },  
+      
+        
+        }) 
+      },  
     //! TODO  [x] :  collect how many cpu  are available   
     cpus_core  : (with_detail_object = false)   =>  {  
         if  (with_detail_object) {  
@@ -41,11 +58,9 @@ module
                }
                resolve(files.length ?  files : dir_contents) 
            })
-       
        })
     } ,
    
-    //!  TODO  :  execute shell statement  ...   
     execmd  : (main_cmd  ,  ...options)=> {
         const  output_ =  spawn(main_cmd , options)   
         return  new Promise( (resolve ,  reject)   => {
@@ -59,13 +74,14 @@ module
        const  buffer  =  execSync(command)  
        return buffer.toString()  
    }
-    //! TODO :  check file extsion ped map phen  ->  menu.js
 }
 __TEST_MODULE__:  
 
 //console.log(module.exports.execmd_("ls -la")) 
 module.exports.execmd("ls" ,"-la").then(res  => console.log(res))
-
+console.log(module.exports.rsv_file('/home/juko/final.csv'))  
+module.exports.rsv_file("/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/test/sample.phen" ,  "\t")
+.then(res => console.log(res)) 
 //console.log(module.exports.cpus_core(true)) 
 //module.exports.scan_directory( "/home/juko/Desktop/Pasteur/Sandbox/Gen_Assoc/test","ped","map", "phen") 
 //.then ( res => console.log(res)) 
