@@ -45,8 +45,10 @@ module
                             const { scan_directory} = utils 
                             scan_directory(`${slash_orientaion}${abs_path}` , "ped","map","phen")
                             .then(res => {
-                                console.log(res) 
-                                wintarget.webContents.send("Browse::single" , res ) 
+                                wintarget.webContents.send("Browse::single",  { 
+                                    main_root : abs_path  , 
+                                    files     :  res  
+                                }) 
                             })
                             .catch(err => console.log(err)) 
                         }

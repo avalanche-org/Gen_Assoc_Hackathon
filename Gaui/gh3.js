@@ -76,8 +76,16 @@ const  {
             log(data) 
             evt.reply("cpus::core" ,  cpus_core())   
         })
-    
-        //ipcMain.on("wc" ,  (e,d) => log(e , "=" , d) ) 
+   
+        ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
+            const  { paths  , selected_files  }  =  _data 
+            const  [,,phenfile]  = selected_files
+            log(`/${paths}/${phenfile}`) 
+            utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
+            .then( res => {
+                mw.webContents.send("load::phenotype"  ,  res-2 )   
+            }) 
+        })
     }
     
 }

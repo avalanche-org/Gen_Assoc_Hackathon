@@ -1,7 +1,8 @@
 //!  author  :  Umar aka  jukoo   
 Object.prototype["range"]  = v_   =>   { 
         let [ t , i ]  = [[] , 0] 
-        if  (v_ <= 1  ||  v_ == undefined) return null  
+        if  (v_ < 1  ||  v_ == undefined) return null  
+        if  (v_ == 1 )  return  [v_] 
         while ( i < v_ )  { 
             i++ 
             t.push(i) 
