@@ -4,8 +4,7 @@ The Installation Wizard is availabe on GNU/Linux, Windows and Mac OS X operating
 
 Make a quick installation of : 
 - Plink
-- R lang  
-- RStudio  
+- R lang
 
 ## For GNU/Linux
 
