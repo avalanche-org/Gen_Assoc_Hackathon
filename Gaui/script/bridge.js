@@ -16,7 +16,7 @@ const  [
     no  , phenotype ,
     nbsim , nbcores ,
     markerset,term  , 
-    run_summary]=[
+    run_summary,run_analysis]=[
         _.querySelector("#ped"),   
         _.querySelector("#map")  ,
         _.querySelector("#phen") , 
@@ -29,7 +29,8 @@ const  [
         _.querySelector("#nbcores"),
         _.querySelector("#marker_set"), 
         _.querySelector("#term") , 
-        _.querySelector("#run_summary") 
+        _.querySelector("#run_summary"), 
+        _.querySelector("#run_analysis") 
     ] 
 term.innerText = "[Gen Assoc@ABC:]$"
 term.setEditable =  false 
@@ -117,7 +118,8 @@ sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault() 
-    //TODO  : run   summary 
+    //TODO  : run   summary
+    term.innerText =  "Processing  Summary ... " 
     const gobject =    { 
          paths  : paths_collections ??  null ,  
          selected_files: [ 
@@ -131,12 +133,17 @@ run_summary.addEventListener("click" , evt => {
 })
 
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
+    log(incomming_data)
      //!TODO  : CLEAN  PHENOTYPE BEFORE
     phenotype.innerHTML = ""  
-    for  ( let phen_index  of range(incomming_data )) { //> 1 ?  incomming_data : incomming_data+1))  {
+    for  ( let phen_index  of range(incomming_data )) { 
         const phenotype_opts = _.createElement("option")  
         phenotype_opts.text      =  phen_index  
         phenotype_opts.value     =  phen_index
         phenotype.add(phenotype_opts)   
     } 
+})
+
+ipcRenderer.on("term::logout" , ( evt , data ) => {
+    term.innerText = data 
 })

@@ -1,1 +1,9 @@
 node_modules/
+.log*
+sample.*
+test/*
+summary.R 
+../test/*
+l
+clear
+ls

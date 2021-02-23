@@ -4,6 +4,8 @@
 __stage__  : {  process.env["STAGE"] = "development"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/index.html"  } 
+__summary_s: { sum_src = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R"}
+
 const
 {   log  }  = console , 
 {   path , 
@@ -65,7 +67,7 @@ const  {
        
     },
     ["main_frame"]  :  ()  => {    
-        mw  =  new BrowserWindow({...defconf})
+        mw  =  new BrowserWindow({...defconf["main_frame"]})
         const { tfile  , mt_load }  =  _start 
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
         mw.loadURL(url.format(tfile(htm_static_path)))
@@ -79,11 +81,28 @@ const  {
    
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
             const  { paths  , selected_files  }  =  _data 
-            const  [,,phenfile]  = selected_files
+            const  [pedfile,mapfile,phenfile]  = selected_files
             log(`/${paths}/${phenfile}`) 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
             .then( res => {
-                mw.webContents.send("load::phenotype"  ,  res-2 )   
+                //! TODO : RUN ANALYSIS !!
+                //utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile ${paths}/${mapfile} --phenfile ${paths}/${phenfile}` , 
+                //utils.std_ofstream(`Rscript summary.R --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
+                
+                //! DISPlAY : TODO  -> fix display format on terminal  
+                utils.std_ofstream("Rscript summary.R --pedfile sample.ped  --mapfile sample.map  --phenfile sample.phen", 
+                    exit_code => {
+                    if  (exit_code == 0x00)  { 
+                        //! TODO : write output to terminal 
+                         
+                        fs.readFile(".logout" , "utf8" ,  (e , d ) => {
+                            if (e) throw e // TODO ! send error event  ... 
+                            mw.webContents.send("term::logout"  , d )  
+                        })
+                        mw.webContents.send("load::phenotype"  ,  res-2 )   
+                    }
+                })
+
             }) 
         })
     }

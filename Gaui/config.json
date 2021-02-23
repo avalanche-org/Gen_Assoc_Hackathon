@@ -1,9 +1,17 @@
 {
-    "title" :  "Gen Assoc",   
-    "width" :  1200 ,
-    "height":  800, 
-    "webPreferences" : {
-        "nodeIntegration" : true 
-    }  
+    "main_frame":  {  
+        "title" :  "Gen Assoc",   
+        "width" :  1200 ,
+        "height":  800, 
+        "webPreferences" : {
+            "nodeIntegration" : true 
+        } 
+    },   
+    
+    "io_fstream" :  { 
+        "fstdout" : ".logout",
+        "fstderr" : ".logerr",
+        "fserror" : ".error" 
+    } 
 } 
 
