@@ -1,5 +1,5 @@
 //!  author  :  Umar aka  jukoo   
-console.log("dsad") 
+
 Object.prototype["range"]  = v_   =>   { 
         let [ t , i ]  = [[] , 0] 
         if  (v_ < 1  ||  v_ == undefined) return null  
@@ -9,7 +9,8 @@ Object.prototype["range"]  = v_   =>   {
             t.push(i) 
         }  
         return [...t]   
-}
+
+} 
 /*
 Object.prototype["createTag"] =  (htm_tag , txt , cb=false/* cb should be a  function  _=documen) => {
     const  new_elmt =  _.createElement(htm_tag)   
@@ -18,4 +19,5 @@ Object.prototype["createTag"] =  (htm_tag , txt , cb=false/* cb should be a  fun
     if  (cb) cb(new_elmt) 
     return  new_elmt  
 }
-*/
+}*/
+

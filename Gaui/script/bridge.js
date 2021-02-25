@@ -3,10 +3,8 @@
 //
 //! TODO  : register  loaded data to  local storage   
 //        + when user reload the application  
-console.log ("loaded")
-const { ipcRenderer} = require("electron") ,
+const { ipcRenderer} =require("electron") ,
       {log}          = console  
-
 const _ = document 
 //!  mapping  DOM Element  
 const  [
@@ -16,7 +14,8 @@ const  [
     no  , phenotype ,
     nbsim , nbcores ,
     markerset,term  , 
-    run_summary,run_analysis]=[
+    run_summary,run_analysis
+]=[
         _.querySelector("#ped"),   
         _.querySelector("#map")  ,
         _.querySelector("#phen") , 
@@ -32,11 +31,13 @@ const  [
         _.querySelector("#run_summary"), 
         _.querySelector("#run_analysis") 
     ] 
- 
-run_analysis.disabled =  true  
-term.innerText = "[Gen Assoc@ABC:]$"
-term.setEditable =  false 
-ipcRenderer.send("init",0x000) 
+
+__init__  = ( ()=> {   
+    run_analysis.disabled =  true  
+    term.innerText        =  ">"
+    term.setEditable      =  false 
+    ipcRenderer.send("init",0x000) 
+})()    
 
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
     for  ( let i of   range(data) ) { 
@@ -156,7 +157,6 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     run_summary.disabled  = true
     }
 })
-
 
 run_analysis.addEventListener("click" ,  evt => { 
 

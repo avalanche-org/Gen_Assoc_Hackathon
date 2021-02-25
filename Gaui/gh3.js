@@ -83,35 +83,40 @@ const  {
             const  { paths  , selected_files  }  =  _data 
             const  [pedfile,mapfile,phenfile]  = selected_files
             log(`/${paths}/${phenfile}`) 
-            utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
-            .then( res => {
-                //utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile ${paths}/${mapfile} --phenfile ${paths}/${phenfile}` , 
-                //utils.std_ofstream(`Rscript summary.R --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
-                
-                //! DISPlAY : TODO  -> fix display format on terminal  
+           utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
+           .then(res => { 
+               //utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile ${paths}/${mapfile} --phenfile ${paths}/${phenfile}` ,
+               //utils.std_ofstream(`Rscript summary.R --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
+               //! DISPlAY : TODO  -> fix display format on terminal  
                 utils.std_ofstream("Rscript summary.R --pedfile sample.ped  --mapfile sample.map  --phenfile sample.phen", 
                     exit_code => {
                     if  (exit_code == 0x00)  { 
-                        //! TODO : write output to terminal 
-                         
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
-                            if (e) throw e // TODO ! send error event  ... 
-                            mw.webContents.send("term::logout"  , d )  
+                            /*sending data  to renderer  process */
+                            if (e)  mw.webContents.send("term::error" , e  ) //!TODO : catch this on renderer  
+                            mw.webContents.send("term::logout"  , d )   
                         })
                         mw.webContents.send("load::phenotype"  ,  res-2)   
                     }
                 })
 
             }) 
-        })
-
+        }) 
         ipcMain.on("run::analysis" , (evt , data) => {
-            const { paths  , selected_index  }  = data  
+            const { paths  , selected_index  }  = data    
             log(paths) 
             log(selected_index)  
+            //  TODO :  RUN  THE  ANALYSIS COMMANDE 
+            utils.std_ofstream("run analysis ", exit_code  => {
+                if(exit_code ==0x00) {
+                    fs.readFile(".logout" , "utf8" , (e , d)  => {
+                        if  (e) throw e 
+                        mw.webContents.send("run::analysis" ,  d  ) 
+                    })
+                }
+            })
         })
-    }
-    
+    }   
 }
 
 app.on("ready",  main_frame)  

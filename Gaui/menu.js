@@ -1,8 +1,8 @@
 #!/usr/bin/env node 
-//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
+//author  : Umar ak jukoo  j_umar@outlook.com   <github.com/jukoo> const {dialog  ,  ipcMain } = require("electron") ,
 
-const {dialog  ,  ipcMain } = require("electron") ,
-    fs                      = require("fs")       ,
+const { dialog ,  ipcMain } =  require("electron") , 
+    fs                      = require("fs") ,
     utils                   = require("./utils")
 
 
@@ -39,6 +39,7 @@ module
                         if  ( actions.length == 1 )  {
                             let  abs_path =  actions[0].split(slash_orientaion)
                             //! TODO : don't forget to use ipc rendering  to send path  
+  
                             abs_path = abs_path.slice(1 , -1).join(slash_orientaion)
                             //! TODO :  load  all required file  ped map phen 
                             console.log("-> " , abs_path) 

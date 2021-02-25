@@ -59,8 +59,7 @@ module
                resolve(files.length ?  files : dir_contents) 
            })
        })
-    } ,
-   
+    },
     execmd  : (main_cmd  ,  ...options)=> {
         const  output_ =  spawn(main_cmd , options)
         log(...options)
