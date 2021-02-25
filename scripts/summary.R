@@ -112,14 +112,14 @@ cat("\n Data loaded\n--- ",
     
     "\n   ---  Missing values\n",
     "missing at \t: ", missing_snps, "positions \n",
-    "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n",
-    "  ---  Check for Mendelian errors \n")
+    "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n")
 
 # --- Check for Mendelian errors
 
-cmd = paste0("cp ",paste0(path_to_file, opt$pedfile)," check_mendel.ped ; cp ",paste0(path_to_file, opt$mapfile)," check_mendel.map")
-system(cmd)
-
-system(paste0(plink_ ," --file check_mendel --mendel --out sample_check"))
-system("rm *check*")        
+#cat("--- Check Mendelian errors")
+# cmd = paste0("cp ",paste0(path_to_file, opt$pedfile)," check_mendel.ped ; cp ",paste0(path_to_file, opt$mapfile)," check_mendel.map")
+# system(cmd)
+# 
+# system(paste0(plink_ ," --file check_mendel --mendel --out sample_check"))
+# system("rm *check*")        
 
