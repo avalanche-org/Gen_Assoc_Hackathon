@@ -3,7 +3,7 @@
 //
 //! TODO  : register  loaded data to  local storage   
 //        + when user reload the application  
-
+console.log ("loaded")
 const { ipcRenderer} = require("electron") ,
       {log}          = console  
 
@@ -37,7 +37,7 @@ term.setEditable =  false
 ipcRenderer.send("init",0x000) 
 
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
-    for  ( let i of   range(data-1) ) { 
+    for  ( let i of   range(data) ) { 
         const ncores_opt =  _.createElement("option") 
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 

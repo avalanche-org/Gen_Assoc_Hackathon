@@ -75,8 +75,8 @@ const  {
         //! TODO : preload  default value  
         const  { cpus_core } = utils 
         ipcMain.on("init" ,  ( evt , data )  => {
-            log(data) 
-            evt.reply("cpus::core" ,  cpus_core())   
+            log("initializing  render process " ,  data)   
+            evt.reply("cpus::core" ,  cpus_core()-1)   
         })
    
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
@@ -99,7 +99,7 @@ const  {
                             if (e) throw e // TODO ! send error event  ... 
                             mw.webContents.send("term::logout"  , d )  
                         })
-                        mw.webContents.send("load::phenotype"  ,  res-2 )   
+                        mw.webContents.send("load::phenotype"  ,  res-2)   
                     }
                 })
 

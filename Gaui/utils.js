@@ -1,5 +1,6 @@
 #!/usr/bin/env node 
-//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
+//author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo>
+
 const   
     {readFile , createWriteStream , readdir}=  require("fs") , 
     os =  require("os") ,  
@@ -18,7 +19,7 @@ module
                 const headers = []  
                 const endcc   =  fromCharCode(0xa)   
                 for ( head  of  file_data.split(default_delimiter))  {
-                    if (head.includes(endcc))  {
+                     if (head.includes(endcc))  {
                         let last_head =  head.split(endcc)[0] 
                         headers.push(last_head) 
                         break 
@@ -26,10 +27,9 @@ module
                     headers.push(head)
                 }
 
-            console.log(headers)  
-            resolve(headers.length)  
-        })  
-      
+                console.log(headers)  
+                resolve(headers.length)  
+            })  
         
         }) 
       },  
@@ -94,18 +94,8 @@ module
     }   
     
 }
-let {
-    s ,ped , map ,phen 
-}=cmd  =  { 
-    s  :'summary.R',
-    ped: '--pedfile sample.ped ',
-    map:'--mapfile sample.map ',
-    phen:'--phenfile sample.phen'
-} 
-d = [ s , ped ,map ,phen] 
 
-
-module.exports.std_ofstream("Rscript summary.R --pedfile sample.ped  --mapfile sample.map  --phenfile sample.phen")  
-console.log(module.exports.rsv_file('/home/juko/final.csv'))  
-module.exports.rsv_file("/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/test/sample.phen" ,  "\t")
-.then(res => console.log(res)) 
+//module.exports.std_ofstream("Rscript summary.R --pedfile sample.ped  --mapfile sample.map  --phenfile sample.phen")  
+//console.log(module.exports.rsv_file('/home/juko/final.csv'))  
+//module.exports.rsv_file("/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/test/sample.phen" ,  "\t")
+//.then(res => console.log(res)) 

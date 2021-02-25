@@ -1,4 +1,5 @@
 //!  author  :  Umar aka  jukoo   
+console.log("dsad") 
 Object.prototype["range"]  = v_   =>   { 
         let [ t , i ]  = [[] , 0] 
         if  (v_ < 1  ||  v_ == undefined) return null  
