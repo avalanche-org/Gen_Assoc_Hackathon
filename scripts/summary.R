@@ -60,9 +60,12 @@ library(stringr)
 
 #path= (unlist(str_split(opt$pedfile,unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))])))[1]
 
-#opt$pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
-#opt$mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
-#opt$phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
+path_to_file = unlist(str_split(opt$pedfile, unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]))[1]
+
+opt$pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
+opt$mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
+opt$phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
+
 
 
 if(is.null(opt$pedfile)) {cat("Option --pedfile is required. \n Execution stopped.")}
@@ -73,21 +76,20 @@ if(is.null(opt$phenfile)) stop(cat("Option --phenfile is required. \n Execution 
 # --- Files
 plink_ = "/home/g4bbm/tools/Plink/plink"
 
-ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
-map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
-phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
+ped = read.delim(paste0(path_to_file, opt$pedfile), header = F , stringsAsFactors = F)
+map = read.delim(paste0(path_to_file, opt$mapfile), header = F , stringsAsFactors = F)
+phen = read.delim(paste0(path_to_file, opt$phenfile), header = F , stringsAsFactors = F)
 
 
 # --- File Control
 
-#if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
-
-if (( nrow(map) != ncol(ped)-6)) stop(  #The MAP file must contain as many markers as are in the PED file
+if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
   cat("\n /!\ Files do not match. \n"),
   cat("**", ncol(ped)-6 ," markers for ped file \n"),
   cat("**", nrow(map) ," markers for map file \n"),
   cat("**", nrow(phen) ," phenotypes for phen file \n")
 )
+
 
 # --- Variables
 numb_snps = nrow(ped)* (ncol(ped)-6)
@@ -110,14 +112,14 @@ cat("\n Data loaded\n--- ",
     
     "\n   ---  Missing values\n",
     "missing at \t: ", missing_snps, "positions \n",
-    "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n",
-    "  ---  Check for Mendelian errors \n")
+    "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n")
 
 # --- Check for Mendelian errors
 
-cmd = paste0("cp ",opt$pedfile," check_mendel.ped ; cp ",opt$mapfile," check_mendel.map")
-system(cmd)
-
-system(paste0(plink_ ," --file check_mendel --mendel --out sample_check"))
-system("rm *check*")        
+#cat("--- Check Mendelian errors")
+# cmd = paste0("cp ",paste0(path_to_file, opt$pedfile)," check_mendel.ped ; cp ",paste0(path_to_file, opt$mapfile)," check_mendel.map")
+# system(cmd)
+# 
+# system(paste0(plink_ ," --file check_mendel --mendel --out sample_check"))
+# system("rm *check*")        
 
