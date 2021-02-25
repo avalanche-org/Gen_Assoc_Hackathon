@@ -33,7 +33,6 @@ module
         
         }) 
       },  
-    //! TODO  [x] :  collect how many cpu  are available   
     cpus_core  : (with_detail_object = false)   =>  {  
         if  (with_detail_object) {  
           return   { 

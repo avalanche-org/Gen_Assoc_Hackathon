@@ -85,7 +85,6 @@ const  {
             log(`/${paths}/${phenfile}`) 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
             .then( res => {
-                //! TODO : RUN ANALYSIS !!
                 //utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile ${paths}/${mapfile} --phenfile ${paths}/${phenfile}` , 
                 //utils.std_ofstream(`Rscript summary.R --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
                 
@@ -104,6 +103,12 @@ const  {
                 })
 
             }) 
+        })
+
+        ipcMain.on("run::analysis" , (evt , data) => {
+            const { paths  , selected_index  }  = data  
+            log(paths) 
+            log(selected_index)  
         })
     }
     

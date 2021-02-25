@@ -32,6 +32,8 @@ const  [
         _.querySelector("#run_summary"), 
         _.querySelector("#run_analysis") 
     ] 
+ 
+run_analysis.disabled =  true  
 term.innerText = "[Gen Assoc@ABC:]$"
 term.setEditable =  false 
 ipcRenderer.send("init",0x000) 
@@ -81,7 +83,6 @@ const  optsfeed  =  gdata   => {
      })
 
 }
-
 let 
 [paths_collections  , files_collections] = [ [] , [] ]  
 
@@ -114,12 +115,14 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
     })
 }
 sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)
+sync_select_action(ped , phen)        ;       sync_select_action(map,phen) 
 
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault() 
     //TODO  : run   summary
-    term.innerText =  "Processing  Summary ... " 
+    term.innerText =  "Processing  Summary ... please wait"
+    run_analysis.disabled = true  
     const gobject =    { 
          paths  : paths_collections ??  null ,  
          selected_files: [ 
@@ -141,9 +144,38 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
         phenotype_opts.text      =  phen_index  
         phenotype_opts.value     =  phen_index
         phenotype.add(phenotype_opts)   
-    } 
+    }  
+    
+    //!TODO   : enable  run analysis  button    " by  default  the run  analysis  is disabled 
 })
 
 ipcRenderer.on("term::logout" , ( evt , data ) => {
-    term.innerText = data 
+    if  ( data  ) {
+    term.innerText        = data   
+    run_analysis.disabled = false 
+    run_summary.disabled  = true
+    }
 })
+
+
+run_analysis.addEventListener("click" ,  evt => { 
+
+    //! GET   ALL   VALUE   TO ALL  SELEECT FIELD 
+    const gobject  =  { 
+        paths           :paths_collections ?? null ,
+        selected_index  :[  
+            ped.options[ped.selectedIndex].value , 
+            map.options[map.selectedIndex].value , 
+            phen.options[phen.selectedIndex].value , 
+            phenotype.options[phenotype.selectedIndex].value , 
+            nbsim.options[nbsim.selectedIndex].value , 
+            nbcores.options[nbcores.selectedIndex].value  
+        
+        ]
+    }
+    
+    ipcRenderer.send("run::analysis" ,  gobject )
+
+})
+
+
