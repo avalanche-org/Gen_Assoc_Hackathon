@@ -120,19 +120,25 @@ sync_select_action(ped , phen)        ;       sync_select_action(map,phen)
 
 
 run_summary.addEventListener("click" , evt => {
-    evt.preventDefault() 
-    //TODO  : run   summary
     term.innerText =  "Processing  Summary ... please wait"
     run_analysis.disabled = true  
     const gobject =    { 
          paths  : paths_collections ??  null ,  
          selected_files: [ 
-              ped.options[ped.selectedIndex].value , 
-              map.options[map.selectedIndex].value , 
-              phen.options[phen.selectedIndex].value  
+              ped.options[ped.selectedIndex]?.value  ??  null ,   
+              map.options[map.selectedIndex]?.value  ?? null , 
+              phen.options[phen.selectedIndex]?.value ?? null  
          ]
     }
-    ipcRenderer.send("run::summary",  gobject )  
+    let  missing  = false 
+    for ( let s  of   gobject["selected_files"] )  {
+        if (s == null )   {
+            missing = true 
+            term.innerText =  "missing  value"
+            break  
+        }
+    }
+    if (!missing) ipcRenderer.send("run::summary",  gobject )  
 })
 
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {

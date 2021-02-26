@@ -88,7 +88,7 @@ const  {
 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
-               utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
+               utils.std_ofstream(`Rscript ${sum_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  { 
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
