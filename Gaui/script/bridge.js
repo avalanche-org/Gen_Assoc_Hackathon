@@ -132,13 +132,10 @@ run_summary.addEventListener("click" , evt => {
               phen.options[phen.selectedIndex].value  
          ]
     }
-
     ipcRenderer.send("run::summary",  gobject )  
 })
 
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
-    log(incomming_data)
-     //!TODO  : CLEAN  PHENOTYPE BEFORE
     phenotype.innerHTML = ""  
     for  ( let phen_index  of range(incomming_data )) { 
         const phenotype_opts = _.createElement("option")  
@@ -146,8 +143,6 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
         phenotype_opts.value     =  phen_index
         phenotype.add(phenotype_opts)   
     }  
-    
-    //!TODO   : enable  run analysis  button    " by  default  the run  analysis  is disabled 
 })
 
 ipcRenderer.on("term::logout" , ( evt , data ) => {
@@ -157,10 +152,14 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     run_summary.disabled  = true
     }
 })
+//! TODO :  [ optional]  style  output error  with red or yellow color  ... 
+ipcRenderer.on("log::fail"        , (evt , data)  => {term.innerText = data}) 
+ipcRenderer.on("logerr::notfound" , (evt , data)  => {term.innerText = data}) 
+ipcRenderer.on("term::logerr"     , (evt , data)  => {term.innerText = data}) 
+ipcRenderer.on("log::broken"      , (evt , data)  => {term.innerText = data}) 
 
 run_analysis.addEventListener("click" ,  evt => { 
 
-    //! GET   ALL   VALUE   TO ALL  SELEECT FIELD 
     const gobject  =  { 
         paths           :paths_collections ?? null ,
         selected_index  :[  
@@ -173,7 +172,6 @@ run_analysis.addEventListener("click" ,  evt => {
         
         ]
     }
-    
     ipcRenderer.send("run::analysis" ,  gobject )
 
 })

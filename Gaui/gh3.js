@@ -3,7 +3,8 @@
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 __stage__  : {  process.env["STAGE"] = "development"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
-__static__ : {  htm_static_path      = "template/index.html"  } 
+__static__ : {  htm_static_path      = "template/index.html"  }
+//NOTE:  the summary  should be  present in your system path ... 
 __summary_s: { sum_src = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R"}
 
 const
@@ -81,27 +82,34 @@ const  {
    
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
             const  { paths  , selected_files  }  =  _data 
-            const  [pedfile,mapfile,phenfile]  = selected_files
-            log(`/${paths}/${phenfile}`) 
-           utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
-           .then(res => { 
-               //utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile ${paths}/${mapfile} --phenfile ${paths}/${phenfile}` ,
-               //utils.std_ofstream(`Rscript summary.R --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
-               //! DISPlAY : TODO  -> fix display format on terminal  
-                utils.std_ofstream("Rscript summary.R --pedfile sample.ped  --mapfile sample.map  --phenfile sample.phen", 
+            const  [pedfile,mapfile,phenfile]  = selected_files 
+            //! TODO :  Build respective complete path  for  ped map phen ...  
+            //!      :+ each file should have   own path   
+
+            utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
+           .then(res => {
+               utils.std_ofstream(`Rscript ${sum_src} --pedfile ${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  { 
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
                             /*sending data  to renderer  process */
-                            if (e)  mw.webContents.send("term::error" , e  ) //!TODO : catch this on renderer  
+                            if (e)  mw.webContents.send("log::fail" , e  )   
                             mw.webContents.send("term::logout"  , d )   
                         })
                         mw.webContents.send("load::phenotype"  ,  res-2)   
+                    }else { 
+                        fs.access(".logerr" , fs.constants["F_OK"] , error => {
+                            if (error )  mw.webContents.send("logerr::notfound" , error)  
+                            fs.readFile('.logerr' , "utf8" , (err , data) =>{
+                                if(err) mw.webContents.send("log::broken" ,  error )  
+                                mw.webContents.send ("term::logerr" , data) 
+                            })
+                        }) 
                     }
                 })
-
             }) 
-        }) 
+        })
+
         ipcMain.on("run::analysis" , (evt , data) => {
             const { paths  , selected_index  }  = data    
             log(paths) 

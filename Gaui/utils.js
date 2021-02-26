@@ -85,7 +85,8 @@ module
         cmd.stderr.pipe(createWriteStream(fstderr)) 
         cmd.on("close" , exit_code =>  {
             cb(exit_code) 
-            log("exiting with " ,  exit_code )
+            log("exiting with code " ,  exit_code )
+
             //if  (exit_code  == 0  && main_window)  main_window.webContents.send("succes"  , exit_code) 
             //if  (exit_code !=  0  && main_window) main_window.webContents.send("errors"  , exit_code)     
         })
