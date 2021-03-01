@@ -18,3 +18,5 @@ Gaui/node_modules/
 Gaui/.*.sw*
 Gaui/script/.*.sw*
 Gaui/template/.*.sw*
+.DS_Store 
+Gaui/.DS_Store 
