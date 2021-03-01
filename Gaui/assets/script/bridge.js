@@ -31,20 +31,49 @@ const  [
         _.querySelector("#run_summary"), 
         _.querySelector("#run_analysis") 
     ] 
-
+let terminal ,  writeSpeed  
 __init__  = ( ()=> {   
     run_analysis.disabled =  true  
     term.innerText        =  ">"
-    term.setEditable      =  false 
-    ipcRenderer.send("init",0x000) 
+    term.setEditable      =  false
+    markerset.disabled    =  true 
+    ipcRenderer.send("init",0x000)
+    writeSpeed            =  2 
 })()    
 
+const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
+const  term_write  =  incomming_data => {
+    let  c  =  0 ;    
+    (function write_simulation () {
+        follow_scrollbar()  
+        if ( c <  incomming_data.length) { 
+            let termbuffer = `${incomming_data.charAt(c)}`  
+            if ( c != incomming_data.length -1) 
+                termbuffer =`${termbuffer}` 
+            term.value +=termbuffer 
+            c++ 
+            setTimeout(write_simulation , writeSpeed)  
+        }else  
+            clearTimeout(write_simulation) 
+    })()
+}
+
+
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
-    for  ( let i of   range(data) ) { 
+    const  {  nbsim_limite  ,  available_cpus_core } = data  
+
+    for  ( let i of   range(available_cpus_core) ) { 
         const ncores_opt =  _.createElement("option") 
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
     }
+    
+    for ( let i of   range(nbsim_limite) ) {
+        const nbsim_opt =  _.createElement("option") 
+        nbsim_opt.text=i 
+        nbsim.add(nbsim_opt) 
+    }
+
 })
 const  get_ext  = args   =>  {
     let  _d  =  args.split(".")  
@@ -115,12 +144,14 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
         } 
     })
 }
-sync_select_action(ped , map) /*< --*/;/*-->*/sync_select_action(map, ped)
-sync_select_action(ped , phen)        ;       sync_select_action(map,phen) 
+sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)
+sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
 
 
 run_summary.addEventListener("click" , evt => {
-    term.innerText =  "Processing  Summary ... please wait"
+    evt.preventDefault() 
+    term_write("Processing Summary  ... please wait")
+    
     run_analysis.disabled = true  
     const gobject =    { 
          paths  : paths_collections ??  null ,  
@@ -140,7 +171,14 @@ run_summary.addEventListener("click" , evt => {
     }
     if (!missing) ipcRenderer.send("run::summary",  gobject )  
 })
-
+mm.addEventListener("change" , evt => {
+    if (evt.target.checked)  
+        markerset.disabled = false
+})
+sm.addEventListener("change" , evt => {
+    if(evt.target.checked)
+        markerset.disabled = true 
+})
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
     phenotype.innerHTML = ""  
     for  ( let phen_index  of range(incomming_data )) { 
@@ -152,10 +190,11 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
 })
 
 ipcRenderer.on("term::logout" , ( evt , data ) => {
-    if  ( data  ) {
-    term.innerText        = data   
-    run_analysis.disabled = false 
-    run_summary.disabled  = true
+    term.focus() 
+    if  ( data  ) { 
+        term_write(data) 
+        run_analysis.disabled = false 
+        run_summary.disabled  = true
     }
 })
 //! TODO :  [ optional]  style  output error  with red or yellow color  ... 
@@ -165,21 +204,27 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {term.innerText = data})
 ipcRenderer.on("log::broken"      , (evt , data)  => {term.innerText = data}) 
 
 run_analysis.addEventListener("click" ,  evt => { 
-
+    evt.preventDefault()
+    term.value ="---"  
+    term_write("Running Analysis") 
     const gobject  =  { 
         paths           :paths_collections ?? null ,
-        selected_index  :[  
-            ped.options[ped.selectedIndex].value , 
-            map.options[map.selectedIndex].value , 
-            phen.options[phen.selectedIndex].value , 
-            phenotype.options[phenotype.selectedIndex].value , 
-            nbsim.options[nbsim.selectedIndex].value , 
-            nbcores.options[nbcores.selectedIndex].value  
-        
-        ]
+        selected_index  :  { 
+            ped      : ped.options[ped.selectedIndex].value , 
+            map      : map.options[map.selectedIndex].value , 
+            phen     : phen.options[phen.selectedIndex].value , 
+            phenotype: phenotype.options[phenotype.selectedIndex].value , 
+            nbsim    : nbsim.options[nbsim.selectedIndex].value , 
+            nbcores  : nbcores.options[nbcores.selectedIndex].value,
+            mm       : mm.checked, 
+            sm       : sm.checked, 
+            markerset: mm.checked ? markerset.value : null 
+        }  
     }
     ipcRenderer.send("run::analysis" ,  gobject )
 
 })
-
+ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
+    term_write(data)   
+})
 

@@ -2,11 +2,12 @@
 
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
 __stage__  : {  process.env["STAGE"] = "development"          }  
+//__stage__  : {  process.env["STAGE"] = "production"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/index.html"  }
 //NOTE:  the summary  should be  present in your system path ... 
-__summary_s: { sum_src = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R"}
-
+__summary_s: { sum_src  = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R"}
+__analysis_s:{ analysis = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/run_analysis.R"}
 const
 {   log  }  = console , 
 {   path , 
@@ -69,6 +70,7 @@ const  {
     },
     ["main_frame"]  :  ()  => {    
         mw  =  new BrowserWindow({...defconf["main_frame"]})
+        mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
         const { tfile  , mt_load }  =  _start 
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
         mw.loadURL(url.format(tfile(htm_static_path)))
@@ -76,8 +78,12 @@ const  {
         //! TODO : preload  default value  
         const  { cpus_core } = utils 
         ipcMain.on("init" ,  ( evt , data )  => {
-            log("initializing  render process " ,  data)   
-            evt.reply("cpus::core" ,  cpus_core()-1)   
+            log("initializing  render process " ,  data)  
+            const initiate  =  { 
+                nbsim_limite          :  defconf["mtdt_pannel"]["limite_nbsims"], 
+                available_cpus_core   :  cpus_core() -1
+            } 
+            evt.reply("cpus::core" ,  initiate)   
         })
    
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
@@ -112,15 +118,32 @@ const  {
 
         ipcMain.on("run::analysis" , (evt , data) => {
             const { paths  , selected_index  }  = data    
-            log(paths) 
-            log(selected_index)  
-            //  TODO :  RUN  THE  ANALYSIS COMMANDE 
-            utils.std_ofstream("run analysis ", exit_code  => {
+            const {  mm    , sm , ped , map , phen , phenotype ,  nbsim , nbcores , markerset }  = selected_index  
+            let cmdstr = null 
+            if (mm && markerset!= null && markerset != '')  {  
+                cmdstr =`Rscript ${analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores} --markerset ${markerset}` 
+            } 
+            if  (sm)  {  
+                cmdstr =`Rscript ${analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores}`
+            }
+
+            utils.std_ofstream(cmdstr ,  exit_code  => {
                 if(exit_code ==0x00) {
+                    log("success") 
                     fs.readFile(".logout" , "utf8" , (e , d)  => {
-                        if  (e) throw e 
-                        mw.webContents.send("run::analysis" ,  d  ) 
+                        if  (e)    mw.webContents.send("log::fail" , e  )  
+                        log("output result" ,  d)  
+                        mw.webContents.send("run::analysis_result" ,  d  ) 
                     })
+                }else {
+                    log (cmdstr) 
+                    fs.access(".logerr" , fs.constants["F_OK"] , error => {
+                        if (error )  mw.webContents.send("logerr::notfound" , error)  
+                        fs.readFile('.logerr' , "utf8" , (err , data) =>{
+                            if(err) mw.webContents.send("log::broken" ,  error )  
+                            mw.webContents.send ("term::logerr" , data) 
+                        })
+                    }) 
                 }
             })
         })

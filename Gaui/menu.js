@@ -12,7 +12,7 @@ is_osx           = process.platform === "darwin"
 slash_orientaion = process.platform  == "win32" ? "\\" : "/"
 
 module
-["exports"]  =   [ 
+["exports"]  =   [  
     { 
         label : "File",
         submenu   : [
@@ -93,16 +93,8 @@ module
         label :  "View" ,
         submenu : [  
             {role : "reload"} , 
-            {role : "forceReload"} , 
-            ...process.env?.["STAGE"] !== "production" ?  [
-                {
-                    label : "Toggle DevTools",  
-                    accelerator : is_osx ? "Command+I" :"Ctrl+I" , 
-                    click (it_ , wintarget )  {
-                        wintarget?.toggleDevTools()
-                    }
-                },   
-            ] : {}, 
+            {role : "forceReload"} ,
+
             {type: "separator"} , 
             {role : "resetZoom"} , 
             {role : "zoomIn"} , 
@@ -131,3 +123,14 @@ module
         ]
     }
 ]
+
+if ( is_osx) module.exports.unshift({})
+if (process.env["STAGE"] != "production") {
+    module.exports[2].submenu.push({
+        label : "Toggle DevTools",  
+        accelerator : is_osx ? "Command+I" :"Ctrl+I" , 
+        click (it_ , wintarget )  {
+            wintarget?.toggleDevTools()
+        }
+    })
+}

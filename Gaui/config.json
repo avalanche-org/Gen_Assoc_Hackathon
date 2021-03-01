@@ -4,14 +4,17 @@
         "width" :  1200 ,
         "height":  800, 
         "webPreferences" : {
-            "nodeIntegration" : true 
+            "nodeIntegration" : true
         } 
     },   
-    
+    "mtdt_pannel" : {  
+        "limite_nbsims": 10 
+    } , 
     "io_fstream" :  { 
         "fstdout" : ".logout",
         "fstderr" : ".logerr",
         "fserror" : ".error" 
-    } 
+    }  
+    
 } 
  
