@@ -102,11 +102,13 @@ const  {
                             mw.webContents.send("term::logout"  , d )   
                         })
                         mw.webContents.send("load::phenotype"  ,  res-2)   
-                    }else { 
+                    }else {
+                        log("fail")  
                         fs.access(".logerr" , fs.constants["F_OK"] , error => {
                             if (error )  mw.webContents.send("logerr::notfound" , error)  
                             fs.readFile('.logerr' , "utf8" , (err , data) =>{
-                                if(err) mw.webContents.send("log::broken" ,  error )  
+                                if(err) mw.webContents.send("log::broken" ,  error ) 
+                                log(data)
                                 mw.webContents.send ("term::logerr" , data) 
                             })
                         }) 

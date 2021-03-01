@@ -149,9 +149,8 @@ sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen)
 
 
 run_summary.addEventListener("click" , evt => {
-    evt.preventDefault() 
-    term_write("Processing Summary  ... please wait")
-    
+    evt.preventDefault()
+    let  annoucement  = "> Processing Summary  ... please wait\n"
     run_analysis.disabled = true  
     const gobject =    { 
          paths  : paths_collections ??  null ,  
@@ -165,10 +164,12 @@ run_summary.addEventListener("click" , evt => {
     for ( let s  of   gobject["selected_files"] )  {
         if (s == null )   {
             missing = true 
-            term.innerText =  "missing  value"
+            annoucement =  "> missing value\n"
             break  
         }
     }
+    term.value =  ""   //  clean output before 
+    term_write(annoucement) 
     if (!missing) ipcRenderer.send("run::summary",  gobject )  
 })
 mm.addEventListener("change" , evt => {
@@ -198,15 +199,14 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     }
 })
 //! TODO :  [ optional]  style  output error  with red or yellow color  ... 
-ipcRenderer.on("log::fail"        , (evt , data)  => {term.innerText = data}) 
-ipcRenderer.on("logerr::notfound" , (evt , data)  => {term.innerText = data}) 
-ipcRenderer.on("term::logerr"     , (evt , data)  => {term.innerText = data}) 
-ipcRenderer.on("log::broken"      , (evt , data)  => {term.innerText = data}) 
+ipcRenderer.on("log::fail"        , (evt , data)  => {term.value = data}) 
+ipcRenderer.on("logerr::notfound" , (evt , data)  => {term.value = data}) 
+ipcRenderer.on("term::logerr"     , (evt , data)  => {term.value = data}) 
+ipcRenderer.on("log::broken"      , (evt , data)  => {term.value = data}) 
 
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
-    term.value ="---"  
-    term_write("Running Analysis") 
+    term_write("> Running Analysis") 
     const gobject  =  { 
         paths           :paths_collections ?? null ,
         selected_index  :  { 
@@ -222,7 +222,6 @@ run_analysis.addEventListener("click" ,  evt => {
         }  
     }
     ipcRenderer.send("run::analysis" ,  gobject )
-
 })
 ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
     term_write(data)   
