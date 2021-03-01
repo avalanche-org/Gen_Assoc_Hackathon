@@ -4,7 +4,7 @@
 __stage__  : {  process.env["STAGE"] = "development"          }  
 //__stage__  : {  process.env["STAGE"] = "production"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
-__static__ : {  htm_static_path      = "template/index.html"  }
+__static__ : {  htm_static_path      = "template/proposal.html"  }
 //NOTE:  the summary  should be  present in your system path ... 
 const
 {   log  }  = console , 

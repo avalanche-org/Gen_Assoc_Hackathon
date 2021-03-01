@@ -6,20 +6,8 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="page_type" content="np-template-header-footer-from-plugin" />
-    <title>mtdt_html</title>
+    <title>mtdt_GUI</title>
     <link rel="stylesheet" href="style.css" media="screen" />
-    <script
-      class="u-script"
-      type="text/javascript"
-      src="jquery-1.9.1.min.js"
-      defer=""
-    ></script>
-    <script
-      class="u-script"
-      type="text/javascript"
-      src="nicepage.js"
-      defer=""
-    ></script>
     <meta name="generator" content="Nicepage 3.6.0, nicepage.com" />
     <link
       id="u-theme-google-font"
@@ -44,7 +32,7 @@
 
     <style>
       /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
-      @media (max-width: 600px) {
+      @media (max-width: 3000px) {
         section,
         footer {
           width: 100%;
@@ -52,7 +40,7 @@
         }
       }
       .terminal {
-        padding: 10px;
+        padding: 10px 10px 10px 10px ;
         width: 100%;
         height: 100%;
         background-color: black;
@@ -61,10 +49,10 @@
         font-family: Consolas, Lucida Console, monospace;
       }
       body,
-      h1 {
+      h6 {
         font-family: "Raleway", Arial, sans-serif;
       }
-      h1 {
+      h6 {
         letter-spacing: 20px;
       }
       .w3-row-padding img {
@@ -75,21 +63,20 @@
   <body class="u-body">
 
     <!-- Header -->
-    <header
+    <!--header
       class="w3-panel w3-center w3-opacity"
-      style="padding: 10px 10px; color: #2f2f2f; text-align: center"
+      style="padding: 10px 40px; color: #2f2f2f; text-align: left;"
     >
-      <h1 class="w3-xlarge">m-TDT</h1>
-      <h6>A tool for Multi-locus Transmission Disequilibrium Test</h6>
+      <h6>m-TDT</h6>
+      <h6>A tool for Multi-locus Transmission Disequilibrium Test</h6-->
 
       <!--div class="w3-padding-32">             # bar menu 
         <div class="w3-bar w3-border">
           <a href="#" class="w3-bar-item w3-button">Interpretation</a>
           <a href="#" class="w3-bar-item w3-button w3-light-grey">About Us</a>
         </div>
-      </div-->
-    </header>
-
+      </div>
+    </header-->
     <section class="u-clearfix u-section-1" id="sec-2761">
       <div class="u-clearfix u-gutter-0 u-layout-wrap u-layout-wrap-1">
         <div class="u-layout">
@@ -106,9 +93,8 @@
                         <div class="u-form u-form-1">
                           <!--form to load files : run summary.R -->
 
+
                           <form
-                            action="https://nicepage.com/editor/Forms/Process"
-                            method="POST"
                             class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
                             source="email"
@@ -136,13 +122,11 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-30ab"
+                                  required
+                                  id="ped"
                                   name="select"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="Item 1">pedfile</option>
-                                  <option value="Item 2">Item 2</option>
-                                  <option value="Item 3">Item 3</option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -168,13 +152,11 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-68f0"
+                                    required
+                                  id="map"
                                   name="select-1"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="Item 1">mapfile</option>
-                                  <option value="Item 2">Item 2</option>
-                                  <option value="Item 3">Item 3</option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -200,13 +182,11 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-f55a"
+                                    required
+                                  id="phen"
                                   name="select-2"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="Item 1">phenfile</option>
-                                  <option value="Item 2">Item 2</option>
-                                  <option value="Item 3">Item 3</option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -223,26 +203,22 @@
                               </div>
                             </div>
                             <div
-                              class="u-align-right u-form-group u-form-submit"
-                            >
-                              <a
-                                href="#"
-                                class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"
-                                >Load</a
-                              >
+                              class="u-align-right u-form-group u-form-submit">
+                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Load</a>
                               <input
                                 type="submit"
-                                value="submit"
+                                value="load"
                                 class="u-form-control-hidden"
                               />
                             </div>
                             <div
                               class="u-form-send-message u-form-send-success"
                             >
-                              Thank you! Your message has been sent.
+                              Markers selected
                             </div>
                             <div class="u-form-send-error u-form-send-message">
-                              Unable to send your message. Please fix errors
+                              Unable to send u:w
+                              your message. Please fix errors
                               then try again.
                             </div>
                             <input
@@ -261,8 +237,6 @@
                         <p class="u-text u-text-3"><b>Choose options</b></p>
                         <div class="u-form u-form-2">
                           <form
-                            action="https://nicepage.com/editor/Forms/Process"
-                            method="POST"
                             class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
                             source="email"
@@ -285,21 +259,25 @@
                             >
                               <div class="u-form-radio-button-wrapper">
                                 <input
+                                  id="single_marker"
                                   type="radio"
-                                  name="radiobutton"
+                                  name="mradiobutton"
                                   value="Item 1"
+                                  checked 
                                 />
-                                <label class="u-label" for="radiobutton"
+                                <label class="u-label" for="mradiobutton"
                                   >Single-Marker &nbsp; &nbsp; &nbsp;
                                   &nbsp;</label
                                 >
 
                                 <input
+                                  id="multi_marker" 
                                   type="radio"
-                                  name="radiobutton"
+                                  name="mradiobutton"
                                   value="Item 2"
                                 />
-                                <label class="u-label" for="radiobutton"
+
+                                <label class="u-label" for="mradiobutton"
                                   >Multi-Marker</label
                                 >
 
@@ -309,13 +287,14 @@
                             <div
                               class="u-form-group u-form-radiobutton u-form-group-5"
                             >
-                              <div class="u-form-radio-button-wrapper">
+                              <!--div class="u-form-radio-button-wrapper">
                                 <p>
                                   Retrieve missing genotypes? (not available
                                   yet)
                                 </p>
 
                                 <input
+                                  id="yes"
                                   type="radio"
                                   name="radiobutton"
                                   value="run_GI"
@@ -327,6 +306,7 @@
                                 </label>
 
                                 <input
+                                    id="no"
                                   type="radio"
                                   name="radiobutton"
                                   value="no_GI"
@@ -337,7 +317,7 @@
 
                                 <br />
                                 <br />
-                              </div>
+                              </div-->
                             </div>
 
                             <div
@@ -350,16 +330,11 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-1cd4"
+                                  id="phenotype"
                                   name="phenotype"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="none">
-                                    -- Choose a phenotype (column number) --
-                                  </option>
-                                  <!--phenotype columns -->
-                                  <option value="Item 1">1</option>
-                                  <option value="Item 2">2</option>
+
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -385,24 +360,11 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-4e3d"
+                                  id="nbsim"
                                   name="select-1"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="none">
-                                    -- Choose the number of simulations --
-                                  </option>
-                                  <!--number of simulations -->
-                                  <option value="Item 1">1</option>
-                                  <option value="Item 2">2</option>
-                                  <option value="Item 3">3</option>
-                                  <option value="Item 4">4</option>
-                                  <option value="Item 5">5</option>
-                                  <option value="Item 6">6</option>
-                                  <option value="Item 7">7</option>
-                                  <option value="Item 8">8</option>
-                                  <option value="Item 9">9</option>
-                                  <option value="Item 10">10</option>
+                                  
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -428,19 +390,10 @@
                               >
                               <div class="u-form-select-wrapper">
                                 <select
-                                  id="select-0c1c"
+                                  id="nbcores"
                                   name="select-2"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
-                                  <option value="none">
-                                    -- Choose the number of nbcores --
-                                  </option>
-                                  <!--number of cores -->
-                                  <option value="Item 1">1</option>
-                                  <option value="Item 2">2</option>
-                                  <option value="Item 3">3</option>
-                                  <option value="Item 4">4</option>
-                                  S
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -467,26 +420,17 @@
                                 placeholder="Choose your markers. eg: 1, 3, 24"
                                 rows="1"
                                 cols="30"
-                                id="message-3339"
+                                id="marker_set"
                                 name="message"
                                 class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 required=""
                               ></textarea>
-                              <br />
+                              
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit"
                             >
-                              <a
-                                href="#"
-                                class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"
-                                >choose options</a
-                              >
-                              <input
-                                type="submit"
-                                value="submit"
-                                class="u-form-control-hidden"
-                              />
+                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary" > Run Analysis  </button>  
                             </div>
                             <div
                               class="u-form-send-message u-form-send-success"
@@ -504,12 +448,8 @@
                             />
                           </form>
                         </div>
-                        <br />
-                        <a
-                          href="#"
-                          class="u-border-2 u-border-grey-40 u-border-hover-grey-75 u-btn u-btn-round u-button-style u-hover-grey-70 u-none u-radius-50 u-btn-4"
-                          >RUN ANALYSIS</a
-                        >
+                        
+                        
                       </div>
                     </div>
                   </div>
@@ -530,7 +470,7 @@
           rows="15">
         </textarea>
         
-      ></div>
+      </div>
                     </div>
                   </div>
                 </div>
@@ -541,14 +481,8 @@
       </div>
       
     </section>
-    <!-- Footer -->
-    <footer class="w3-container w3-padding-64 w3-light-grey w3-center w3-large">
-      <p>
-        <a
-          class="w3-hover-text-green"
-          >Gen_Assoc Project - H3ABioNet</a
-        >
-      </p>
-    </footer>
+    
   </body>
+  <script src="../assets/script/ops.js"> </script>  
+  <script src ="../assets/script/bridge.js"> </script>
 </html>
