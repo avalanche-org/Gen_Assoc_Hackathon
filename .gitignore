@@ -19,3 +19,5 @@ Gaui/.*.sw*
 Gaui/script/.*.sw*
 Gaui/template/.*.sw*
 Gaui/sample_results/
+.DS_Store 
+Gaui/.DS_Store 
