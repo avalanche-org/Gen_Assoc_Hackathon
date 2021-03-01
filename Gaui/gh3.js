@@ -6,8 +6,6 @@ __stage__  : {  process.env["STAGE"] = "development"          }
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/index.html"  }
 //NOTE:  the summary  should be  present in your system path ... 
-__summary_s: { sum_src  = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R"}
-__analysis_s:{ analysis = "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/run_analysis.R"}
 const
 {   log  }  = console , 
 {   path , 
@@ -16,7 +14,8 @@ const
     url  , 
     _ejs_
 }         = core["@node_module"] , 
-{defconf} = core["@config"], 
+{defconf} = core["@config"],
+{summary_src ,  run_analysis } = defconf["mtdt_pannel"], 
 {menu ,  utils}    = core["@libs"] 
 
 const 
@@ -94,7 +93,7 @@ const  {
 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
-               utils.std_ofstream(`Rscript ${sum_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
+               utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  { 
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
@@ -121,10 +120,10 @@ const  {
             const {  mm    , sm , ped , map , phen , phenotype ,  nbsim , nbcores , markerset }  = selected_index  
             let cmdstr = null 
             if (mm && markerset!= null && markerset != '')  {  
-                cmdstr =`Rscript ${analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores} --markerset ${markerset}` 
+                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores} --markerset ${markerset}` 
             } 
             if  (sm)  {  
-                cmdstr =`Rscript ${analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores}`
+                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores}`
             }
 
             utils.std_ofstream(cmdstr ,  exit_code  => {
