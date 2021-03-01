@@ -18,3 +18,4 @@ Gaui/node_modules/
 Gaui/.*.sw*
 Gaui/script/.*.sw*
 Gaui/template/.*.sw*
+Gaui/sample_results/
