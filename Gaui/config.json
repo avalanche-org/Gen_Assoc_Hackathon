@@ -9,8 +9,8 @@
     },   
     "mtdt_pannel" : {  
         "limite_nbsims": 10 , 
-        "summary_src" : "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R", 
-        "run_analysis": "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/run_analysis.R",
+        "summary_src" : "/Users/marieme/Desktop/Gen_Assoc/scripts/summary.R", 
+        "run_analysis": "/Users/marieme/Desktop/Gen_Assoc/scripts/run_analysis.R",
         "mtdt_src"    : "" 
     } , 
     "io_fstream" :  { 
