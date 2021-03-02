@@ -34,11 +34,11 @@ const  [
 let terminal ,  writeSpeed  
 __init__  = ( ()=> {   
     run_analysis.disabled =  true  
-    term.innerText        =  ">"
+    term.innerText        =  "> "
     term.setEditable      =  false
     markerset.disabled    =  true 
     ipcRenderer.send("init",0x000)
-    writeSpeed            =  2 
+    writeSpeed            =  1 
 })()    
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
@@ -143,13 +143,15 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
             s_elmt2.options[data_index].selected= true  
         } 
     })
-}
-sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)
+} 
+//!  this section  make a synchronisation  between ped map and  phen file  
+sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
 sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
-
+//!--end sync 
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
+    term.focus()
     let  annoucement  = "> Processing Summary  ... please wait\n"
     run_analysis.disabled = true  
     const gobject =    { 
@@ -206,6 +208,7 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {term.value = data})
 
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
+    term.focus()
     term_write("> Running Analysis") 
     const gobject  =  { 
         paths           :paths_collections ?? null ,

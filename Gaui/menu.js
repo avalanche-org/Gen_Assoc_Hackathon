@@ -25,7 +25,6 @@ module
                         filters : [ 
                             {name : "All Files" , extensions:["ped" , "map","phen"] }
                         ],
-                        buttonLabel :  "Choose" , 
                         properties  : [  
                             "openFile",  
                             "openDirectiory", 
@@ -123,8 +122,8 @@ module
         ]
     }
 ]
-//if ( is_osx) module.exports.unshift({})
-/*
+if ( is_osx) module.exports.unshift({})
+
 if (process.env["STAGE"] != "production") {
     module.exports[2].submenu.push({
         label : "Toggle DevTools",  
@@ -133,4 +132,4 @@ if (process.env["STAGE"] != "production") {
             wintarget?.toggleDevTools()
         }
     })
-}*/
+}

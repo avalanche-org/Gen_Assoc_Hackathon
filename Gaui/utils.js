@@ -17,7 +17,8 @@ module
             readFile(file ,  "utf8" , (e , file_data ) => {
                 if (e) reject(e.code)
                 const headers = []  
-                const endcc   =  fromCharCode(0xa)   
+                const endcc   =  fromCharCode(0xa)  
+                log(file_data)  
                 for ( head  of  file_data.split(default_delimiter))  {
                      if (head.includes(endcc))  {
                         let last_head =  head.split(endcc)[0] 
@@ -79,16 +80,13 @@ module
        return buffer.toString()  
     }, 
     
-    std_ofstream   : (command ,  cb )=> {
+    std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
         cmd.stdout.pipe(createWriteStream(fstdout))
         cmd.stderr.pipe(createWriteStream(fstderr)) 
         cmd.on("close" , exit_code =>  {
-            cb(exit_code) 
+            callback(exit_code) 
             log("exiting with code " ,  exit_code )
-
-            //if  (exit_code  == 0  && main_window)  main_window.webContents.send("succes"  , exit_code) 
-            //if  (exit_code !=  0  && main_window) main_window.webContents.send("errors"  , exit_code)     
         })
     }   
     

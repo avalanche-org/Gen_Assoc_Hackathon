@@ -1,8 +1,10 @@
 {
     "main_frame":  {  
         "title" :  "Gen Assoc",   
-        "width" :  1200 ,
+        "width" :  950 ,
         "height":  800, 
+        "resizqble":false,
+        "scrollBounce":true,  
         "webPreferences" : {
             "nodeIntegration" : true
         } 
