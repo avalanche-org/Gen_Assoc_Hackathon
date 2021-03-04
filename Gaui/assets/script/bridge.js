@@ -164,7 +164,7 @@ run_summary.addEventListener("click" , evt => {
     }
     let  missing  = false 
     for ( let s  of   gobject["selected_files"] )  {
-        if (s == null )   {
+        if (s == null  || s ==  "" )   {
             missing = true 
             annoucement =  "> missing value\n"
             break  

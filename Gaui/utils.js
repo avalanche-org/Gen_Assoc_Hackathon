@@ -62,7 +62,7 @@ module
        })
     },
     execmd  : (main_cmd  ,  ...options)=> {
-        const  output_ =  spawn(main_cmd , options)
+        const  output_ =  spawn(main_cmd , options) 
         log(...options)
         console.log(`${main_cmd}` , ...options)
         return  new Promise( (resolve ,  reject)   => {

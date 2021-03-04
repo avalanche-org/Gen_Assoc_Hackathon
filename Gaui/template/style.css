@@ -3,7 +3,6 @@
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2020 Froala Labs
  */
-
 .fr-clearfix::after {
   clear: both;
   display: block;
@@ -86,7 +85,7 @@
   border: 1px solid #ddd;
 }
 .fr-view table td:empty,
-.fr-view table th:empty {
+fr-view table th:empty {
   height: 20px;
 }
 .fr-view table td.fr-highlighted,
@@ -16783,6 +16782,7 @@ p {
 .u-black.u-body {
   background-image: none;
 }
+
 .u-button-style[class*="u-custom-color-"],
 .u-button-style[class*="u-palette-"],
 .u-button-style[class*="u-gray-"],
@@ -19361,31 +19361,31 @@ a.u-button-style.u-border-20 {
 .u-radius-46:before,
 .u-radius-46 .u-background-effect,
 .u-radius-46 > .u-container-layout {
-  border-radius: 46px !important;
+  border-radius: 10px !important;
 }
 .u-radius-47,
 .u-radius-47:before,
 .u-radius-47 .u-background-effect,
 .u-radius-47 > .u-container-layout {
-  border-radius: 47px !important;
+  border-radius: 10px !important;
 }
 .u-radius-48,
 .u-radius-48:before,
 .u-radius-48 .u-background-effect,
 .u-radius-48 > .u-container-layout {
-  border-radius: 48px !important;
+  border-radius: 10px !important;
 }
 .u-radius-49,
 .u-radius-49:before,
 .u-radius-49 .u-background-effect,
 .u-radius-49 > .u-container-layout {
-  border-radius: 49px !important;
+  border-radius: 10px !important;
 }
 .u-radius-50,
 .u-radius-50:before,
 .u-radius-50 .u-background-effect,
 .u-radius-50 > .u-container-layout {
-  border-radius: 50px !important;
+  border-radius: 10px !important;
 }
 /*begin-variables font-family*/
 .u-body {
@@ -23675,12 +23675,12 @@ a.u-link.u-hover-grey-40:hover {
 .u-container-style.u-grey-50:before,
 .u-table-alt-grey-50 tr:nth-child(even) {
   color: #ffffff;
-  background-color: #736e6d52;
+  background-color: #222222 ; /*#736e6d52;*/
 }
 .u-button-style.u-grey-50,
 .u-button-style.u-grey-50[class*="u-border-"] {
   color: #ffffff !important;
-  background-color: #736e6d52 !important;
+  background-color: #222222 ; /*#736e6d52;*/
 }
 .u-button-style.u-grey-50:hover,
 .u-button-style.u-grey-50[class*="u-border-"]:hover,
@@ -23691,7 +23691,7 @@ a.u-link.u-hover-grey-40:hover {
 .u-button-style.u-button-style.u-grey-50.active,
 .u-button-style.u-button-style.u-grey-50[class*="u-border-"].active {
   color: #ffffff !important;
-  background-color: #737373 !important;
+  background-color:  #222222/* #737373*/ !important;
 }
 .u-hover-grey-50:hover,
 .u-hover-grey-50[class*="u-border-"]:hover,
@@ -23708,10 +23708,11 @@ a.u-button-style.u-button-style.u-active-grey-50[class*="u-border-"]:active,
 a.u-button-style.u-button-style.u-active-grey-50.active,
 a.u-button-style.u-button-style.u-active-grey-50[class*="u-border-"].active {
   color: #ffffff !important;
-  background-color: #736e6d52 !important;
+  background-color:  #222222/* #737373*/ !important;
 }
 a.u-link.u-hover-grey-50:hover {
   color: #736e6d52 !important;
+  background-color:  #222222/* #737373*/ !important;
 }
 .u-grey-60,
 .u-body.u-grey-60,
@@ -32552,8 +32553,7 @@ p.u-small-text {
 }
 p:not(.u-text-variant) {
   margin-top: 20px;
-  margin-bottom: 20px;
-}
+  margin-bottom: 20px10}
 .u-btn {
   margin-top: 20px;
   margin-bottom: 20px;

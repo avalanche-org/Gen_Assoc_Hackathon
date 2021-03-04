@@ -7,3 +7,5 @@ summary.R
 l
 clear
 ls
+config.json 
+assets/script/*.sw*

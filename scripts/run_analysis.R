@@ -161,7 +161,8 @@ for (i in 4:length(flag)){    # complete cmd
   cmd = paste0(cmd," --",flag[i])
 }
 
-cat("\n * Starting run.. \n => Selected flags : \n")
+cat("\n * Starting run.. \n ")
+cat(cmd)
 system(cmd)
 
 # --- Output 

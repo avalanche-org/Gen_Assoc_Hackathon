@@ -50,7 +50,13 @@
         font-size: 20px;
         font-family: VT323, Consolas, Lucida Console, monospace;
       }
-      body,
+      body{
+          /*background-image: url('https://image.freepik.com/vecteurs-libre/concept-papier-peint-science-abstraite-molecules-adn_43778-8.jpg');*/
+          background-image: url('https://onemorecupof-coffee.com/wp-content/uploads/2019/11/Best-Genetic-Testing-Affiliate-Programs.jpg');
+          background-repeat: no-repeat ;
+          background-size  : cover ;
+          background-attachment:fixed;
+      }
       h6 {
         font-family: "Raleway", Arial, sans-serif;
       }
@@ -129,6 +135,7 @@
                                   name="select"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
+                                <option   value = ""  disabled selected> pedfile  </option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -159,6 +166,7 @@
                                   name="select-1"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
+                                <option   value = "" disabled selected > map  </option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -189,6 +197,7 @@
                                   name="select-2"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
+                                <option   value = ""  disabled selected > phen</option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -337,6 +346,7 @@
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
 
+                                <option   value = ""  disabled selected >  choose  your  phenotype </option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -360,12 +370,14 @@
                                 class="u-form-control-hidden u-label"
                                 >Select</label
                               >
+
                               <div class="u-form-select-wrapper">
                                 <select
                                   id="nbsim"
                                   name="select-1"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
+                                <option   value = ""  disabled selected > choose your  simulation </option>
                                   
                                 </select>
                                 <svg
@@ -396,6 +408,8 @@
                                   name="select-2"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 >
+
+                                <option   value = ""  disabled selected > choose  your number of cores </option>
                                 </select>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -432,7 +446,7 @@
                             <div
                               class="u-align-right u-form-group u-form-submit"
                             >
-                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary" > Run Analysis  </button>  
+                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis  </button>  
                             </div>
                            
                           </form>
