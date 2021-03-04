@@ -122,7 +122,7 @@ module
         ]
     }
 ]
-if ( is_osx) module.exports.unshift({})
+//if ( is_osx) module.exports.unshift({})
 
 if (process.env["STAGE"] != "production") {
     module.exports[2].submenu.push({
