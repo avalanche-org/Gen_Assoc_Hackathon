@@ -84,6 +84,12 @@ const get_prefix_filename =  ( file , separator = ".")  => {
     return  file_prefix.slice(0 ,-1)  
 }
 
+const  is_satisfied  =  needs   => { 
+    for  ( need of needs )  
+         return !(( need == null ||  need  == ""))   
+
+    return true 
+}
 const  optsfeed  =  gdata   => {
     gdata.forEach(data => {
         let ext = get_ext(data)  
@@ -139,8 +145,10 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
             if (file_name[0]  == f_prefix[0] )  return  element  
         })
         if (match) {
-            let data_index  = map_elmts_opts.indexOf(match[0])  
-            s_elmt2.options[data_index].selected= true  
+            let data_index  = map_elmts_opts.indexOf(match[0]) 
+            try  {  
+                s_elmt2.options[data_index].selected= true  
+            }catch ( no_sync_error )  { /*shuuuttt !!!!*/}
         } 
     })
 } 
@@ -148,13 +156,17 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
 sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
 sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
 //!--end sync 
+let ped_  = null , 
+    map_  = null ,
+    phen_ = null   
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     term.focus()
     let  annoucement  = "> Processing Summary  ... please wait\n"
-    run_analysis.disabled = true  
-    const gobject =    { 
+    run_analysis.disabled = true 
+    run_summary.disabled  = true  
+    const  {selected_files}=gobject =    { 
          paths  : paths_collections ??  null ,  
          selected_files: [ 
               ped.options[ped.selectedIndex]?.value  ??  null ,   
@@ -162,17 +174,18 @@ run_summary.addEventListener("click" , evt => {
               phen.options[phen.selectedIndex]?.value ?? null  
          ]
     }
-    let  missing  = false 
-    for ( let s  of   gobject["selected_files"] )  {
-        if (s == null  || s ==  "" )   {
-            missing = true 
-            annoucement =  "> missing value\n"
-            break  
-        }
+ 
+    let  done   = is_satisfied (selected_files)  
+    if  (!done)  {
+        annoucement = "> Missing " 
+        run_summary.disabled = false   
     }
     term.value =  ""   //  clean output before 
     term_write(annoucement) 
-    if (!missing) ipcRenderer.send("run::summary",  gobject )  
+    if (done) {
+        [ped_  , map_ , phen_ ]  =  selected_files
+        ipcRenderer.send("run::summary",  gobject ) 
+    } 
 })
 mm.addEventListener("change" , evt => {
     if (evt.target.checked)  
@@ -201,30 +214,52 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     }
 })
 //! TODO :  [ optional]  style  output error  with red or yellow color  ... 
-ipcRenderer.on("log::fail"        , (evt , data)  => {term.value = data}) 
-ipcRenderer.on("logerr::notfound" , (evt , data)  => {term.value = data}) 
-ipcRenderer.on("term::logerr"     , (evt , data)  => {term.value = data}) 
-ipcRenderer.on("log::broken"      , (evt , data)  => {term.value = data}) 
-
+ipcRenderer.on("log::fail"        , (evt , data)  => {
+    term.value = data 
+    run_summary.disabled=false  
+}) 
+ipcRenderer.on("logerr::notfound" , (evt , data)  => {
+    term.value = data 
+    run_summary.disabled=false 
+}) 
+ipcRenderer.on("term::logerr"     , (evt , data)  => {
+    term.value = data 
+    run_summary.disabled=false 
+})  
+ipcRenderer.on("log::broken"      , (evt , data)  => {
+    term.value = data  
+    run_summary.disabled = false  
+}) 
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
     term_write("> Running Analysis") 
-    const gobject  =  { 
+    const  { 
+        selected_index
+         }  = gobject  =  { 
         paths           :paths_collections ?? null ,
         selected_index  :  { 
-            ped      : ped.options[ped.selectedIndex].value , 
-            map      : map.options[map.selectedIndex].value , 
-            phen     : phen.options[phen.selectedIndex].value , 
-            phenotype: phenotype.options[phenotype.selectedIndex].value , 
-            nbsim    : nbsim.options[nbsim.selectedIndex].value , 
-            nbcores  : nbcores.options[nbcores.selectedIndex].value,
-            mm       : mm.checked, 
-            sm       : sm.checked, 
-            markerset: mm.checked ? markerset.value : null 
+            ped        : ped_  ,  //  ped.options[ped.selectedIndex].value ?? null  , 
+            map        : map_  ,  //.options[map.selectedIndex].value ?? null  , 
+            phen       : phen_ , //.options[phen.selectedIndex].value?? null , 
+            phenotype_ : phenotype.options[phenotype.selectedIndex].value ?? null  , 
+            nbsim_     : nbsim.options[nbsim.selectedIndex].value ?? null  , 
+            nbcores_   : nbcores.options[nbcores.selectedIndex].value ?? null,
+            mm         : mm.checked, 
+            sm         : sm.checked, 
+            markerset  : mm.checked ? markerset.value : null 
         }  
     }
-    ipcRenderer.send("run::analysis" ,  gobject )
+    //!TODO  : make  a verification before running analysis ... 
+    const  {phenotype_, nbsim_, nbcores_}  = selected_index  
+    const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
+    let  not_statified  = false  
+    let  done  =  is_satisfied(require_needed)  
+    if   ( !done )  { 
+        term_write ("> Run analysis  need to be satisfied" )   
+    }
+    if (done)  
+        ipcRenderer.send("run::analysis" ,  gobject )
 })
 ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
     term_write(data)   
