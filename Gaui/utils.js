@@ -28,7 +28,6 @@ module
                     headers.push(head)
                 }
 
-                console.log(headers)  
                 resolve(headers.length)  
             })  
         

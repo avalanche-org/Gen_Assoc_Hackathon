@@ -239,27 +239,27 @@ run_analysis.addEventListener("click" ,  evt => {
          }  = gobject  =  { 
         paths           :paths_collections ?? null ,
         selected_index  :  { 
-            ped        : ped_  ,  //  ped.options[ped.selectedIndex].value ?? null  , 
-            map        : map_  ,  //.options[map.selectedIndex].value ?? null  , 
-            phen       : phen_ , //.options[phen.selectedIndex].value?? null , 
+            ped        : ped_  ,   
+            map        : map_  ,   
+            phen       : phen_ ,   
             phenotype_ : phenotype.options[phenotype.selectedIndex].value ?? null  , 
-            nbsim_     : nbsim.options[nbsim.selectedIndex].value ?? null  , 
-            nbcores_   : nbcores.options[nbcores.selectedIndex].value ?? null,
+            nbsim_     : nbsim.options[nbsim.selectedIndex].value         ?? null  , 
+            nbcores_   : nbcores.options[nbcores.selectedIndex].value     ?? null  ,
             mm         : mm.checked, 
             sm         : sm.checked, 
             markerset  : mm.checked ? markerset.value : null 
         }  
     }
-    //!TODO  : make  a verification before running analysis ... 
     const  {phenotype_, nbsim_, nbcores_}  = selected_index  
     const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
     let  not_statified  = false  
-    let  done  =  is_satisfied(require_needed)  
-    if   ( !done )  { 
-        term_write ("> Run analysis  need to be satisfied" )   
-    }
-    if (done)  
+    let  done  =  is_satisfied(require_needed) 
+
+    if   ( !done )  term_write ("> Run analysis  need to be satisfied" )   
+    else  {  
+        run_analysis.disabled =  true
         ipcRenderer.send("run::analysis" ,  gobject )
+    }
 })
 ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
     term_write(data)   

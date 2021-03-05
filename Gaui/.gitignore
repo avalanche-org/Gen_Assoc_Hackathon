@@ -9,3 +9,4 @@ clear
 ls
 config.json 
 assets/script/*.sw*
+config.json 

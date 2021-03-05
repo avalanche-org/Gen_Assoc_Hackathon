@@ -5,7 +5,6 @@ __stage__  : {  process.env["STAGE"] = "development"          }
 //__stage__  : {  process.env["STAGE"] = "production"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/proposal.html"  }
-//NOTE:  the summary  should be  present in your system path ... 
 const
 {   log  }  = console , 
 {   path , 
@@ -88,8 +87,6 @@ const  {
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
             const  { paths  , selected_files  }  =  _data 
             const  [pedfile,mapfile,phenfile]  = selected_files 
-            //! TODO :  Build respective complete path  for  ped map phen ...  
-            //!      :+ each file should have   own path   
 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
@@ -119,13 +116,13 @@ const  {
 
         ipcMain.on("run::analysis" , (evt , data) => {
             const { paths  , selected_index  }  = data    
-            const {  mm    , sm , ped , map , phen , phenotype ,  nbsim , nbcores , markerset }  = selected_index  
+            const {  mm    , sm , ped , map , phen , phenotype_,  nbsim_ , nbcores_ , markerset }  = selected_index  
             let cmdstr = null 
             if (mm && markerset!= null && markerset != '')  {  
                 cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores} --markerset ${markerset}` 
             } 
             if  (sm)  {  
-                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores}`
+                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_} --nbsim ${nbsim_} --nbcores ${nbcores_}`
             }
 
             utils.std_ofstream(cmdstr ,  exit_code  => {
