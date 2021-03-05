@@ -18,7 +18,6 @@ module
                 if (e) reject(e.code)
                 const headers = []  
                 const endcc   =  fromCharCode(0xa)  
-                log(file_data)  
                 for ( head  of  file_data.split(default_delimiter))  {
                      if (head.includes(endcc))  {
                         let last_head =  head.split(endcc)[0] 
