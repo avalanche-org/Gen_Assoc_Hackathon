@@ -169,8 +169,13 @@ system(cmd)
 cat("\n ** Writing results... \n ")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
-cat("\n *** RUN OUTPUT *** \n ")
+cat("\n *** RUN OUTPUT *** \n\n ")
 
+i = 1
+column <- c(1,2,5,7,8,9,10)
+for (i in column){
+  cat(names(output)[i], " " )
+}
 i = 1
 for (i in 1:length(output)){
   cat(output$models[i],"\t|",output$nb_info_transmi[i],"|",output$mTDT_Stat[i],"|",output$mTDT_asympt_Pval[i],"|",output$mTDT_asympt_Pval_FDR[i],"|",output$mTDT_empirical_Pval[i],"|",output$mTDT_empirical_Pval_FDR[i],"|| \n")
