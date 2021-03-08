@@ -288,7 +288,9 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
-    term_write("> Running Analysis") 
+    term_write("> Running Analysis")
+
+    setInterval(plugonlog , term_display_speed)    
     const  { 
         selected_index
          }  = gobject  =  { 
