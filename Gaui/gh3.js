@@ -5,6 +5,7 @@ __stage__  : {  process.env["STAGE"] = "development"          }
 //__stage__  : {  process.env["STAGE"] = "production"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
 __static__ : {  htm_static_path      = "template/proposal.html"  }
+__output_r : {  output_result        ="/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/sample_results/weighted_res_multilocus.csv"} 
 const
 {   log  }  = console , 
 {   path , 
@@ -95,9 +96,11 @@ const  {
                utils.Rlog(".logout"  ,  mw) 
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
-                    if  (exit_code == 0x00)  { 
+                    if  (exit_code == 0x00)  {
+                        //TODO  : send   signal to  stop printing  ... 
+                        mw.webContents.send("end" , exit_code)
+                         
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
-                            /*sending data  to renderer  process */
                             if (e)  mw.webContents.send("log::fail" , e  )   
                             mw.webContents.send("term::logout"  , d )   
                         })
@@ -125,20 +128,21 @@ const  {
                 cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_} --nbsim ${nbsim_} --nbcores ${nbcores_} --markerset ${markerset}` 
             } 
             if  (sm)  {  
-                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_} --nbsim ${nbsim_} --nbcores ${nbcores_}`
+                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_}  --nbcores ${nbcores_}`
             }
 
             utils.std_ofstream(cmdstr ,  exit_code  => {
                 if(exit_code ==0x00) {
-                    log("success") 
+                    log("exit" , exit_code ) 
                     fs.readFile(".logout" , "utf8" , (e , d)  => {
                         if  (e)    mw.webContents.send("log::fail" , e  )  
-                        log("output result" ,  d)  
+                        log("output result" ,  d) 
                         //mw.webContents.send("run::analysis_result" ,  d  ) 
                         mw.webContents.send("term::logout" ,  d  ) 
+                         
                     })
                 }else {
-                    log (cmdstr) 
+                    log("error") 
                     fs.access(".logerr" , fs.constants["F_OK"] , error => {
                         if (error )  mw.webContents.send("logerr::notfound" , error)  
                         fs.readFile('.logerr' , "utf8" , (err , data) =>{

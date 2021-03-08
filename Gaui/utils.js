@@ -12,9 +12,12 @@ const
 module
 ["exports"]  =  {
     //! TODO  : improve this function to manage correctly  csv or tsv  file ...  
-    rsv_file :  (  file  , default_delimiter = "," )  => {
+    rsv_file :  (  file  , default_delimiter = ","  , readable_mode  = false  )  => {
         return new Promise  ( (resolve , reject )  => {
             readFile(file ,  "utf8" , (e , file_data ) => {
+                if (readable_mode ) 
+                    resolve(file_data) 
+
                 if (e) reject(e.code)
                 const headers = []  
                 const endcc   =  fromCharCode(0xa)  
@@ -80,14 +83,14 @@ module
     
     std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
-        const stdout = createWriteStream(fstdout) 
+        const stdout = createWriteStream(fstdout ) // ,  { flags : "a"}) 
         const stderr = createWriteStream(fstderr) 
         cmd.stdout.pipe(stdout)  
         cmd.stderr.pipe(stderr)   
 
         cmd.on("close" , exit_code =>  {
             callback(exit_code) 
-            process.stdout.write(`exiting with code ${exit_code}`)
+            process.stdout.write(`exiting with code ${exit_code}\n`)
         })
     } ,  
     Rlog :  ( logfile ,  mw_ ) => {  // Rlog  aka   realtime readable log 
