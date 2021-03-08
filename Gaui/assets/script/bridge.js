@@ -35,10 +35,11 @@ const  [
         _.querySelector("#run_analysis") 
     ] 
 let terminal ,  writeSpeed  
-__init__  = ( ()=> {   
+__init__  = ( ()=> { 
     run_analysis.disabled =  true  
     term.innerText        =  "> "
     term.setEditable      =  false
+    nbsim.disabled        = true
     markerset.disabled    =  true 
     ipcRenderer.send("init",0x000)
     writeSpeed            =  1  
@@ -180,7 +181,7 @@ sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen)
 //
 let  p  = 0
 
-const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ... 
+const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ...
     const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p)  
     plug.on("data"  , data  => {
         if ( data.length != p ) {  
@@ -204,7 +205,7 @@ run_summary.addEventListener("click" , evt => {
     setInterval(plugonlog , term_display_speed)    
     
     run_analysis.disabled = true 
-    run_summary.disabled  = true  
+    run_summary.disabled  = false   
     const  {
         paths  , 
         selected_files
@@ -231,12 +232,16 @@ run_summary.addEventListener("click" , evt => {
     } 
 })
 mm.addEventListener("change" , evt => {
-    if (evt.target.checked)  
-        markerset.disabled = false
+    if (evt.target.checked) { 
+        markerset.disabled = false 
+        nbsim.disabled     = false 
+    }
 })
 sm.addEventListener("change" , evt => {
-    if(evt.target.checked)
-        markerset.disabled = true 
+    if(evt.target.checked) { 
+        markerset.disabled = true
+        nbsim.disabled     = true 
+    } 
 })
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
     phenotype.innerHTML = ""  
@@ -252,7 +257,7 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
     if  ( data  ) { 
-        term_write(data)  
+        //term_write(data)  
         run_summary.disabled  = summary_already_run
         run_analysis.disabled = !summary_already_run 
     }
@@ -311,5 +316,9 @@ run_analysis.addEventListener("click" ,  evt => {
 ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
     term_write(data)   
 })
-*/ 
+*/
+
+/*ipcRenderer.on("data::available"  ,  (evt , data) => {
+    term_write(data)  
+})*/
 
