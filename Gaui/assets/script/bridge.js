@@ -207,8 +207,8 @@ run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     term.focus()
     let  annoucement  = "> Processing Summary  ... please wait\n"
-
-    setInterval(plugonlog , term_display_speed)    
+    //plugonlog() 
+    //setInterval(plugonlog , term_display_speed)    
     
     run_analysis.disabled = true 
     run_summary.disabled  = false   
@@ -265,6 +265,8 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     if  ( data  ) { 
         //term_write(data)  
        // run_summary.disabled  = summary_already_run
+        term.value = data
+
         run_analysis.disabled = !summary_already_run 
     }
 })
@@ -290,7 +292,7 @@ run_analysis.addEventListener("click" ,  evt => {
     term.focus()
     term_write("> Running Analysis")
 
-    setInterval(plugonlog , term_display_speed)    
+    //setInterval(plugonlog , term_display_speed)    
     const  { 
         selected_index
          }  = gobject  =  { 
