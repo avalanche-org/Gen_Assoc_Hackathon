@@ -90,6 +90,8 @@ const  {
 
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
+               // TODO  : send   event to read stream  ...  
+               utils.Rlog(".logout"  ,  mw) 
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  { 
@@ -119,7 +121,7 @@ const  {
             const {  mm    , sm , ped , map , phen , phenotype_,  nbsim_ , nbcores_ , markerset }  = selected_index  
             let cmdstr = null 
             if (mm && markerset!= null && markerset != '')  {  
-                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype} --nbsim ${nbsim} --nbcores ${nbcores} --markerset ${markerset}` 
+                cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_} --nbsim ${nbsim_} --nbcores ${nbcores_} --markerset ${markerset}` 
             } 
             if  (sm)  {  
                 cmdstr =`Rscript ${run_analysis} --pedfile /${paths}/${ped} --mapfile /${paths}/${map} --phenfile /${paths}/${phen} --phen ${phenotype_} --nbsim ${nbsim_} --nbcores ${nbcores_}`
@@ -131,7 +133,8 @@ const  {
                     fs.readFile(".logout" , "utf8" , (e , d)  => {
                         if  (e)    mw.webContents.send("log::fail" , e  )  
                         log("output result" ,  d)  
-                        mw.webContents.send("run::analysis_result" ,  d  ) 
+                        //mw.webContents.send("run::analysis_result" ,  d  ) 
+                        mw.webContents.send("term::logout" ,  d  ) 
                     })
                 }else {
                     log (cmdstr) 

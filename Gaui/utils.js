@@ -2,7 +2,7 @@
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo>
 
 const   
-    {readFile , createWriteStream , readdir}=  require("fs") , 
+    {readFile , createWriteStream , readdir , access ,  constants  , createReadStream}=  require("fs") , 
     os =  require("os") ,  
     {execSync ,exec , spawn}  = require("child_process"), 
     {fromCharCode}            = String , 
@@ -80,13 +80,26 @@ module
     
     std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
-        cmd.stdout.pipe(createWriteStream(fstdout))
-        cmd.stderr.pipe(createWriteStream(fstderr)) 
+        const stdout = createWriteStream(fstdout) 
+        const stderr = createWriteStream(fstderr) 
+        cmd.stdout.pipe(stdout)  
+        cmd.stderr.pipe(stderr)   
+
         cmd.on("close" , exit_code =>  {
             callback(exit_code) 
-            log("exiting with code " ,  exit_code )
+            process.stdout.write(`exiting with code ${exit_code}`)
         })
-    }   
+    } ,  
+    Rlog :  ( logfile ,  mw_ ) => {  // Rlog  aka   realtime readable log 
+         access( logfile  , constants["F_OK"] , error => {   
+             if  (error) log("Unable  to access file or permission denied!") 
+             if  (!error) log("ok  streaming  out -> "  ,logfile)  
+         })
+        const  plug  =  createReadStream(logfile)
+        plug.on("data"  , data  => {
+             mw_?.webContents?.send("plug"  , data )  
+        }) 
+    }
     
 }
 

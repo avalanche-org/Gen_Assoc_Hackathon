@@ -4,7 +4,10 @@
 //! TODO  : register  loaded data to  local storage   
 //        + when user reload the application  
 const { ipcRenderer} =require("electron") ,
-      {log}          = console  
+      {log}          = console            , 
+      fs             = require("fs")      , 
+      {execSync , exec}     = require("child_process") 
+
 const _ = document 
 //!  mapping  DOM Element  
 const  [
@@ -38,8 +41,16 @@ __init__  = ( ()=> {
     term.setEditable      =  false
     markerset.disabled    =  true 
     ipcRenderer.send("init",0x000)
-    writeSpeed            =  1 
+    writeSpeed            =  1  
+    term_display_speed    =  500   //  millisec 
 })()    
+/*
+const execute   =  (cmdstr  , tag )  => { 
+     exec ( cmdstr  ,  ( error , stdout ,stderr ) => {
+         log(stdout) 
+         tag.value = stdout
+     })
+}*/ 
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  incomming_data => {
@@ -58,7 +69,10 @@ const  term_write  =  incomming_data => {
     })()
 }
 
-
+//!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
+//          ->  cpus core avlailable  
+//          ->  where the  log file  is supposed to be  
+//
 ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
     const  {  nbsim_limite  ,  available_cpus_core } = data  
 
@@ -122,7 +136,9 @@ const  optsfeed  =  gdata   => {
 let 
 [paths_collections  , files_collections] = [ [] , [] ]  
 
-
+ipcRenderer.on("plug" ,  (evt , data ) => {
+     log(data) 
+})
 ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   { 
     paths_collections =  main_root  
     files_collections =  files 
@@ -155,18 +171,41 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
 //!  this section  make a synchronisation  between ped map and  phen file  
 sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
 sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
-//!--end sync 
+//!--end sync
+//
+let  p  = 0
+
+const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ... 
+    let logfile =  "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/.logout"  
+    const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p)  
+    plug.on("data"  , data  => {
+        log(data) 
+        if ( data.length != p ) {  
+            follow_scrollbar()
+            term.value = data  
+            p+=  data.length
+        }
+    }) 
+}
+
 let ped_  = null , 
     map_  = null ,
     phen_ = null   
 
+let summary_already_run =  false 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     term.focus()
     let  annoucement  = "> Processing Summary  ... please wait\n"
+
+    setInterval(plugonlog , term_display_speed)    
+    
     run_analysis.disabled = true 
     run_summary.disabled  = true  
-    const  {selected_files}=gobject =    { 
+    const  {
+        paths  , 
+        selected_files
+    }=  gobject ={ 
          paths  : paths_collections ??  null ,  
          selected_files: [ 
               ped.options[ped.selectedIndex]?.value  ??  null ,   
@@ -183,7 +222,8 @@ run_summary.addEventListener("click" , evt => {
     term.value =  ""   //  clean output before 
     term_write(annoucement) 
     if (done) {
-        [ped_  , map_ , phen_ ]  =  selected_files
+        [ped_  , map_ , phen_ ]  =  selected_files 
+        summary_already_run = true  
         ipcRenderer.send("run::summary",  gobject ) 
     } 
 })
@@ -205,12 +245,13 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
     }  
 })
 
+//! TODO  :  make realtime reading  stdout stream  
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
     if  ( data  ) { 
-        term_write(data) 
-        run_analysis.disabled = false 
-        run_summary.disabled  = true
+        term_write(data)  
+        run_summary.disabled  = summary_already_run
+        run_analysis.disabled = !summary_already_run 
     }
 })
 //! TODO :  [ optional]  style  output error  with red or yellow color  ... 
@@ -250,18 +291,22 @@ run_analysis.addEventListener("click" ,  evt => {
             markerset  : mm.checked ? markerset.value : null 
         }  
     }
+    
     const  {phenotype_, nbsim_, nbcores_}  = selected_index  
     const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
     let  not_statified  = false  
     let  done  =  is_satisfied(require_needed) 
-
+    log(gobject) 
     if   ( !done )  term_write ("> Run analysis  need to be satisfied" )   
     else  {  
         run_analysis.disabled =  true
         ipcRenderer.send("run::analysis" ,  gobject )
     }
 })
+
+/*
 ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
     term_write(data)   
 })
+*/ 
 

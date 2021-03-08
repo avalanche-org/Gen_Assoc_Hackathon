@@ -1,5 +1,5 @@
 #!/usr/bin/env node 
-//author  : Umar ak jukoo  j_umar@outlook.com   <github.com/jukoo> const {dialog  ,  ipcMain } = require("electron") ,
+//author  : Umar ak jukoo  j_umar@outlook.com   <github.com/jukoo> 
 
 const { dialog ,  ipcMain } =  require("electron") , 
     fs                      = require("fs") ,
