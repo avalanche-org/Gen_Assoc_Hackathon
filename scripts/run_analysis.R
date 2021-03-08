@@ -170,7 +170,6 @@ cat("\n ** Writing results... \n ")
 cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/")
 system(cmd)
 
-cat("\n ** Run finished.\n\n\n")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
 
@@ -183,6 +182,6 @@ for (i in 1:length(output)){
   i = i + 1
 }
 
-
+cat("\n ** Run finished.\n\n\n")
 rm(list=ls())
 
