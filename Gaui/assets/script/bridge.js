@@ -181,15 +181,21 @@ sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen)
 //
 let  p  = 0
 
-const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ...
-    const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p)  
-    plug.on("data"  , data  => {
+const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ..
+    const  cl   = setInterval( function ()  {
+        const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p) 
+        plug.on("data"  , data  => {
         if ( data.length != p ) {  
             //follow_scrollbar()
             term.value = data  
             p+=  data.length
         }
     }) 
+        ipcRenderer.on("end"  , (evt ,data ) => {
+            log("end " ,data ) 
+            clearInterval(cl) 
+        })
+    } , term_display_speed ) 
 }
 
 let ped_  = null , 

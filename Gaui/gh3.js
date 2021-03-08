@@ -97,6 +97,7 @@ const  {
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  {
+                        mw.webContents.send("end"  , exit_code) 
                         //TODO  : send   signal to  stop printing  ... 
                         mw.webContents.send("end" , exit_code)
                          
@@ -133,7 +134,8 @@ const  {
 
             utils.std_ofstream(cmdstr ,  exit_code  => {
                 if(exit_code ==0x00) {
-                    log("exit" , exit_code ) 
+                    log("exit" , exit_code )
+                    mw.webContents.send("end"  , exit_code) 
                     fs.readFile(".logout" , "utf8" , (e , d)  => {
                         if  (e)    mw.webContents.send("log::fail" , e  )  
                         log("output result" ,  d) 
