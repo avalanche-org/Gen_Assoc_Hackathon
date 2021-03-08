@@ -184,7 +184,7 @@ const  plugonlog =   () => {   //TODO : do not forget to make the path as argume
     const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p)  
     plug.on("data"  , data  => {
         if ( data.length != p ) {  
-            follow_scrollbar()
+            //follow_scrollbar()
             term.value = data  
             p+=  data.length
         }
