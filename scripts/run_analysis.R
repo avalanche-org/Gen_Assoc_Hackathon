@@ -69,8 +69,8 @@ opt = parse_args(opt_parser)
 
 library(stringr)
 
-cat("\n,______ Starting analysis ______ \n")
-cat("\n Working directory",getwd(), "\n\n")
+cat("\n,_______ Starting analysis ________ \n")
+cat("\n __ Working directory",getwd(), "\n\n")
 
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
             " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
@@ -88,7 +88,7 @@ if (length(positions)>0){
   flag = flag[-positions]
 }
 
-cat("* Selected flags: \n")
+cat(" * Selected flags: \n")
 for (i in 1:length(flag)){
   cat(paste0(" --",flag[i], "\n"))
 }
@@ -124,7 +124,7 @@ phen_basename = unlist(str_split(phenfile, ".phen"))[1]
 
 # --- Read Files
 
-cat("\n Reading files...\t")
+cat("\n * Reading files...\t")
 
 # ped = read.delim(unlist(str_split(flag[1], " "))[2], header = F , stringsAsFactors = F)
 # map = read.delim(unlist(str_split(flag[2], " "))[2], header = F , stringsAsFactors = F)
@@ -139,14 +139,14 @@ cat('Done. \n')
 
 # --- Process files with Complete Pedigree function
 
-cat("\n * Preparing files for mTDT run... \n ")
+cat("\n ** Preparing files for mTDT run... \n ")
 
 mtdt_ped = rbind(ped, completePedigree(ped))
 mtdt_map = paste0("M", (7:ncol(mtdt_ped)-6))
 
 # --- write files
 
-cat("* writing processed files... \n ")
+cat(" ** Writing processed files... \n ")
 
 write.table(mtdt_ped, paste0(unlist(str_split(ped_basename,".ped"))[1],"_CP.ped"),
             sep = "\t", quote = F, col.names = F, row.names = F)
@@ -161,16 +161,28 @@ for (i in 4:length(flag)){    # complete cmd
   cmd = paste0(cmd," --",flag[i])
 }
 
-cat("\n * Starting run.. \n ")
+cat("\n ** Starting run.. \n ")
 cat(cmd)
 system(cmd)
 
 # --- Output 
-cat("\n *Writing results... \n ")
+cat("\n ** Writing results... \n ")
 cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/")
 system(cmd)
 
-cat("\n *Run finished.\n\n\n")
+cat("\n ** Run finished.\n\n\n")
+
+output <- read.csv("weighted_res_multilocus.csv", sep = ";")
+
+
+cat("\n *** RUN OUTPUT *** \n ")
+
+i = 1
+for (i in 1:length(output)){
+  cat(output$models[i],"\t|",output$nb_info_transmi[i],"|",output$mTDT_Stat[i],"|",output$mTDT_asympt_Pval[i],"|",output$mTDT_asympt_Pval_FDR[i],"|",output$mTDT_empirical_Pval[i],"|",output$mTDT_empirical_Pval_FDR[i],"|| \n")
+  i = i + 1
+}
+
 
 rm(list=ls())
 
