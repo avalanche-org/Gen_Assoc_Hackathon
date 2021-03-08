@@ -258,7 +258,7 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
     if  ( data  ) { 
         //term_write(data)  
-        run_summary.disabled  = summary_already_run
+       // run_summary.disabled  = summary_already_run
         run_analysis.disabled = !summary_already_run 
     }
 })
