@@ -180,6 +180,6 @@ for (i in 1:length(output)){
 cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/")
 system(cmd)
 
-cat("\n ** Run finished. Results are written in ", unlist(str_split(ped_basename,".ped"))[1], "\n\n\n")
+cat("\n ** Run finished. Results are written in ", paste0(unlist(str_split(ped_basename,".ped"))[1],"_results"), "\n\n\n")
 rm(list=ls())
 
