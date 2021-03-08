@@ -15,6 +15,7 @@
         "_run_analysis": "/Users/marieme/Desktop/Gen_Assoc/scripts/run_analysis.R",
         "summary_src" : "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R", 
         "run_analysis": "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/run_analysis.R",
+        "logpath"     : "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/.logout",
         "mtdt_src": "/Users/marieme/Desktop/Gen_Assoc/scripts/mtdt.R"
     } , 
     "io_fstream" :  { 

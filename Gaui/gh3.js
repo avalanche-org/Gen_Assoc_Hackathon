@@ -79,9 +79,10 @@ const  {
             log("initializing  render process " ,  data)  
             const initiate  =  { 
                 nbsim_limite          :  defconf["mtdt_pannel"]["limite_nbsims"], 
-                available_cpus_core   :  cpus_core() -1
+                logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
+                available_cpus_core   :  cpus_core() -1 
             } 
-            evt.reply("cpus::core" ,  initiate)   
+            evt.reply("initialization" ,  initiate)   
         })
    
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {

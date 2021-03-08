@@ -72,10 +72,12 @@ const  term_write  =  incomming_data => {
 //!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
 //          ->  cpus core avlailable  
 //          ->  where the  log file  is supposed to be  
-//
-ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
-    const  {  nbsim_limite  ,  available_cpus_core } = data  
+ 
+let  logfile  =  null  
+ipcRenderer.on("initialization" ,  (evt , data)  =>{
+    const  {  nbsim_limite ,  logpath_location,  available_cpus_core } = data  
 
+    logfile  = logpath_location
     for  ( let i of   range(available_cpus_core) ) { 
         const ncores_opt =  _.createElement("option") 
         ncores_opt.text=i 
@@ -88,7 +90,10 @@ ipcRenderer.on("cpus::core" ,  (evt , data)  =>{
         nbsim.add(nbsim_opt) 
     }
 
+
 })
+
+log(logfile) 
 const  get_ext  = args   =>  {
     let  _d  =  args.split(".")  
     return  _d[_d.length -1 ]  
@@ -176,10 +181,8 @@ sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen)
 let  p  = 0
 
 const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ... 
-    let logfile =  "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/.logout"  
     const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p)  
     plug.on("data"  , data  => {
-        log(data) 
         if ( data.length != p ) {  
             follow_scrollbar()
             term.value = data  
