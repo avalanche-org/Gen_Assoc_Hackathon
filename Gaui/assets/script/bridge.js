@@ -45,13 +45,16 @@ __init__  = ( ()=> {
     writeSpeed            =  0 
     term_display_speed    =  500   //  millisec 
 })()    
-/*
-const execute   =  (cmdstr  , tag )  => { 
-     exec ( cmdstr  ,  ( error , stdout ,stderr ) => {
-         log(stdout) 
-         tag.value = stdout
-     })
-}*/ 
+
+
+let  numdigit =  []  
+nbsim.addEventListener("keyup"  ,  evt  => {
+    if(!isNaN(evt.target.value)) 
+        numdigit.push(evt.target.value)
+        
+    evt.target.value  = numdigit[numdigit.length -1] ??  ""
+
+})   
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  incomming_data => {
