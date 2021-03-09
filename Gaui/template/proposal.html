@@ -96,10 +96,12 @@
                     <div
                       class="u-container-style u-layout-cell u-size-26 u-layout-cell-2"
                     >
+
                       <div class="u-container-layout u-container-layout-2">
-                        <p class="u-text u-text-2"><b>Select your files</b></p>
-                        <div class="u-form u-form-1">
+                        <div  class="u-form u-form-1">
                           <!--form to load files : run summary.R -->
+                        <fieldset>
+                              <legend  style="color:blue">File Select</legend>
 
 
                           <form
@@ -107,20 +109,8 @@
                             style="padding: 10px"
                             source="email"
                             name="form"
-                          >
-                            <input
-                              type="hidden"
-                              id="siteId"
-                              name="siteId"
-                              value="228560"
-                            />
-                            <input
-                              type="hidden"
-                              id="pageId"
-                              name="pageId"
-                              value="232432"
-                            />
-                            <div
+                          >  
+                                                                          <div
                               class="u-form-group u-form-select u-form-group-1"
                             >
                               <label
@@ -215,38 +205,30 @@
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit">
-                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Load</a>
+                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary  &dtrif;</a>
+                             
                               <input
                                 type="submit"
                                 value="load"
                                 class="u-form-control-hidden"
                               />
-                            </div>
-                            <div
-                              class="u-form-send-message u-form-send-success"
-                            >
-                              Markers selected
-                            </div>
-                            <div class="u-form-send-error u-form-send-message">
-                              Unable to send u:w
-                              your message. Please fix errors
-                              then try again.
-                            </div>
-                            <input
-                              type="hidden"
-                              value=""
-                              name="recaptchaResponse"
-                            />
+                            </div>  
+                          </fieldset> 
                           </form>
+                          
                         </div>
+                        <!--div  style="border: thin solid yellow">
+                            <small>  mTdt  version  Beta v1  </small> 
+                        </div-->
                       </div>
                     </div>
                     <div
                       class="u-container-style u-layout-cell u-size-34 u-layout-cell-3"
                     >
                       <div class="u-container-layout u-container-layout-3">
-                        <p class="u-text u-text-3"><b>Choose options</b></p>
                         <div class="u-form u-form-2">
+                            <fieldset>  
+                                <legend style="color:blue">Choose Option</legend> 
                           <form
                             class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
@@ -265,37 +247,7 @@
                               name="pageId"
                               value="232432"
                             />
-                            <div
-                              class="u-form-group u-form-radiobutton u-form-group-5"
-                            >
-                              <div class="u-form-radio-button-wrapper">
-                                <input
-                                  id="single_marker"
-                                  type="radio"
-                                  name="mradiobutton"
-                                  value="Item 1"
-                                  checked 
-                                />
-                                <label class="u-label" for="mradiobutton"
-                                  >Single-Marker &nbsp; &nbsp; &nbsp;
-                                  &nbsp;</label
-                                >
-
-                                <input
-                                  id="multi_marker" 
-                                  type="radio"
-                                  name="mradiobutton"
-                                  value="Item 2"
-                                />
-
-                                <label class="u-label" for="mradiobutton"
-                                  >Multi-Marker</label
-                                >
-
-                                <br />
-                              </div>
-                            </div>
-                            <div
+                                                       <div
                               class="u-form-group u-form-radiobutton u-form-group-5"
                             >
                               <!--div class="u-form-radio-button-wrapper">
@@ -357,25 +309,18 @@
                                 class="u-form-control-hidden u-label"
                                 >Select</label
                               >
-                              choose  your  number of simulation 
-                                <select
-                                  id="nbsim"
-                                  name="select-1"
-                                  class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
-                                >
+                              
+                              <input  id="nbsim" placeholder="number of simulations you want " class ="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" >
+
                                   
-                                </select>
-                      
+                            </div> 
                             <div
                               class="u-form-group u-form-select u-form-group-8"
                             >
-                              <label
-                                for="select-0c1c"
-                                class="u-form-control-hidden u-label"
-                                >Select</label
-                              > 
-                                choose your  number of  cpus core 
+                              <small style="color:firebrick;"> cpus cores available </small> 
+                            
                                 <select
+                                  placeholder="cpus core available"
                                   id="nbcores"
                                   name="select-2"
                                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
@@ -383,14 +328,42 @@
 
                                 </select>
                             </div>                         
+
+
+                            <div
+                              class="u-form-group u-form-radiobutton u-form-group-5"
+                            >
+                              <div class="u-form-radio-button-wrapper">
+                                <input
+                                  id="single_marker"
+                                  type="radio"
+                                  name="mradiobutton"
+                                  value="Item 1"
+                                  checked 
+                                />
+                                <label class="u-label" for="mradiobutton"
+                                  >Single-Marker &nbsp; &nbsp; &nbsp;
+                                  &nbsp;</label
+                                >
+
+                                <input
+                                  id="multi_marker" 
+                                  type="radio"
+                                  name="mradiobutton"
+                                  value="Item 2"
+                                />
+
+                                <label class="u-label" for="mradiobutton"
+                                  >Multi-Marker</label
+                                >
+
+                                <br />
+                              </div>
                             </div>
+
                             <div class="u-form-group u-form-message">
-                              <label
-                                for="message-3339"
-                                class="u-form-control-hidden u-label"
-                                >Message</label
-                              >
-                              <!--markerset -->
+                         
+                                <!--markerset -->
                               <textarea
                                 placeholder="Choose your markers. eg: 1, 3, 24"
                                 rows="1"
@@ -399,15 +372,17 @@
                                 name="message"
                                 class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
                                 required=""
+                                
                               ></textarea>
                               
+                            </fieldset>
+                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis &rarr;</button>  
+                            </div>
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit"
                             >
-                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis  </button>  
                             </div>
-                           
                           </form>
                         </div>
                         
@@ -441,7 +416,7 @@
           spellcheck="false" 
           id="term" 
           cols="400" 
-          rows="9">
+           rows="9">
         </textarea>
     </section>
     

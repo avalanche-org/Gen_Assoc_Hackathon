@@ -37,12 +37,12 @@ const  [
 let terminal ,  writeSpeed  
 __init__  = ( ()=> { 
     run_analysis.disabled =  true  
-    term.innerText        =  "> "
+    term.innerText        =  "▮ "
     term.setEditable      =  false
-    nbsim.disabled        = true
+    //nbsim.disabled        = true
     markerset.disabled    =  true 
     ipcRenderer.send("init",0x000)
-    writeSpeed            =  1  
+    writeSpeed            =  0 
     term_display_speed    =  500   //  millisec 
 })()    
 /*
@@ -62,7 +62,8 @@ const  term_write  =  incomming_data => {
             let termbuffer = `${incomming_data.charAt(c)}`  
             if ( c != incomming_data.length -1) 
                 termbuffer =`${termbuffer}` 
-            term.value +=termbuffer 
+            term.value +=termbuffer
+            
             c++ 
             setTimeout(write_simulation , writeSpeed)  
         }else  
@@ -84,17 +85,16 @@ ipcRenderer.on("initialization" ,  (evt , data)  =>{
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
     }
-    
+    /* 
     for ( let i of   range(nbsim_limite) ) {
         const nbsim_opt =  _.createElement("option") 
         nbsim_opt.text=i 
         nbsim.add(nbsim_opt) 
-    }
+    }*/ 
 
 
 })
 
-log(logfile) 
 const  get_ext  = args   =>  {
     let  _d  =  args.split(".")  
     return  _d[_d.length -1 ]  
@@ -123,7 +123,15 @@ const  optsfeed  =  gdata   => {
                 break ; 
             case  "map" : 
                 const  map_opts =  _.createElement("option") 
-                map_opts.text   = data  
+                map_opts.text   = data  /*
+ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
+    term_write(data)   
+})
+*/
+
+/*ipcRenderer.on("data::available"  ,  (evt , data) => {
+    term_write(data)  
+})*/
                 map_opts.value  = data
                 map_opts.title  = data
                 map.add(map_opts)  
@@ -178,9 +186,11 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
 sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
 sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
 //!--end sync
-//
-let  p  = 0
 
+    
+/* TODO :  REAL TIME LOGOUT  FEATURING  NEED TO BE IMPLEMENTED 
+ * NOTE :  THIS  A FEATURE REQUEST  !  
+let  p  = 0 
 const  plugonlog =   () => {   //TODO : do not forget to make the path as argument  ..
     const  cl   = setInterval( function ()  {
         const  plug  =  fs.createReadStream(logfile , encoding="utf8", start=p) 
@@ -197,6 +207,7 @@ const  plugonlog =   () => {   //TODO : do not forget to make the path as argume
         })
     } , term_display_speed ) 
 }
+*/ 
 
 let ped_  = null , 
     map_  = null ,
@@ -206,7 +217,7 @@ let summary_already_run =  false
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     term.focus()
-    let  annoucement  = "> Processing Summary  ... please wait\n"
+    let  annoucement  = "▮ Processing Summary  ... please wait\n"
     //plugonlog() 
     //setInterval(plugonlog , term_display_speed)    
     
@@ -226,7 +237,7 @@ run_summary.addEventListener("click" , evt => {
  
     let  done   = is_satisfied (selected_files)  
     if  (!done)  {
-        annoucement = "> Missing " 
+        annoucement = "▮ Missing " 
         run_summary.disabled = false   
     }
     term.value =  ""   //  clean output before 
@@ -240,13 +251,13 @@ run_summary.addEventListener("click" , evt => {
 mm.addEventListener("change" , evt => {
     if (evt.target.checked) { 
         markerset.disabled = false 
-        nbsim.disabled     = false 
+        //nbsim.disabled     = false 
     }
 })
 sm.addEventListener("change" , evt => {
     if(evt.target.checked) { 
         markerset.disabled = true
-        nbsim.disabled     = true 
+        //nbsim.disabled     = true 
     } 
 })
 ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
@@ -263,10 +274,10 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
     if  ( data  ) { 
-        //term_write(data)  
-       // run_summary.disabled  = summary_already_run
-        term.value = data
-
+        term_write(data)  
+       // run_summary.disabled  = summary_already_run 
+        //term.value = data
+        follow_scrollbar()  
         run_analysis.disabled = !summary_already_run 
     }
 })
@@ -290,7 +301,7 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
-    term_write("> Running Analysis")
+    term_write("▮ Running Analysis")
 
     //setInterval(plugonlog , term_display_speed)    
     const  { 
@@ -315,20 +326,10 @@ run_analysis.addEventListener("click" ,  evt => {
     let  not_statified  = false  
     let  done  =  is_satisfied(require_needed) 
     log(gobject) 
-    if   ( !done )  term_write ("> Run analysis  need to be satisfied" )   
+    if   ( !done )  term_write ("▮ Run analysis  need to be satisfied" )   
     else  {  
         run_analysis.disabled =  true
         ipcRenderer.send("run::analysis" ,  gobject )
     }
 })
-
-/*
-ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
-    term_write(data)   
-})
-*/
-
-/*ipcRenderer.on("data::available"  ,  (evt , data) => {
-    term_write(data)  
-})*/
 
