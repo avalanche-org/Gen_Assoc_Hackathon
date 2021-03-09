@@ -40,6 +40,15 @@
           height: auto;
         }
       }
+
+      #run_summary,#run_analysis {
+        border:"thin solid orange";
+      }
+
+    #marker_set , #nbcores,#nbsim,
+    #phenotype , #ped ,#map,#phen,option {
+        border-radius : 5px;
+      }
       .terminal {
         padding: 10px ;
         width: 100%;
@@ -101,7 +110,9 @@
                         <div  class="u-form u-form-1">
                           <!--form to load files : run summary.R -->
                         <fieldset>
-                              <legend  style="color:blue">File Select</legend>
+                              <legend  style="color:blue">
+                                  <small>  File Select </small>
+                              </legend>
 
 
                           <form
@@ -228,7 +239,9 @@
                       <div class="u-container-layout u-container-layout-3">
                         <div class="u-form u-form-2">
                             <fieldset>  
-                                <legend style="color:blue">Choose Option</legend> 
+                                <legend style="color:blue">
+                                  <small>Choose Option</small>
+                                </legend> 
                           <form
                             class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
@@ -291,7 +304,7 @@
                                 class="u-form-control-hidden u-label"
                                 >Select</label
                               > 
-                              choose  your phenotype
+                              <small style="color:firebrick"> choose your phenotype </small> 
                                 <select
                                   id="phenotype"
                                   name="phenotype"

@@ -40,7 +40,9 @@ __init__  = ( ()=> {
     term.innerText        =  "▮ "
     term.setEditable      =  false
     //nbsim.disabled        = true
-    markerset.disabled    =  true 
+    markerset.disabled    =  true
+    markerset.style.backgroundColor="grey"
+    markerset.style.color="whitesmoke"
     ipcRenderer.send("init",0x000)
     writeSpeed            =  0 
     term_display_speed    =  500   //  millisec 
@@ -126,15 +128,7 @@ const  optsfeed  =  gdata   => {
                 break ; 
             case  "map" : 
                 const  map_opts =  _.createElement("option") 
-                map_opts.text   = data  /*
-ipcRenderer.on("run::analysis_result" ,  (evt , data ) => { 
-    term_write(data)   
-})
-*/
-
-/*ipcRenderer.on("data::available"  ,  (evt , data) => {
-    term_write(data)  
-})*/
+                map_opts.text   = data
                 map_opts.value  = data
                 map_opts.title  = data
                 map.add(map_opts)  
@@ -254,12 +248,17 @@ run_summary.addEventListener("click" , evt => {
 mm.addEventListener("change" , evt => {
     if (evt.target.checked) { 
         markerset.disabled = false 
+        markerset.style.backgroundColor="whitesmoke"
+        markerset.style.color="grey"
+        markerset.focus()
         //nbsim.disabled     = false 
     }
 })
 sm.addEventListener("change" , evt => {
     if(evt.target.checked) { 
         markerset.disabled = true
+        markerset.style.backgroundColor="grey"
+        markerset.style.color="whitesmoke"
         //nbsim.disabled     = true 
     } 
 })
@@ -316,7 +315,7 @@ run_analysis.addEventListener("click" ,  evt => {
             map        : map_  ,   
             phen       : phen_ ,   
             phenotype_ : phenotype.options[phenotype.selectedIndex].value ?? null  , 
-            nbsim_     : nbsim.options[nbsim.selectedIndex].value         ?? null  , 
+            nbsim_     : nbsim.value         ?? null  , 
             nbcores_   : nbcores.options[nbcores.selectedIndex].value     ?? null  ,
             mm         : mm.checked, 
             sm         : sm.checked, 
