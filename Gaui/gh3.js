@@ -4,7 +4,7 @@
 __stage__  : {  process.env["STAGE"] = "development"          }  
 //__stage__  : {  process.env["STAGE"] = "production"          }  
 __kernel__ : {  core                 = require("./kernel")    } 
-__static__ : {  htm_static_path      = "template/proposal.html"  }
+__static__ : {  htm_static_path      = "index.html"  }
 __output_r : {  output_result        ="/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/sample_results/weighted_res_multilocus.csv"} 
 const
 {   log  }  = console , 
