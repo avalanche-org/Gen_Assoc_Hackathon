@@ -1,78 +1,37 @@
 #!/usr/bin/env  node  
 
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo> 
-__stage__  : {  process.env["STAGE"] = "development"          }  
 //__stage__  : {  process.env["STAGE"] = "production"          }  
-__kernel__ : {  core                 = require("./kernel")    } 
-__static__ : {  htm_static_path      = "index.html"  }
-__output_r : {  output_result        ="/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/sample_results/weighted_res_multilocus.csv"} 
+//__output_r : {  output_result        ="/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/Gaui/sample_results/weighted_res_multilocus.csv"} 
+__stage__  : {  process.env["STAGE"] = "development"          }  
 const
+{ app,  BrowserWindow  , Menu , dialog , ipcMain } =  require('electron') ,  
 {   log  }  = console , 
-{   path , 
-    fs   , 
-    ps   ,
-    url  , 
-    _ejs_
-}         = core["@node_module"] , 
-{defconf} = core["@config"],
+    path    = require("path") ,
+    fs      = require("fs") , 
+    url     = require("url"), 
+    defconf = require("./config.json") , 
 {summary_src ,  run_analysis } = defconf["mtdt_pannel"], 
-{menu ,  utils}    = core["@libs"] 
-
-const 
-{ app , BrowserWindow  , Menu , dialog , ipcMain } = _ejs_  
+menu        = require("./menu"), 
+utils       = require("./utils"),  
+htm_static_path      = "index.html"   
 
 let mw  =  null  
-const  {  
-    main_frame , 
-    ctrl 
-} = _start =  {  
-    ["ctrl"]  : {
-        ["file?"] : file  => {
-             return new Promise((resolve ,reject) => {
-                 fs.access(file , fs.constants["F_OK"]  , error =>  { 
-                     error? reject(false) : resolve(true)  
-                 }) 
-             }) 
-        }
-    },
-    ["tfile"]  : filepath => {
-        ctrl["file?"](filepath)
-        .catch(error => process.exit()) 
-        return {  
-               ["pathname"]:  path.join(__dirname,filepath) , 
-               ["protocol"]: 'file:',
-               ["slashes "]:  true
-           } 
-    } ,
-    ["mt_load"] :   menu_template  =>  Menu.buildFromTemplate(menu_template)  , 
+
+const  mt_load = menu_template  =>  Menu.buildFromTemplate(menu_template)  
+
+app.on("ready",  () =>  {
     
-    ["box_dialog"] :  (options ,  with_check_Box =  false)  => { 
-       const  defopts =  {  
-           type          : options?.type     || "error" , 
-           buttons       : options?.buttons  || ["cancel", "ok"] ,    
-           default       : 2 , 
-           title         : options?.title    || "Error", 
-           message       : options?.message  || "An Error was occured",
-           detail        : options?.detail   || "Error Exception" 
-       }  
-       if  (with_check_Box)  { 
-           defopts["checkboxLabel"]   = options?.checkboxLabel   || "" 
-           defopts["checkboxChecked"] = options?.checkboxChecked || with_check_Box  
-           dialog.showMessageBox(null ,  defopts ,    ( res ,  cb )  => {
-               log(res)  
-               log(cb) 
-           })
-       }else  {
-           dialog.showMessageBox(null ,  defopts)
-       }
-       
-    },
-    ["main_frame"]  :  ()  => {    
         mw  =  new BrowserWindow({...defconf["main_frame"]})
-        mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
-        const { tfile  , mt_load }  =  _start 
+        //mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
-        mw.loadURL(url.format(tfile(htm_static_path)))
+        mw.loadURL(url.format( { 
+               pathname:  path.join(__dirname, "index.html") , 
+               protocol: 'file:',
+               slashes :  true
+
+        } ))
+
         Menu.setApplicationMenu(mt_load(menu))  
         //! TODO : preload  default value  
         const  { cpus_core } = utils 
@@ -155,10 +114,9 @@ const  {
                 }
             })
         })
-    }   
-}
-
-app.on("ready",  main_frame)  
+     mw.once("ready-to-show" , ()=> { mw.show() } ) 
+     
+})  
 app.on("close" ,  app_closed  => { 
     mw =  null  //! free memory  
     app.quit()

@@ -3,10 +3,8 @@
         "title" :  "Gen Assoc",   
         "width" :  987 ,
         "height":  830, 
-        "resizqble":false,
-        "scrollBounce":true,  
         "webPreferences" : {
-            "nodeIntegration" : true
+            "nodeIntegration" : true  
         } 
     },   
     "mtdt_pannel" : {  
