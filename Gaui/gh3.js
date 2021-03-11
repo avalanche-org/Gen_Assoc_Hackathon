@@ -72,7 +72,12 @@ const  {
         mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
         const { tfile  , mt_load }  =  _start 
         //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
-        mw.loadURL(url.format(tfile(htm_static_path)))
+        mw.loadURL(url.format({ 
+            pathname:  path.join(__dirname,"index.html") , 
+            protocol: 'file:',
+            slashes :  true
+        }))
+
         Menu.setApplicationMenu(mt_load(menu))  
         //! TODO : preload  default value  
         const  { cpus_core } = utils 
@@ -155,6 +160,7 @@ const  {
                 }
             })
         })
+        mw.once("ready-to-show" ,  () => {mw.show() }) 
     }   
 }
 

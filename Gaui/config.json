@@ -3,10 +3,11 @@
         "title" :  "Gen Assoc",   
         "width" :  987 ,
         "height":  830, 
-        "resizqble":false,
+        "resiaqble":false,
         "scrollBounce":true,  
         "webPreferences" : {
-            "nodeIntegration" : true
+            "nodeIntegration" : true, 
+            "contextIsolation": false  
         } 
     },   
     "mtdt_pannel" : {  
@@ -22,7 +23,9 @@
         "fstdout" : ".logout",
         "fstderr" : ".logerr",
         "fserror" : ".error" 
-    }  
+    } , 
+    "_hint" : "if the  application does't run   please type this command bellow" ,  
+    "_command" : "sudo sysctl kernel.unprivileged_userns_clone=1"
     
 } 
  
