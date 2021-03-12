@@ -1,5 +1,0 @@
-Rscript summary.R  --pedfile file.ped --mapfile  file.map  --phenfile  file.phen  
-mtdt  run command : 
----------------
-Rscript mtdt.R  --nbcores 20   --pedfile file.ped  --mapfile file.map --phenfile  file.phen --phen1
-RT
