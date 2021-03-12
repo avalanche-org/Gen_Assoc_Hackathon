@@ -12,7 +12,7 @@ args = commandArgs(trailingOnly = TRUE)
 #-------  Receive all arguments to run mTDT 
 
 
-plink_ = "/home/g4bbm/tools/Plink/plink"
+# plink_ = "/home/g4bbm/tools/Plink/plink"
 
 #   --- Install Required Packages
 
@@ -70,7 +70,7 @@ opt = parse_args(opt_parser)
 library(stringr)
 
 cat("\n,_______ Starting analysis ________ \n")
-cat("\n __ Working directory",getwd(), "\n\n")
+cat("\n __ Working directory:",getwd(), "\n\n")
 
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
             " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
@@ -96,22 +96,6 @@ for (i in 1:length(flag)){
 #   ---  File management
 
 # --- Path
-
-# path = "/"
-# if (length(unlist(str_split(c(flag[1]), "/")))){
-#   for (i in 2:(length(unlist(str_split(c(flag[1]), "/")))-1)){
-#     path = paste0(path,unlist(str_split(c(flag[1]), "/"))[i],"/")
-#   }
-# } else {path= ""}
-
-
-# --- Basenames
-
-# ped_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[1]), "/"))[length(unlist(str_split(c(flag[1]), "/")))],side = "both"),".ped"))[1]
-# map_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[2]), "/"))[length(unlist(str_split(c(flag[2]), "/")))],side = "both"),".map"))[1]
-# phen_basename = unlist(str_split(str_trim(unlist(str_split(c(flag[3]), "/"))[length(unlist(str_split(c(flag[3]), "/")))],side = "both"),".phen"))[1]
-
-
 pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
 mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
 phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
@@ -126,14 +110,10 @@ phen_basename = unlist(str_split(phenfile, ".phen"))[1]
 
 cat("\n * Reading files...\t")
 
-# ped = read.delim(unlist(str_split(flag[1], " "))[2], header = F , stringsAsFactors = F)
-# map = read.delim(unlist(str_split(flag[2], " "))[2], header = F , stringsAsFactors = F)
-# phen = read.delim(unlist(str_split(flag[3], " "))[2], header = F , stringsAsFactors = F)
+ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
+map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
+phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
 
-
-ped = read.delim(pedfile, header = F , stringsAsFactors = F)
-map = read.delim(mapfile, header = F , stringsAsFactors = F)
-phen = read.delim(phenfile, header = F , stringsAsFactors = F)
 
 cat('Done. \n')
 
@@ -155,14 +135,18 @@ write.table(mtdt_map, paste0(unlist(str_split(map_basename,".map"))[1],"_CP.map"
 
 # ---  run command
 
-cmd = paste0("Rscript mtdt.R --pedfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", unlist(str_split(phen_basename,".phen"))[1],".phen ")
+cmd = paste0("Rscript mtdt.R --pedfile ", 
+             unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ",
+             unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", 
+             opt$phenfile)
 
-for (i in 4:length(flag)){    # complete cmd
+# complete cmd
+for (i in 4:length(flag)){    
   cmd = paste0(cmd," --",flag[i])
 }
 
 cat("\n ** Starting run.. \n ")
-cat(cmd)
+cat(cmd)   #check
 system(cmd)
 
 # --- Output 
@@ -180,4 +164,3 @@ system(cmd)
 
 cat("\n ** Run finished. Results are written in ", paste0(unlist(str_split(ped_basename,".ped"))[1],"_results"), "\n\n\n")
 rm(list=ls())
-
