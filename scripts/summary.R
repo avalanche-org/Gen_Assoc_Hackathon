@@ -74,7 +74,7 @@ if(is.null(opt$phenfile)) stop(cat("Option --phenfile is required. \n Execution 
 
 
 # --- Files
-plink_ = "/home/g4bbm/tools/Plink/plink"
+#plink_ = "/home/g4bbm/tools/Plink/plink"
 
 ped = read.delim(paste0(path_to_file, opt$pedfile), header = F , stringsAsFactors = F)
 map = read.delim(paste0(path_to_file, opt$mapfile), header = F , stringsAsFactors = F)
@@ -83,12 +83,12 @@ phen = read.delim(paste0(path_to_file, opt$phenfile), header = F , stringsAsFact
 
 # --- File Control
 
-if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
-  cat("\n /!\ Files do not match. \n"),
-  cat("**", ncol(ped)-6 ," markers for ped file \n"),
-  cat("**", nrow(map) ," markers for map file \n"),
-  cat("**", nrow(phen) ," phenotypes for phen file \n")
-)
+# if (( nrow(map) != ncol(ped)-6) | length(intersect(phen$V2,ped$V2))!= nrow(ped) ) stop(
+#   cat("\n /!\ Files do not match. \n"),
+#   cat("**", ncol(ped)-6 ," markers for ped file \n"),
+#   cat("**", nrow(map) ," markers for map file \n"),
+#   cat("**", nrow(phen) ," phenotypes for phen file \n")
+# )
 
 
 # --- Variables
@@ -114,6 +114,7 @@ cat("\n Data loaded\n--- ",
     "missing at \t: ", missing_snps, "positions \n",
     "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n")
 
+
 # --- Check for Mendelian errors
 
 #cat("--- Check Mendelian errors")
@@ -122,4 +123,3 @@ cat("\n Data loaded\n--- ",
 # 
 # system(paste0(plink_ ," --file check_mendel --mendel --out sample_check"))
 # system("rm *check*")        
-
