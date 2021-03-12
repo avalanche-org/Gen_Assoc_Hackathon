@@ -63,7 +63,7 @@ const capture_ctrl  =  ( self ) => {
 
 nbsim.addEventListener("keyup"  ,  capture_ctrl) 
 
-let  is_it_correct   =  false  
+let  is_it_correct   =  null  
 markerset.addEventListener("keyup" ,  evt =>  { 
     const require_patern  =  /^(\d{1,},)+\d+$/g
     const just_on_digit   = /^\d{1,}$/g 
@@ -324,7 +324,7 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()  
-    if (!is_it_correct)  {   
+    if (!is_it_correct && is_it_correct != null)  {   
         term_write(`Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
         return 
     }
