@@ -98,7 +98,7 @@ const  {
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
                // TODO  : send   event to read stream  ...  
-               utils.Rlog(".logout"  ,  mw) 
+               // utils.Rlog(".logout"  ,  mw) 
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  {

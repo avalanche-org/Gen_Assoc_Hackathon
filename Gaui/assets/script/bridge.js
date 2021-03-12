@@ -6,6 +6,7 @@
 const { ipcRenderer} =require("electron") ,
       {log}          = console            , 
       fs             = require("fs")      , 
+      {fromCharCode} = String  , 
       {execSync , exec}     = require("child_process") 
 
 const _ = document 
@@ -43,6 +44,7 @@ __init__  = ( ()=> {
     markerset.disabled    =  true
     markerset.style.backgroundColor="grey"
     markerset.style.color="whitesmoke"
+    mm.disabled = true 
     ipcRenderer.send("init",0x000)
     writeSpeed            =  0 
     term_display_speed    =  500   //  millisec 
@@ -50,16 +52,35 @@ __init__  = ( ()=> {
 
 
 let  numdigit =  []  
-nbsim.addEventListener("keyup"  ,  evt  => {
-    if(!isNaN(evt.target.value)) 
-        numdigit.push(evt.target.value)
-        
-    evt.target.value  = numdigit[numdigit.length -1] ??  ""
 
-})   
+const capture_ctrl  =  ( self ) => {
+     if (!isNaN(self.target.value))
+        numdigit.push(self.target.value)   
+
+    self.target.value  =  numdigit[numdigit.length -1 ]  ?? ""  
+    
+}
+
+nbsim.addEventListener("keyup"  ,  capture_ctrl) 
+
+let  is_it_correct   =  false  
+markerset.addEventListener("keyup" ,  evt =>  { 
+    const require_patern  =  /^(\d{1,},)+\d+$/g
+    const just_on_digit   = /^\d{1,}$/g 
+    if (require_patern.test(evt.target.value) || just_on_digit.test(evt.target.value)) { 
+        markerset.style.backgroundColor = "green" 
+        markerset.style.color = "whitesmoke"  
+        is_it_correct         = true 
+    }else {    
+        markerset.style.backgroundColor ="firebrick"
+        markerset.style.color = "black" 
+        is_it_correct         = false  
+    }
+    
+})  
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
-const  term_write  =  incomming_data => {
+const  term_write  =  ( incomming_data  , warning = false )  => {
     let  c  =  0 ;    
     (function write_simulation () {
         follow_scrollbar()  
@@ -68,6 +89,10 @@ const  term_write  =  incomming_data => {
             if ( c != incomming_data.length -1) 
                 termbuffer =`${termbuffer}` 
             term.value +=termbuffer
+            if  ( warning )  
+                term.style.color ="yellow" 
+            else  
+                term.style.color = "whitesmoke" 
             
             c++ 
             setTimeout(write_simulation , writeSpeed)  
@@ -90,13 +115,6 @@ ipcRenderer.on("initialization" ,  (evt , data)  =>{
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
     }
-    /* 
-    for ( let i of   range(nbsim_limite) ) {
-        const nbsim_opt =  _.createElement("option") 
-        nbsim_opt.text=i 
-        nbsim.add(nbsim_opt) 
-    }*/ 
-
 
 })
 
@@ -147,9 +165,11 @@ const  optsfeed  =  gdata   => {
 let 
 [paths_collections  , files_collections] = [ [] , [] ]  
 
+/*
 ipcRenderer.on("plug" ,  (evt , data ) => {
      log(data) 
 })
+*/ 
 ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   { 
     paths_collections =  main_root  
     files_collections =  files 
@@ -280,7 +300,8 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
        // run_summary.disabled  = summary_already_run 
         //term.value = data
         follow_scrollbar()  
-        run_analysis.disabled = !summary_already_run 
+        run_analysis.disabled = !summary_already_run
+        mm.disabled = false 
     }
 })
 //! TODO :  [ optional]  style  output error  with red or yellow color  ... 
@@ -302,7 +323,11 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 }) 
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
-    term.focus()
+    term.focus()  
+    if (!is_it_correct)  {   
+        term_write(`Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
+        return 
+    }
     term_write("▮ Running Analysis")
 
     //setInterval(plugonlog , term_display_speed)    

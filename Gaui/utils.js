@@ -83,7 +83,8 @@ module
     
     std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
-        const stdout = createWriteStream(fstdout ) // ,  { flags : "a"}) 
+        // TODO  :  redirect  log  to  native  system log 
+        const stdout = createWriteStream(fstdout) // ,  { flags : "a"}) 
         const stderr = createWriteStream(fstderr) 
         cmd.stdout.pipe(stdout)  
         cmd.stderr.pipe(stderr)   
@@ -92,7 +93,8 @@ module
             callback(exit_code) 
             process.stdout.write(`exiting with code ${exit_code}\n`)
         })
-    } ,  
+    } , 
+    //! TODO   :   need to implement this  feature ...
     Rlog :  ( logfile ,  mw_ ) => {  // Rlog  aka   realtime readable log 
          access( logfile  , constants["F_OK"] , error => {   
              if  (error) log("Unable  to access file or permission denied!") 
