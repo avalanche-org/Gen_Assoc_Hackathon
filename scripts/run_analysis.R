@@ -135,7 +135,10 @@ write.table(mtdt_map, paste0(unlist(str_split(map_basename,".map"))[1],"_CP.map"
 
 # ---  run command
 
-cmd = paste0("Rscript mtdt.R --pedfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ", unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", unlist(str_split(phen_basename,".phen"))[1],".phen ")
+cmd = paste0("Rscript mtdt.R --pedfile ", 
+             unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ",
+             unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", 
+             opt$phenfile)
 
 # complete cmd
 for (i in 4:length(flag)){    
