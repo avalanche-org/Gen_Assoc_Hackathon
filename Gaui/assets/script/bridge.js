@@ -325,7 +325,7 @@ run_analysis.addEventListener("click" ,  evt => {
     evt.preventDefault()
     term.focus()  
     if (!is_it_correct && is_it_correct != null)  {   
-        term_write(`Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
+        term_write(`▮ Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
         return 
     }
     term_write("▮ Running Analysis")
