@@ -96,18 +96,14 @@ for (i in 1:length(flag)){
 #   ---  File management
 
 # --- Path
-pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]
-mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
-phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
 
-
-ped_basename = unlist(str_split(pedfile, ".ped"))[1]
-map_basename = unlist(str_split(mapfile, ".map"))[1]
-phen_basename = unlist(str_split(phenfile, ".phen"))[1]
+ped_basename = unlist(str_split(unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))], ".ped"))[1]
+map_basename = unlist(str_split(unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))], ".map"))[1]
+phen_basename = unlist(str_split(unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))], ".phen"))[1]
 
 
 # --- Read Files
-
+ 
 cat("\n * Reading files...\t")
 
 ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
