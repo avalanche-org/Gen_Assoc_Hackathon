@@ -1,0 +1,103 @@
+#!/bin/bash  
+#author :  Umar aka jukoo  <j_umar@outlook.fr> 
+#This script for  mac and gnu/linux Operating  system   
+#YOU NEED TO EXECUTE THIS AS ROOT  CHEF 
+
+set -o  errexit  
+ 
+declare -a mains_srcipts    
+declare -r dns_test="one.one.one.one"
+declare -r src="scripts/"
+declare -r remote_repo_url="https://raw.githubusercontent.com/avalanche-org/Gen_Assoc/master/${src}"
+declare -r ubin="/usr/bin/" 
+declare -r defC="\033[0m"  
+declare -r rootuid=$((0x00)) 
+ 
+[[  ${rootuid} -ne ${UID} ]] &&  {
+    echo -e  "Sorry !! you need to be root to  proceed "  
+    exit   ${UID}  
+}
+
+mains_srcipts=( 
+    "mtdt.R"
+    "summary.R"
+    "run_analysis.R"
+    )
+
+has_command () {
+    local is_define=`command -v  $1`  
+    [[   -n ${is_define} ]]  && {  
+        return $((0x00)) 
+    } || {  
+        echo  -e "\033[1;33m Warrning  on line  $LINENO : this $1 command is not available in your system\033[0m"
+        return $((0x001)) 
+    }
+}
+
+
+is_internet_available () {
+    has_command  wget
+    echo -e  "... testing  connexion"
+    `wget -q  --spider   ${dns_test}` 
+    test  $? -eq 0  && { 
+        echo -e  "Online !"
+        return  $? 
+    }||{
+        echo -e "Offline  mode " 
+        return  $? 
+    }
+}
+
+automove  () {
+    local path 
+    [[ -n  $1 ]] && path=$1 || path=""
+    for script in ${mains_srcipts[@]} ; do 
+        [[  -f  ${path}${script} ]]  &&  {
+            echo -e "moving  ${path}${script} \t ->  ${ubin}"  
+            `chmod +x  ${path}${script}`
+            sleep 0.3
+            if  [[ -n ${path}  ]] ; then 
+                `cp ${path}${script}  ${ubin}` 
+            else  
+                `mv  ${path}${script}  ${ubin}` 
+            fi 
+             test  $? -eq 0 ||  echo  -e "fail  to move  no root permission !! "  
+            
+        }|| echo  -e "not  found"
+    done    
+}
+
+download_srcipts  () { 
+    has_command wget 
+    case  $1  in 
+        "--remote")  
+            is_internet_available 
+            test $? -eq 0  || {
+                echo -e "require  internet unless  you found script folder in path system "
+                exit $?  
+            }
+            for  script  in ${mains_srcipts[@]}   ;do 
+                echo  -e "\033[1;34m + Dowloading  $script from source$defC"
+                `wget ${remote_repo_url}${script} --quiet`
+                test  $? -ne 0  &&  {
+                    echo -e "-\033[1;31m fail to download  $script $defC"
+                }||{
+                    echo -e "-\033[1;32m $script [ downloaded ]  $defC"
+                } 
+            done
+            automove 
+            ;;
+        *)
+            automove  $src  
+
+esac 
+}
+
+
+
+ 
+if [[ -n  $1 ]] ;then 
+    download_srcipts  $1  
+else 
+    download_srcipts  
+fi      
