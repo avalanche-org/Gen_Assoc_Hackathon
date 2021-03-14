@@ -11,8 +11,7 @@ args = commandArgs(trailingOnly = TRUE)
 #-------  run_analysis.R
 #-------  Receive all arguments to run mTDT 
 
-
-# plink_ = "/home/g4bbm/tools/Plink/plink"
+# plink_ = "/home/g4bbm/tools/Plink/plink" (not a requierement)
 
 #   --- Install Required Packages
 
@@ -25,6 +24,7 @@ if(("stringr" %in% rownames(installed.packages())) == F){
 } 
 
 #   ---  Functions
+
 completePedigree <- function(dbwork){
   
   # --- Prepare ped file for m-TDT run
@@ -80,7 +80,6 @@ cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile 
 flag <- unlist(str_split(c(cmd),"--"))[-1]
 positions= NULL
 
-
 for (i in 1:length(flag)){
   if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}
 }
@@ -93,36 +92,34 @@ for (i in 1:length(flag)){
   cat(paste0(" --",flag[i], "\n"))
 }
 
+
 #   ---  File management
 
-# --- Path
-
+# --- Basenames
 ped_basename = unlist(str_split(unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))], ".ped"))[1]
 map_basename = unlist(str_split(unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))], ".map"))[1]
 phen_basename = unlist(str_split(unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))], ".phen"))[1]
 
 
 # --- Read Files
- 
 cat("\n * Reading files...\t")
 
 ped = read.delim(opt$pedfile, header = F , stringsAsFactors = F)
 map = read.delim(opt$mapfile, header = F , stringsAsFactors = F)
 phen = read.delim(opt$phenfile, header = F , stringsAsFactors = F)
 
-
 cat('Done. \n')
 
 # --- Process files with Complete Pedigree function
 
-cat("\n ** Preparing files for mTDT run... \n ")
+cat("\n * Preparing files for mTDT run... \n ")
 
 mtdt_ped = rbind(ped, completePedigree(ped))
 mtdt_map = paste0("M", (7:ncol(mtdt_ped)-6))
 
-# --- write files
+# --- write CP files
 
-cat(" ** Writing processed files... \n ")
+cat("* Writing processed files... \n ")
 
 write.table(mtdt_ped, paste0(unlist(str_split(ped_basename,".ped"))[1],"_CP.ped"),
             sep = "\t", quote = F, col.names = F, row.names = F)
@@ -138,28 +135,39 @@ cmd = paste0("Rscript mtdt.R --pedfile ",
              unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", 
              phen_basename,".phen ")
 
-# complete cmd
+# -- complete cmd
+
 for (i in 4:length(flag)){    
   cmd = paste0(cmd," --",flag[i])
 }
 
-cat("\n ** Starting run.. \n ")
-cat(cmd)   #check
-cat("\n")
+cat("\n ** Starting run.. \n ",cmd,"\n\n")
 system(cmd)
-
 # --- Output 
-cat("\n ** Writing results... \n ")
+
+cat("\n ** Writing results... \n\n \n ___________________________________________________________________________________________________________________________________________________________ \n\n  ")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
-
-cat("\n *** RUN OUTPUT *** \n\n ")
 
 cmd = "cat weighted_res_multilocus.csv  | column -t -s ';'"
 system(cmd)
 
-cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/; mv ",ped_basename ,".phen ",unlist(str_split(ped_basename,".ped"))[1],"_results/")
+cat("\n ___________________________________________________________________________________________________________________________________________________________  \n\n")
+
+
+#---- Output filename
+
+if (is.null(opt$markerset) == TRUE ){
+  name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_SM_results")
+}
+if (is.null(opt$markerset) == FALSE){
+  name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_MM_results")
+}
+
+cmd = paste0("mkdir ", name_,"; mv weighted* ", name_," ; mv *_CP.* ", name_,"; mv ",ped_basename ,".phen ",name_)
 system(cmd)
 
-cat("\n ** Run finished. Results are written in ", paste0(unlist(str_split(ped_basename,".ped"))[1],"_results"), "\n\n\n")
+#------------
+
+cat("\n ** Run finished. Results are written in ", name_, "\n\n\n")
 rm(list=ls())
