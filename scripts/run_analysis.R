@@ -130,11 +130,13 @@ write.table(mtdt_map, paste0(unlist(str_split(map_basename,".map"))[1],"_CP.map"
             sep = "\t", quote = F, col.names = F, row.names = F)
 
 # ---  run command
+cmd = paste0("cp ", opt$phenfile, " .")
+system(cmd)
 
 cmd = paste0("Rscript mtdt.R --pedfile ", 
              unlist(str_split(ped_basename,".ped"))[1],"_CP.ped --mapfile ",
              unlist(str_split(ped_basename,".ped"))[1],"_CP.map --phenfile ", 
-             opt$phenfile)
+             phen_basename,".phen ")
 
 # complete cmd
 for (i in 4:length(flag)){    
@@ -155,7 +157,7 @@ cat("\n *** RUN OUTPUT *** \n\n ")
 cmd = "cat weighted_res_multilocus.csv  | column -t -s ';'"
 system(cmd)
 
-cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/")
+cmd = paste0("mkdir ", unlist(str_split(ped_basename,".ped"))[1],"_results; mv weighted* ", unlist(str_split(ped_basename,".ped"))[1],"_results/ ; mv *_CP.* ", unlist(str_split(ped_basename,".ped"))[1],"_results/; mv ",ped_basename ,".phen ",unlist(str_split(ped_basename,".ped"))[1],"_results/")
 system(cmd)
 
 cat("\n ** Run finished. Results are written in ", paste0(unlist(str_split(ped_basename,".ped"))[1],"_results"), "\n\n\n")
