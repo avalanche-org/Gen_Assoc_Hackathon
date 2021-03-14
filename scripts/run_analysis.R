@@ -145,6 +145,7 @@ for (i in 4:length(flag)){
 
 cat("\n ** Starting run.. \n ")
 cat(cmd)   #check
+cat("\n")
 system(cmd)
 
 # --- Output 
