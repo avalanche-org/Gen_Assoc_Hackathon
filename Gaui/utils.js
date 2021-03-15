@@ -87,7 +87,7 @@ module
         // TODO  :  create  log file  on mac  if not exist  
         if  ( os.platform()  === "darwin")  {   // for mac   
             [  fstdout ,  fstderr].forEach(log  =>  {  
-                writeFile(fstdout  , ""  ,  "utf8" ,  err =>   {
+                writeFile(log  , " "  ,  "utf8" ,  err =>   {
                 if  ( err ) throw  new Error("connot create  logfile ")   
                 })
             })
