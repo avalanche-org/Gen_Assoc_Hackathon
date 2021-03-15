@@ -340,7 +340,7 @@ run_analysis.addEventListener("click" ,  evt => {
             map        : map_  ,   
             phen       : phen_ ,   
             phenotype_ : phenotype.options[phenotype.selectedIndex].value ?? null  , 
-            nbsim_     : nbsim.value         ?? null  , 
+            nbsim_     : nbsim.value || 0, 
             nbcores_   : nbcores.options[nbcores.selectedIndex].value     ?? null  ,
             mm         : mm.checked, 
             sm         : sm.checked, 
@@ -348,7 +348,7 @@ run_analysis.addEventListener("click" ,  evt => {
         }  
     }
     
-    const  {phenotype_, nbsim_, nbcores_}  = selected_index  
+    const  {phenotype_, nbsim_, nbcores_}  = selected_index 
     const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
     let  not_statified  = false  
     let  done  =  is_satisfied(require_needed) 
