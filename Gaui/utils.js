@@ -88,15 +88,13 @@ module
         if  ( os.platform()  === "darwin")  {   // for mac   
             [  fstdout ,  fstderr].forEach(log  =>  {  
                 writeFile(log  , " "  ,  "utf8" ,  err =>   {
-                if  ( err ) throw  new Error("connot create  logfile ")   
+                if  ( err ) throw  new Error("connot create ",  log , "file")   
                 })
             })
         }
                     
-        const stdout = createWriteStream(fstdout) // ,  { flags : "a"})  
-        const stderr = createWriteStream(fstderr) 
-        cmd.stdout.pipe(stdout)  
-        cmd.stderr.pipe(stderr)   
+        cmd.stdout.pipe(createWriteStream(fstdout))  
+        cmd.stderr.pipe(createWriteStream(fstderr))   
 
         cmd.on("close" , exit_code =>  {
             callback(exit_code) 
