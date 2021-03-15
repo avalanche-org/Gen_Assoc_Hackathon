@@ -2,7 +2,7 @@
 //author  : Umar aka jukoo  j_umar@outlook.com   <github.com/jukoo>
 
 const   
-    {readFile , createWriteStream , readdir , access ,  constants  , createReadStream}=  require("fs") , 
+    {readFile , createWriteStream , readdir , access ,  constants  , createReadStream ,  writeFile}=  require("fs") , 
     os =  require("os") ,  
     {execSync ,exec , spawn}  = require("child_process"), 
     {fromCharCode}            = String , 
@@ -83,8 +83,17 @@ module
     
     std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
-        // TODO  :  redirect  log  to  native  system log 
-        const stdout = createWriteStream(fstdout) // ,  { flags : "a"}) 
+        // TODO  :  redirect  log  to  native  system log
+        // TODO  :  create  log file  on mac  if not exist  
+        if  ( os.platform()  === "darwin")  {   // for mac   
+            [  fstdout ,  fstderr].forEach(log  =>  {  
+                writeFile(fstdout  , ""  ,  "utf8" ,  err =>   {
+                if  ( err ) throw  new Error("connot create  logfile ")   
+                })
+            })
+        }
+                    
+        const stdout = createWriteStream(fstdout) // ,  { flags : "a"})  
         const stderr = createWriteStream(fstderr) 
         cmd.stdout.pipe(stdout)  
         cmd.stderr.pipe(stderr)   
