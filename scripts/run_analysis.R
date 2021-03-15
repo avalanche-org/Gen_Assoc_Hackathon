@@ -172,7 +172,7 @@ if (is.null(opt$markerset) == FALSE){
   name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_MM_results")
 }
 
-cmd = paste0("mkdir ", name_,"; mv weighted* ", name_," ; mv *_CP.* ", name_,"; mv ",ped_basename ,".phen ",name_)
+cmd = paste0("mkdir ", name_,"; mv weighted* ", name_," ; mv *_CP.* ", name_,"; mv ",phen_basename ,".phen ",name_)
 system(cmd)
 
 #------------
