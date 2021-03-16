@@ -149,21 +149,48 @@ cat("\n ** Writing results... \n")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
 
-if (is.null(opt$markerset) == TRUE){
+if (opt$nbsim == 0){
+  
+  ### Output
+  
   cat("\n ___________________________________________________________________________  \n\n")
   system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t -s ' '; rm x")
-  cat("\n ___________________________________________________________________________  \n\n")
+  cat("\n ")
+  cat("___________________________________________________________________________  \n\n")
+  
+  
+  ### Classement selon p-value croissant
+  
+  cat("--- Rank of the 10 most significant markers in descending order ------------\n\n")
+  t <- output[order(output$mTDT_asympt_Pval),]
+  
+  write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+  system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm 10_significants_markers")
+  cat("\n----------------------------------------------------------------------------") 
 }
-if (is.null(opt$markerset) == FALSE){
-  cat("\n _____________________________________________________________________________________________________________________________________________  \n\n")
+
+
+
+if (opt$nbsim > 0){
+  
+  ### Output 
+  
+  cat("\n ___________________________________________________________________________________________________________________________________________  \n\n")
   system("cat weighted_res_multilocus.csv  | column -t -s ';'")
-  cat("\n _____________________________________________________________________________________________________________________________________________  \n\n")
+  cat("\n ___________________________________________________________________________________________________________________________________________  \n\n")
+
+  ### Classement selon p-value croissant
+  cat("--- Rank of the 10 most significant markers in descending order ----------------------------------------------------------------------\n\n")
+  t <- output[order(output$mTDT_empirical_Pval_FDR),]
+  
+  write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+  system("cat 10_significants_markers | column -t ; rm 10_significants_markers")
+  cat("\n--------------------------------------------------------------------------------------------------------------------------------------") 
 }
 
 
 
-
-#---- Output filename
+ #---- Output filename
 
 if (is.null(opt$markerset) == TRUE ){
   name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_SM_results")
@@ -179,3 +206,4 @@ system(cmd)
 
 cat("\n ** Run finished. Results are written in ", name_, "\n\n\n")
 rm(list=ls())
+
