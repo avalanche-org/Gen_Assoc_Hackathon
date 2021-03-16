@@ -165,7 +165,7 @@ if (opt$nbsim == 0){
   t <- output[order(output$mTDT_asympt_Pval),]
   
   write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
-  system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm 10_significants_markers")
+  system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm  x 10_significants_markers")
   cat("\n----------------------------------------------------------------------------") 
 }
 
