@@ -1,17 +1,20 @@
 #!/usr/bin/env Rscript
 
+####################################################################################################
+#   @MaryemT 
+#   avalanche-org/Gen_Assoc
+
+# This is code to run the m-TDT tool 
+#                             * prepare files for mTDT run  
+#                             * displays output in terminal
+#                             * generates output folder
+####################################################################################################
+
+
 args = commandArgs(trailingOnly = TRUE) 
 
-#   @MaryemT 
-
-#   avalanche-org
-
-#   /Gen_Assoc
-
-#-------  run_analysis.R
-#-------  Receive all arguments to run mTDT 
-
 # plink_ = "/home/g4bbm/tools/Plink/plink" (not a requierement)
+
 
 #   --- Install Required Packages
 
@@ -23,7 +26,12 @@ if(("stringr" %in% rownames(installed.packages())) == F){
   install.packages("optparse", dependencies=TRUE, repos="http://cran.r-project.org")
 } 
 
-#   ---  Functions
+
+library(optparse)
+library(stringr)
+
+
+#   --- Functions
 
 completePedigree <- function(dbwork){
   
@@ -48,11 +56,8 @@ completePedigree <- function(dbwork){
   return(dataset)
 }
 
-#   ---  Collect arguments
 
-# --- Options
-
-library(optparse)
+#   --- Arguments
 
 option_list = list(
   make_option(c("--pedfile"), type="character", help="name of 'ped' file", metavar="character"),
@@ -67,33 +72,35 @@ opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
 
-library(stringr)
+#---------------------------------------------------------
+#                     START ANALYSIS                     #
+#---------------------------------------------------------
+
 
 cat("\n,_______ Starting analysis ________ \n")
+
 cat("\n __ Working directory:",getwd(), "\n\n")
 
 cmd= paste0("--pedfile ", opt$pedfile, " --mapfile ", opt$mapfile, " --phenfile ", opt$phenfile, " --phen ",opt$phen, 
             " --markerset ", opt$markerset, " --nbsim ", opt$nbsim,  " --nbcores ", opt$nbcores)
 
-# --- Detect selected flags and write command
+
+# --- Detect selected flags
 
 flag <- unlist(str_split(c(cmd),"--"))[-1]
+
 positions= NULL
 
-for (i in 1:length(flag)){
-  if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}
-}
-if (length(positions)>0){
-  flag = flag[-positions]
-}
+for (i in 1:length(flag)){if (unlist(str_split(flag[i]," "))[2] == ""){positions = c(positions, i)}}
+
+if (length(positions)>0){flag = flag[-positions]}
 
 cat(" * Selected flags: \n")
-for (i in 1:length(flag)){
-  cat(paste0(" --",flag[i], "\n"))
-}
+
+for (i in 1:length(flag)){cat(paste0(" --",flag[i], "\n"))}
 
 
-#   ---  File management
+# ---  File management
 
 # --- Basenames
 ped_basename = unlist(str_split(unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))], ".ped"))[1]
@@ -127,6 +134,7 @@ write.table(mtdt_map, paste0(unlist(str_split(map_basename,".map"))[1],"_CP.map"
             sep = "\t", quote = F, col.names = F, row.names = F)
 
 # ---  run command
+
 cmd = paste0("cp ", opt$phenfile, " .")
 system(cmd)
 
@@ -142,55 +150,98 @@ for (i in 4:length(flag)){
 }
 
 cat("\n ** Starting run.. \n ",cmd,"\n\n")
+
+# RUN COMMAND 
 system(cmd)
+
+#---------------------------------------------------------
+#                     OUTPUT DISPLAY                     #
+#---------------------------------------------------------
+
 # --- Output 
 
 cat("\n ** Writing results... \n")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
 
-if (opt$nbsim == 0){
+##########################################################
+
+# --- No number of simulations selected, default value = 0, no need of corrected p-values
+
+if (is.null(opt$nbsim) == TRUE){
   
-  ### Output
+  #   Display output
   
-  cat("\n ___________________________________________________________________________  \n\n")
+  cat("\n____________________________________________________________________________________\n\n")
   system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t -s ' '; rm x")
   cat("\n ")
-  cat("___________________________________________________________________________  \n\n")
   
+  #    Ranking : 10 most significant markers
   
-  ### Classement selon p-value croissant
+  cat("\n--- Rank of the 10 most significant markers in descending order --------------------\n\n\n")
   
-  cat("--- Rank of the 10 most significant markers in descending order ------------\n\n")
   t <- output[order(output$mTDT_asympt_Pval),]
-  
   write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
   system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm  x 10_significants_markers")
-  cat("\n----------------------------------------------------------------------------") 
+  
+  cat("\n____________________________________________________________________________________\n\n") 
+}
+
+# --- Number of simulations selected
+
+if (is.null(opt$nbsim) == FALSE){
+  
+  # --- Single-Marker run, no need of corrected p-values
+  
+  if (is.null(opt$markerset) == TRUE){
+    
+    #   Output without corrected p-values
+    
+    cat("\n______________________________________________________________________________________________  \n\n")
+    system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7,$9}' x | column -t -s ' '; rm x")
+    
+    ### Classement selon p-value croissant
+    
+    cat("\n--- Rank of the 10 most significant markers in descending order ---------------------------------\n\n\n")
+    t <- output[order(output$mTDT_empirical_Pval_FDR),]
+    
+    write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+    system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7,$9}' x | column -t  ; rm  x 10_significants_markers")
+    
+    cat("\n______________________________________________________________________________________________  \n\n")
+    
+  }
+  
+  # --- Multi-Marker run, corrected p-values 
+  
+  if (is.null(opt$markerset) == FALSE){
+    
+    ### Output with corrected p-values
+    
+    cat("\n___________________________________________________________________________________________________________________________________________  \n\n")
+    system("cat weighted_res_multilocus.csv  | column -t -s ';'")
+    
+    ### Classement selon p-value croissant
+    
+    cat("\n--- Rank of the 10 most significant markers in descending order ----------------------------------------------------------------------\n\n\n")
+    t <- output[order(output$mTDT_empirical_Pval_FDR),]
+    
+    write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+    system("cat 10_significants_markers | column -t ; rm 10_significants_markers")
+    
+    cat("\n___________________________________________________________________________________________________________________________________________  \n\n") 
+  }
+  
+  
+  
 }
 
 
+#---------------------------------------------------------
+#                     FILE MANAGEMENT                    #
+#---------------------------------------------------------
 
-if (opt$nbsim > 0){
-  
-  ### Output 
-  
-  cat("\n ___________________________________________________________________________________________________________________________________________  \n\n")
-  system("cat weighted_res_multilocus.csv  | column -t -s ';'")
-  cat("\n ___________________________________________________________________________________________________________________________________________  \n\n")
-
-  ### Classement selon p-value croissant
-  cat("--- Rank of the 10 most significant markers in descending order ----------------------------------------------------------------------\n\n")
-  t <- output[order(output$mTDT_empirical_Pval_FDR),]
-  
-  write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
-  system("cat 10_significants_markers | column -t ; rm 10_significants_markers")
-  cat("\n--------------------------------------------------------------------------------------------------------------------------------------") 
-}
-
-
-
- #---- Output filename
+ #---- Output filename based on pedfile name
 
 if (is.null(opt$markerset) == TRUE ){
   name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_SM_results")
