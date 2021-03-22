@@ -2,7 +2,9 @@
 //! sending event through backend side  
 //
 //! TODO  : register  loaded data to  local storage   
-//        + when user reload the application  
+//        + when user reload the application
+//        [] add  connexion status 
+//        [] progress bar status for step  validation  
 const { ipcRenderer} =require("electron") ,
       {log}          = console            , 
       fs             = require("fs")      , 
@@ -33,28 +35,80 @@ const  [
         _.querySelector("#term") , 
         _.querySelector("#run_summary"), 
         _.querySelector("#run_analysis") 
-    ] 
+    ]
+
+const [  
+     i_lock  , i_unlock,
+     blur_area, status, 
+     microchip  , bar_progress 
+] = [ 
+    _.querySelector("#lock_default"), 
+    _.querySelector("#unlocked_default"), 
+    _.querySelector(".default-blur-content"),
+    _.querySelector("#status"), 
+    _.querySelector("#microchip"), 
+    _.querySelector("#bar")   
+]
+
+
+let jauge   =  0 
+const progress_step =(state  ,  status_message , duration /*millisec*/ ) => {
+    if  ( state >100 ) return 
+    status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>${status_message}`
+          bar_value     =  bar_progress.textContent   ,
+          bar_state     =  parseInt(bar_value.slice(0 , -1 ))
+    
+    jauge = bar_state 
+    const  move_progress_bar =  setInterval( animate   , duration)
+    function animate () {
+        if ( jauge==  state) {  
+            clearInterval(move_progress_bar) 
+            status.innerHTML =""
+
+        }
+        bar_progress.style.width=`${jauge}%` 
+        bar_progress.textContent=`${jauge}%`
+        jauge++ 
+    }  
+
+}
+
+progress_step(10 ,"initialization..." , 200 )
+     
 let terminal ,  writeSpeed  
 __init__  = ( ()=> { 
     run_analysis.disabled =  true  
     term.innerText        =  "▮ "
     term.setEditable      =  false
-    //nbsim.disabled        = true
+    phenotype.disabled    =  true 
+    nbsim.disabled        =  true 
+    nbcores.disabled      =  true  
     markerset.disabled    =  true
     markerset.style.backgroundColor="grey"
     markerset.style.color="whitesmoke"
     ipcRenderer.send("init",0x000)
     writeSpeed            =  0 
-    term_display_speed    =  500   //  millisec 
+    term_display_speed    =  500   //  millisec
+   
 })()    
 
+const  check_network_connectivity  = () => window.navigator.onLine 
+setInterval( () => {
+    if (window.navigator.onLine) _.querySelector("#network").style.color="green"  
+    else                         _.querySelector("#network").style.color="firebrick"  
+} , 10000 )
 
-let  numdigit =  []  
+let  numdigit =  [] 
+
 nbsim.addEventListener("keyup"  ,  evt  => {
     if(!isNaN(evt.target.value)) 
         numdigit.push(evt.target.value)
         
     evt.target.value  = numdigit[numdigit.length -1] ??  ""
+    if (evt.target.value > 1  ) 
+        nbcores.disabled = false 
+    else  
+        nbcores.disabled = true 
 
 })   
 
@@ -70,12 +124,33 @@ const  term_write  =  incomming_data => {
             term.value +=termbuffer
             
             c++ 
-            setTimeout(write_simulation , writeSpeed)  
+            setTimeout(write_simulation ,0)  
         }else  
             clearTimeout(write_simulation) 
     })()
 }
 
+function  AssertionError(message){  this.message =  message }  
+AssertionError.prototype = Error.prototype  
+
+const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed */)  => {
+    if  (colorshemes.length > 2  || colorshemes <=1  ) 
+        AssertionError("requires two colornames")  
+
+
+    if ( element.style.color== colorshemes[0] ) 
+        element.style.color =  colorshemes[1]
+    else  
+        element.style.color = colorshemes[0] 
+}
+
+const use_cpus_resources = trigger => { 
+    if  ( trigger)   { 
+        let   blink = setInterval(toggle_blink(microchip ,  "black"  , "limegreen"),100)
+    }else  
+        clearInterval(blink)  
+}
+ 
 //!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
 //          ->  cpus core avlailable  
 //          ->  where the  log file  is supposed to be  
@@ -86,6 +161,7 @@ ipcRenderer.on("initialization" ,  (evt , data)  =>{
 
     logfile  = logpath_location
     for  ( let i of   range(available_cpus_core) ) { 
+    // set  how many  cpus  the os got 
         const ncores_opt =  _.createElement("option") 
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
@@ -150,16 +226,19 @@ let
 ipcRenderer.on("plug" ,  (evt , data ) => {
      log(data) 
 })
+// on file  chooser  dialog  =>  +5 %  
 ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   { 
     paths_collections =  main_root  
     files_collections =  files 
     optsfeed(files)
+    progress_step(15 , `loading  files ` , 500) 
 }) 
 
 ipcRenderer.on("Browse::multiple" , (evt , mbrowse_data )  =>{
     const request_files =  Object.keys(mbrowse_data)   
     for ( let  htm_elmt  of  [ ped  , map , phen ]  )  htm_elmt.innerHTML= ""    
     optsfeed(request_files)
+    progress_step(15 , "loading files ..." , 500) 
 })
 //! sync select action  between  ped and maps
 const sync_select_action =  (s_elmt1 , s_elmt2) => {
@@ -210,14 +289,17 @@ let ped_  = null ,
     map_  = null ,
     phen_ = null   
 
-let summary_already_run =  false 
+let summary_already_run =  false , 
+    analysis_on_going   =  false   
+
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
-    term.focus()
-    let  annoucement  = "▮ Processing Summary  ... please wait\n"
+    let  annoucement  = "▮ Generating Summary Statistics ... please wait\n"
     //plugonlog() 
     //setInterval(plugonlog , term_display_speed)    
-    
+    status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
+    status.style.color = "blue"   
+    bar_progress.style.backgroundColor = "limegreen"   
     run_analysis.disabled = true 
     run_summary.disabled  = false   
     const  {
@@ -234,7 +316,7 @@ run_summary.addEventListener("click" , evt => {
  
     let  done   = is_satisfied (selected_files)  
     if  (!done)  {
-        annoucement = "▮ Missing " 
+        annoucement = "▮ Error :  No files selected ! " 
         run_summary.disabled = false   
     }
     term.value =  ""   //  clean output before 
@@ -275,26 +357,49 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
 //! TODO  :  make realtime reading  stdout stream  
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
+    if (summary_already_run) 
+        progress_step(47 , "finishing ", 140)
+    if (analysis_on_going)  
+        progress_step(99 , "Analysising ... ", 240)
+    //progress_step(45 , 10) 
     if  ( data  ) { 
         term_write(data)  
        // run_summary.disabled  = summary_already_run 
         //term.value = data
         follow_scrollbar()  
-        run_analysis.disabled = !summary_already_run 
+        run_analysis.disabled = !summary_already_run  
+        phenotype.disabled    = !summary_already_run  
+        nbsim.disabled        = !summary_already_run
+        i_lock.classList.remove("fa-lock") 
+        i_lock.classList.add("fa-unlock") 
+        blur_area.style.filter = "blur(0px)" 
     }
 })
-//! TODO :  [ optional]  style  output error  with red or yellow color  ... 
+//! TODO :  [ optional]  style  output error  with red or yellow color  ...
+let tigger  = false 
 ipcRenderer.on("log::fail"        , (evt , data)  => {
     term.value = data 
     run_summary.disabled=false  
+    term.style.color ="red"
+    status.style.color ="red"
+    status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> failure ` 
+    bar_progress.style.backgroundColor = "firebrick"
 }) 
 ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     term.value = data 
     run_summary.disabled=false 
+    term.style.color ="red"
+    status.style.color ="red"
+    status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> error log not found`
+    bar_progress.style.backgroundColor = "firebrick"
 }) 
 ipcRenderer.on("term::logerr"     , (evt , data)  => {
     term.value = data 
     run_summary.disabled=false 
+    term.style.color   ="red"
+    status.style.color ="red"
+    status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> An error has occurred  ` 
+    bar_progress.style.backgroundColor = "firebrick"
 })  
 ipcRenderer.on("log::broken"      , (evt , data)  => {
     term.value = data  
@@ -304,7 +409,8 @@ run_analysis.addEventListener("click" ,  evt => {
     evt.preventDefault()
     term.focus()
     term_write("▮ Running Analysis")
-
+    status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
+    analysis_on_going = true 
     //setInterval(plugonlog , term_display_speed)    
     const  { 
         selected_index
@@ -315,8 +421,8 @@ run_analysis.addEventListener("click" ,  evt => {
             map        : map_  ,   
             phen       : phen_ ,   
             phenotype_ : phenotype.options[phenotype.selectedIndex].value ?? null  , 
-            nbsim_     : nbsim.value         ?? null  , 
-            nbcores_   : nbcores.options[nbcores.selectedIndex].value     ?? null  ,
+            nbsim_     : nbsim.value     || 0  , 
+            nbcores_   : nbcores.options[nbcores.selectedIndex].value  ||  null  ,
             mm         : mm.checked, 
             sm         : sm.checked, 
             markerset  : mm.checked ? markerset.value : null 
@@ -331,6 +437,10 @@ run_analysis.addEventListener("click" ,  evt => {
     if   ( !done )  term_write ("▮ Run analysis  need to be satisfied" )   
     else  {  
         run_analysis.disabled =  true
+        if (!nbcores.disabled)  { r 
+            trigger = true
+            use_cpus_resources(trigger) 
+        } 
         ipcRenderer.send("run::analysis" ,  gobject )
     }
 })

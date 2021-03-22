@@ -10,21 +10,16 @@
     <link rel="stylesheet" href="style.css" media="screen" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=VT323:regular" media="screen" />
     <meta name="generator" content="Nicepage 3.6.0, nicepage.com" />
+    <link rel="stylesheet" href="assets/styles/semantic/semantic.min.css"> 
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link
       id="u-theme-google-font"
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto+Slab:100,300,400,700|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i"
     />
 
-    <script type="application/ld+json">
-      {
-        "@context": "http://schema.org",
-        "@type": "Organization",
-        "name": "",
-        "url": "index.html",
-        "logo": "images/default-logo.png"
-      }
-    </script>
+
     <meta property="og:title" content="mtdt_html" />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#808080" />
@@ -75,10 +70,27 @@
       .w3-row-padding img {
         margin-bottom: 12px;
       }
+      #bar {
+          width: 1%;
+          height: 15px;
+          border-radius:3px;
+          background-color:limegreen ; 
+          text-align: center; /* To center it horizontally (if you want) */
+          line-height: 15px; /* To center it vertically */
+          color: white;
+          font-size:10px; 
+      }
+      .default-blur-content {
+      filter: blur(5px);
+  -webkit-filter: blur(5px);
+  -webkit-transition: 1s -webkit-filter linear; 
+  -o-transition: 1s -o-filter linear;
+      }
+  
     </style>
   </head>
-  <body class="u-body">
 
+  <body class="u-body">
     <!-- Header -->
     <!--header
       class="w3-panel w3-center w3-opacity"
@@ -94,6 +106,7 @@
         </div>
       </div>
     </header-->
+
     <section class="u-clearfix u-section-1" id="sec-2761">
       <div class="u-clearfix u-gutter-0 u-layout-wrap u-layout-wrap-1">
         <div class="u-layout">
@@ -107,11 +120,11 @@
                     >
 
                       <div class="u-container-layout u-container-layout-2">
-                        <div  class="u-form u-form-1">
+                        <div  class="u-form u-form-1 w3-container w3-center w3-animate-left">
                           <!--form to load files : run summary.R -->
                         <fieldset>
                               <legend  style="color:blue">
-                                  <small>  File Select </small>
+                                  <small> [ Step 1:Select Files <i  id="unlocked_default"style="font-size:20px" class="fa fa-unlock"></i> ]</small>
                               </legend>
 
 
@@ -216,8 +229,7 @@
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit">
-                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary  &dtrif;</a>
-                             
+                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary Statistics  <i style="font-size:20px" class="fa fa-bar-chart" aria-hidden="true"></i></button>
                               <input
                                 type="submit"
                                 value="load"
@@ -231,19 +243,25 @@
                         <!--div  style="border: thin solid yellow">
                             <small>  mTdt  version  Beta v1  </small> 
                         </div-->
+                        </br>
+                            <small style="color:blue" id="status">  </small>  
+                        </br>
+                        <div id="stepper-bar" class="w3-center w3-animate-opacity">
+                          <div id="bar">1%</div>
+                      </div>
                       </div>
                     </div>
                     <div
                       class="u-container-style u-layout-cell u-size-34 u-layout-cell-3"
                     >
-                      <div class="u-container-layout u-container-layout-3">
+                      <div class="u-container-layout u-container-layout-3 w3-container w3-center w3-animate-opacityw3-container w3-center w3-animate-right">
                         <div class="u-form u-form-2">
                             <fieldset>  
                                 <legend style="color:blue">
-                                  <small>Choose Option</small>
+                                  <small> [ Step 2 :Choose Options <i id="lock_default" style="font-size:20px" class="fa fa-lock"></i> ]</small>
                                 </legend> 
                           <form
-                            class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
+                            class="default-blur-content u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
                             source="email"
                             name="form-1"
@@ -322,7 +340,8 @@
                                 class="u-form-control-hidden u-label"
                                 >Select</label
                               >
-                              
+                              <small style="color:firebrick"> number of simulations you want </small> 
+
                               <input  id="nbsim" placeholder="number of simulations you want " class ="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" >
 
                                   
@@ -389,7 +408,7 @@
                               ></textarea>
                               
                             </fieldset>
-                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis &rarr;</button>  
+                                <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis <!--i style="font-size:20px" class="fa fa-cog fa-spin fa-3x fa-fw"> </i--></button>  
                             </div>
                             </div>
                             <div
@@ -401,6 +420,16 @@
                         
                         
                       </div>
+                    <div style="padding-right: 16px; padding-top:1px;width:5%;"id="os-stat"  class="w3-left w3-animate-top" > 
+                        <fieldset>  
+                            <legend> <i class="fa fa-info-circle" aria-hidden="true"></i></legend>  
+                            <i id="network" class="fa fa-exchange" aria-hidden="true"></i> <br>
+                        <i  id="microchip" class="fa fa-microchip" aria-hidden="true"></i> 
+
+                        <br>
+                        
+                        </fieldset> 
+                    </div> 
                     </div>
                   </div>
 
@@ -419,8 +448,11 @@
               </div>
             </div>
           </div>
+ 
         </div>
+        
       </div>
+      <div class="w3-center w3-animate-bottom"> 
   <textarea 
           class="terminal" 
           readonly autocomplete="off" 
@@ -431,6 +463,7 @@
           cols="400" 
            rows="9">
         </textarea>
+      </div>
     </section>
     
   </body>
