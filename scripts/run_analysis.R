@@ -108,6 +108,7 @@ map_basename = unlist(str_split(unlist(str_split(opt$mapfile,"/"))[length(unlist
 phen_basename = unlist(str_split(unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))], ".phen"))[1]
 
 
+
 # --- Read Files
 cat("\n * Reading files...\t")
 
@@ -166,37 +167,61 @@ output <- read.csv("weighted_res_multilocus.csv", sep = ";")
 
 ##########################################################
 
-# --- No number of simulations selected, default value = 0, no need of corrected p-values
+# --- No number of simulations selected, default value = 0, nbcores default = 1
+# ----------------------------------------------------------------------------------------------------
 
-if (is.null(opt$nbsim) == TRUE){
+if (isTRUE(opt$nbsim  ==  0) | is.null(opt$nbsim) == TRUE) {
   
-  #   Display output
-  
-  cat("\n____________________________________________________________________________________\n\n")
-  system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t -s ' '; rm x")
-  cat("\n ")
-  
-  #    Ranking : 10 most significant markers
-  
-  cat("\n--- Rank of the 10 most significant markers in descending order --------------------\n\n\n")
-  
-  t <- output[order(output$mTDT_asympt_Pval),]
-  write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
-  system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm  x 10_significants_markers")
-  
-  cat("\n____________________________________________________________________________________\n\n") 
+ #-- S-M no need corrected p-values
+  if (is.null(opt$markerset) == TRUE){
+    #   Display output
+    
+    cat("\n____________________________________________________________________________________\n\n")
+    system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t -s ' '; rm x")
+    cat("\n ")
+    
+    #    Ranking : 10 most significant markers
+    
+    cat("\n--- Rank of the 10 most significant markers in descending order -------------\n\n\n")
+    
+    t <- output[order(output$mTDT_asympt_Pval),]
+    write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+    system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7}' x | column -t  ; rm  x 10_significants_markers")
+    
+    cat("\n____________________________________________________________________________________\n\n") 
+  }
+#-- M-M range by corrected p-values  
+  if (is.null(opt$markerset) == FALSE){
+      
+      #   Display output
+      
+      cat("\n________________________________________________________________________________________________________\n\n")
+      system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7,$8}' x | column -t -s ' '; rm x")
+      cat("\n ")
+      
+      #    Ranking : 10 most significant markers
+      
+      cat("\n--- Rank of the 10 most significant markers in descending order --------------------\n\n\n")
+      
+      t <- output[order(output$mTDT_asympt_Pval_FDR),]
+      write.table(t[1:10,], "10_significants_markers",sep = "\t", quote = F, col.names = T, row.names = F)
+      system("cat 10_significants_markers | column -t  > x; awk '{print $1,$2,$3,$4,$5,$6,$7,$8}' x | column -t  ; rm  x 10_significants_markers")
+      
+      cat("\n________________________________________________________________________________________________________\n\n") 
+      
+    }
+   
 }
 
 # --- Number of simulations selected
+# ----------------------------------------------------------------------------------------------------
 
-if (is.null(opt$nbsim) == FALSE){
+if (isTRUE(opt$nbsim  > 0)){
   
-  # --- Single-Marker run, no need of corrected p-values
-  
+  #-- S-M no need corrected p-values
   if (is.null(opt$markerset) == TRUE){
     
     #   Output without corrected p-values
-    
     cat("\n______________________________________________________________________________________________  \n\n")
     system("cat weighted_res_multilocus.csv  | column -t -s ';' > x; awk '{print $1,$2,$3,$4,$5,$6,$7,$9}' x | column -t -s ' '; rm x")
     
@@ -212,8 +237,7 @@ if (is.null(opt$nbsim) == FALSE){
     
   }
   
-  # --- Multi-Marker run, corrected p-values 
-  
+  #-- M-M range by corrected p-values  
   if (is.null(opt$markerset) == FALSE){
     
     ### Output with corrected p-values
