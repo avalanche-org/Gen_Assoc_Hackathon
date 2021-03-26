@@ -1,7 +1,7 @@
 {
     "main_frame":  {  
         "title" :  "Gen Assoc",   
-        "width" :  987 ,
+        "width" :  900 ,
         "height":  830, 
         "webPreferences" : {
             "nodeIntegration" : true  
@@ -11,8 +11,8 @@
         "limite_nbsims": 10 ,
         "_summary_src" : "/Users/marieme/Desktop/Gen_Assoc/scripts/summary.R", 
         "_run_analrysis": "/Users/marieme/Desktop/Gen_Assoc/scripts/run_analysis.R",
-        "summary_src" : "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/summary.R", 
-        "run_analysis": "/home/juko/Desktop/Pasteur/Sandbox/H3BioNet/Gen_Assoc_Hackathon/scripts/run_analysis.R",
+        "summary_src" : "/home/juko/Desktop/Project/Gen_Assoc/scripts/summary.R", 
+        "run_analysis": "/home/juko/Desktop/Project/Gen_Assoc/scripts/run_analysis.R",
         "logpath"     : "/Users/marieme/Desktop/Gen_Assoc/Gaui/.logout",
         "mtdt_src": "/Users/marieme/Desktop/Gen_Assoc/scripts/mtdt.R"
     } , 

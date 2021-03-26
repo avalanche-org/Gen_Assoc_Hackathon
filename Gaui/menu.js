@@ -108,7 +108,7 @@ module
         submenu : [ 
                 {role : "minimize"} ,
                 {role : "zoom"}, 
-                {type : "separator"}, 
+                {type : "separator"},
                 {role : "window"} 
         ]
     }, 

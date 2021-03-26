@@ -20,31 +20,8 @@ let mw  =  null
 
 const  mt_load = menu_template  =>  Menu.buildFromTemplate(menu_template)  
 
-app.on("ready",  () =>  {
-    
-        mw  =  new BrowserWindow({...defconf["main_frame"]})
-        //mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
-        //mw.loadURL(direct_link) //'https://teranga.pasteur.sn/reception/')
-        mw.loadURL(url.format( { 
-               pathname:  path.join(__dirname, "index.html") , 
-               protocol: 'file:',
-               slashes :  true
-
-        } ))
-
-        Menu.setApplicationMenu(mt_load(menu))  
-        //! TODO : preload  default value  
-        const  { cpus_core } = utils 
-        ipcMain.on("init" ,  ( evt , data )  => {
-            log("initializing  render process " ,  data)  
-            const initiate  =  { 
-                nbsim_limite          :  defconf["mtdt_pannel"]["limite_nbsims"], 
-                logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
-                available_cpus_core   :  cpus_core() -1 
-            } 
-            evt.reply("initialization" ,  initiate)   
-        })
-   
+const  action_event  =  wi  => {  
+    if ( ! wi instanceof BrowserWindow) return  
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
             const  { paths  , selected_files  }  =  _data 
             const  [pedfile,mapfile,phenfile]  = selected_files 
@@ -56,23 +33,23 @@ app.on("ready",  () =>  {
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  {
-                        mw.webContents.send("end"  , exit_code) 
+                        wi.webContents.send("end"  , exit_code) 
                         //TODO  : send   signal to  stop printing  ... 
-                        mw.webContents.send("end" , exit_code)
+                        wi.webContents.send("end" , exit_code)
                          
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
-                            if (e)  mw.webContents.send("log::fail" , e  )   
-                            mw.webContents.send("term::logout"  , d )   
+                            if (e)  wi.webContents.send("log::fail" , e  )   
+                            wi.webContents.send("term::logout"  , d )   
                         })
-                        mw.webContents.send("load::phenotype"  ,  res-2)   
+                        wi.webContents.send("load::phenotype"  ,  res-2)   
                     }else {
                         log("fail")  
                         fs.access(".logerr" , fs.constants["F_OK"] , error => {
-                            if (error )  mw.webContents.send("logerr::notfound" , error)  
+                            if (error )  wi.webContents.send("logerr::notfound" , error)  
                             fs.readFile('.logerr' , "utf8" , (err , data) =>{
-                                if(err) mw.webContents.send("log::broken" ,  error ) 
+                                if(err) wi.webContents.send("log::broken" ,  error ) 
                                 log(data)
-                                mw.webContents.send ("term::logerr" , data) 
+                                wi.webContents.send ("term::logerr" , data) 
                             })
                         }) 
                     }
@@ -94,26 +71,54 @@ app.on("ready",  () =>  {
             utils.std_ofstream(cmdstr ,  exit_code  => {
                 if(exit_code ==0x00) {
                     log("exit" , exit_code )
-                    mw.webContents.send("end"  , exit_code) 
+                    wi.webContents.send("end"  , exit_code) 
                     fs.readFile(".logout" , "utf8" , (e , d)  => {
-                        if  (e)    mw.webContents.send("log::fail" , e  )  
+                        if  (e)    wi.webContents.send("log::fail" , e  )  
                         log("output result" ,  d) 
                         //mw.webContents.send("run::analysis_result" ,  d  ) 
-                        mw.webContents.send("term::logout" ,  d  ) 
+                        wi.webContents.send("term::logout" ,  d  ) 
                          
                     })
                 }else {
                     log("error") 
                     fs.access(".logerr" , fs.constants["F_OK"] , error => {
-                        if (error )  mw.webContents.send("logerr::notfound" , error)  
+                        if (error )  wi.webContents.send("logerr::notfound" , error)  
                         fs.readFile('.logerr' , "utf8" , (err , data) =>{
-                            if(err) mw.webContents.send("log::broken" ,  error )  
-                            mw.webContents.send ("term::logerr" , data) 
+                            if(err) wi.webContents.send("log::broken" ,  error )  
+                            wi.webContents.send ("term::logerr" , data) 
                         })
                     }) 
                 }
             })
         })
+
+}
+
+
+app.on("ready",  () =>  {
+    mw  =  new BrowserWindow ({...defconf["main_frame"]}) 
+    //mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
+    mw.loadURL(url.format( { 
+               pathname:  path.join(__dirname, "index.html") , 
+               protocol: 'file:',
+               slashes :  true
+
+        } ))
+        Menu.setApplicationMenu(mt_load(menu))  
+        //! TODO : preload  default value    
+        const  { cpus_core } = utils 
+        ipcMain.on("init" ,  ( evt ,  init_proc  )  => {
+            log("initializing  render process " ,  init_proc)  
+            const initiate  =  { 
+                logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
+                available_cpus_core   :  cpus_core() -1 
+            }
+            log(cpus_core(true)) 
+            if  (init_proc == 1 )  initiate["os_detail_info"] =  cpus_core(true)  
+
+            evt.reply("initialization" ,  {  initiate ,  init_proc}  )   
+        })
+     action_event(mw) 
      mw.once("ready-to-show" , ()=> { mw.show() } ) 
      
 })  
@@ -121,4 +126,8 @@ app.on("close" ,  app_closed  => {
     mw =  null  //! free memory  
     app.quit()
 })  
-process.on("exit" ,  code_status  =>  log(`Exit with :${code_status}`))
+process.on("exit" ,  code_status  =>  {
+
+    mw.webContents.send("clean::localStorage" ,  null ) 
+    log(`Exit with :${code_status}`)
+})

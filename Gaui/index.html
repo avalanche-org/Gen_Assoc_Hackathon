@@ -6,26 +6,16 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="page_type" content="np-template-header-footer-from-plugin" />
-    <title>mtdt_GUI</title>
+    <title>mTdt</title>
     <link rel="stylesheet" href="style.css" media="screen" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=VT323:regular" media="screen" />
-    <meta name="generator" content="Nicepage 3.6.0, nicepage.com" />
     <link rel="stylesheet" href="assets/styles/semantic/semantic.min.css"> 
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/styles/w3/w3.css">
+    <link rel="stylesheet" href="assets/styles/fa/css/all.min.css">
     <link
-      id="u-theme-google-font"
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto+Slab:100,300,400,700|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i"
     />
-
-
-    <meta property="og:title" content="mtdt_html" />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#808080" />
-    <link rel="canonical" href="index.html" />
-    <meta property="og:url" content="index.html" />
-
     <style>
       /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
       @media (max-width: 3000px) {
@@ -124,7 +114,7 @@
                           <!--form to load files : run summary.R -->
                         <fieldset>
                               <legend  style="color:blue">
-                                  <small> [ Step 1:Select Files <i  id="unlocked_default"style="font-size:20px" class="fa fa-unlock"></i> ]</small>
+                                  <small> [ Step 1:Select Files <i  id="unlocked_default"style="font-size:20px" class="fas fa-unlock"></i> ]</small>
                               </legend>
 
 
@@ -229,7 +219,7 @@
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit">
-                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary Statistics  <i style="font-size:20px" class="fa fa-bar-chart" aria-hidden="true"></i></button>
+                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary Statistics  <i class="fas fa-chart-bar"></i></button>
                               <input
                                 type="submit"
                                 value="load"
@@ -258,7 +248,7 @@
                         <div class="u-form u-form-2">
                             <fieldset>  
                                 <legend style="color:blue">
-                                  <small> [ Step 2 :Choose Options <i id="lock_default" style="font-size:20px" class="fa fa-lock"></i> ]</small>
+                                  <small> [ Step 2 :Choose Options <i id="lock_default" style="font-size:20px" class="fas fa-lock"></i> ]</small>
                                 </legend> 
                           <form
                             class="default-blur-content u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
@@ -408,7 +398,7 @@
                               ></textarea>
                               
                             </fieldset>
-                                <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis <!--i style="font-size:20px" class="fa fa-cog fa-spin fa-3x fa-fw"> </i--></button>  
+                                <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis <i class="fas fa-dna"></i></button>  
                             </div>
                             </div>
                             <div
@@ -422,9 +412,9 @@
                       </div>
                     <div style="padding-right: 16px; padding-top:1px;width:5%;"id="os-stat"  class="w3-left w3-animate-top" > 
                         <fieldset>  
-                            <legend> <i class="fa fa-info-circle" aria-hidden="true"></i></legend>  
-                            <i id="network" class="fa fa-exchange" aria-hidden="true"></i> <br>
-                        <i  id="microchip" class="fa fa-microchip" aria-hidden="true"></i> 
+                            <legend> <i class="fas fa-info-circle" aria-hidden="true"></i></legend>  
+                            <i id="network" class="fas fa-satellite-dish"></i><br>
+                        <i  id="microchip" class="fas fa-microchip" aria-hidden="true"></i> 
 
                         <br>
                         
@@ -452,8 +442,28 @@
         </div>
         
       </div>
-      <div class="w3-center w3-animate-bottom"> 
-  <textarea 
+      <div class="w3-left w3-animate-bottom">
+          <div class=" ui small basic icon buttons"> 
+        <button class=" ui icon button" id="clear" title ="clear console">
+            <i class="fas fa-broom"></i>
+        </button> 
+         <button class=" ui  icon button" id="infosys" title="show system info">
+            <i class="fas fa-info"></i>
+        </button> 
+        <button class=" ui  icon button" id="detach_term" title="detach terminal">
+            <i class="fas fa-terminal"></i>
+        </button> 
+          </div> 
+          <div  id="term_area">  
+              <pre id="term_ascii_art"  hidden>                                                                                        
+ ,-.                ,--.   ,--.  ,--.     ,--.  ,--.  ,--------.                       
+ \  \               |   `.'   |,-'  '-. ,-|  |,-'  '-.'--.  .--',---. ,--.--.,--,--,--.
+  \  \              |  |'.'|  |'-.  .-'' .-. |'-.  .-'   |  |  | .-. :|  .--'|        | 
+  /  /,----.        |  |   |  |  |  |  \ `-' |  |  |     |  |  \   --.|  |   |  |  |  | 
+ /  / '----'        `--'   `--'  `--'   `---'   `--'     `--'   `----'`--'   `--`--`--' 
+ `-'                                                                                                            
+              </pre> 
+      <textarea 
           class="terminal" 
           readonly autocomplete="off" 
           autocorrect="off" 
@@ -461,10 +471,12 @@
           spellcheck="false" 
           id="term" 
           cols="400" 
-           rows="9">
+           rows="6">
         </textarea>
       </div>
+      </div>
     </section>
+   
     
   </body>
   <script src="./ops.js"> </script>  

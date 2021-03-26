@@ -8,21 +8,19 @@
 const { ipcRenderer} =require("electron") ,
       {log}          = console            , 
       fs             = require("fs")      , 
-      {execSync , exec}     = require("child_process") 
-
-const _ = document 
-//!  mapping  DOM Element  
-const  [
+      {execSync , exec}     = require("child_process"), 
+     _ = document  , 
+    [
     ped , map , 
     phen, sm  ,
-    mm  , yes ,
+    mm  , yes , 
     no  , phenotype ,
     nbsim , nbcores ,
     markerset,term  , 
     run_summary,run_analysis
-]=[
+  ]=[
         _.querySelector("#ped"),   
-        _.querySelector("#map")  ,
+        _.querySelector("#map"), 
         _.querySelector("#phen") , 
         _.querySelector("#single_marker") , 
         _.querySelector("#multi_marker") ,  
@@ -35,25 +33,25 @@ const  [
         _.querySelector("#term") , 
         _.querySelector("#run_summary"), 
         _.querySelector("#run_analysis") 
-    ]
-
-const [  
+    ] ,
+    [  
      i_lock  , i_unlock,
      blur_area, status, 
      microchip  , bar_progress 
-] = [ 
+  ] = [ 
     _.querySelector("#lock_default"), 
     _.querySelector("#unlocked_default"), 
     _.querySelector(".default-blur-content"),
     _.querySelector("#status"), 
     _.querySelector("#microchip"), 
     _.querySelector("#bar")   
-]
+]   
 
 
 let jauge   =  0 
 const progress_step =(state  ,  status_message , duration /*millisec*/ ) => {
     if  ( state >100 ) return 
+    if  (jauge !=  0  && jauge >=  state)  return  
     status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>${status_message}`
           bar_value     =  bar_progress.textContent   ,
           bar_state     =  parseInt(bar_value.slice(0 , -1 ))
@@ -74,9 +72,11 @@ const progress_step =(state  ,  status_message , duration /*millisec*/ ) => {
 }
 
 progress_step(10 ,"initialization..." , 200 )
-     
+
+ 
 let terminal ,  writeSpeed  
-__init__  = ( ()=> { 
+__init__  = ( ()=> {
+    notify("mtdt  beta version  1.0", { body : "This a beta version 1.0  under  development"})
     run_analysis.disabled =  true  
     term.innerText        =  "▮ "
     term.setEditable      =  false
@@ -86,34 +86,57 @@ __init__  = ( ()=> {
     markerset.disabled    =  true
     markerset.style.backgroundColor="grey"
     markerset.style.color="whitesmoke"
-    ipcRenderer.send("init",0x000)
+    ipcRenderer.send("init",1)
     writeSpeed            =  0 
-    term_display_speed    =  500   //  millisec
+    display_              = display_speed(2)
    
 })()    
 
-const  check_network_connectivity  = () => window.navigator.onLine 
 setInterval( () => {
-    if (window.navigator.onLine) _.querySelector("#network").style.color="green"  
+    if (check_network_connectivity()) _.querySelector("#network").style.color="green"  
     else                         _.querySelector("#network").style.color="firebrick"  
 } , 10000 )
 
-let  numdigit =  [] 
+let  numdigit =  []
 
-nbsim.addEventListener("keyup"  ,  evt  => {
-    if(!isNaN(evt.target.value)) 
-        numdigit.push(evt.target.value)
-        
-    evt.target.value  = numdigit[numdigit.length -1] ??  ""
-    if (evt.target.value > 1  ) 
-        nbcores.disabled = false 
-    else  
-        nbcores.disabled = true 
+const capture_ctrl  =  ( self ) => {
+     if (!isNaN(self.target.value)) 
+    { 
+        numdigit.push(self.target.value) 
+    }
+    self.target.value  =  numdigit[numdigit.length -1 ]  ?? ""
+}
 
-})   
+nbsim.addEventListener("keyup"  ,   evt =>   {
+    capture_ctrl(evt)  
+    nbcores.disabled = !isNaN(evt.target.value)&& parseInt(evt.target.value)  >  1  ? false  : true 
+})
+
+let  is_it_correct   =  null
+markerset.addEventListener("keyup" ,  evt =>  {
+    const require_patern  =  /^(\d{1,},)+\d+$/g
+    const just_on_digit   = /^\d{1,}$/g
+    if (require_patern.test(evt.target.value) || just_on_digit.test(evt.target.value)) {
+        markerset.style.backgroundColor = "green"
+        markerset.style.color = "whitesmoke"
+        is_it_correct         = true
+    }else {
+        markerset.style.backgroundColor ="firebrick"
+        markerset.style.color = "black"
+        is_it_correct         = false
+    }
+
+})
+let  global_info = new Object("")  
+
+_.querySelector("#clear").addEventListener("click", evt => {term.value= "▮" ;  term.style.color="whitesmoke"})
+_.querySelector("#infosys").addEventListener("click" , evt =>  {  
+    term.value = "" 
+    term_write(global_info) 
+})
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
-const  term_write  =  incomming_data => {
+const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  => {
     let  c  =  0 ;    
     (function write_simulation () {
         follow_scrollbar()  
@@ -122,9 +145,10 @@ const  term_write  =  incomming_data => {
             if ( c != incomming_data.length -1) 
                 termbuffer =`${termbuffer}` 
             term.value +=termbuffer
-            
+            if  ( warning )   term.style.color ="orange" 
+            else   term.style.color = "whitesmoke" 
             c++ 
-            setTimeout(write_simulation ,0)  
+            setTimeout(write_simulation , wspeed ||writeSpeed)  
         }else  
             clearTimeout(write_simulation) 
     })()
@@ -137,28 +161,54 @@ const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed 
     if  (colorshemes.length > 2  || colorshemes <=1  ) 
         AssertionError("requires two colornames")  
 
-
     if ( element.style.color== colorshemes[0] ) 
         element.style.color =  colorshemes[1]
     else  
         element.style.color = colorshemes[0] 
 }
-
-const use_cpus_resources = trigger => { 
-    if  ( trigger)   { 
-        let   blink = setInterval(toggle_blink(microchip ,  "black"  , "limegreen"),100)
+const use_cpus_resources = signal_trap /* type : bool */ => {  
+    if  (signal_trap)   {
+        blink = setInterval( () => {  
+            toggle_blink(microchip ,  "black"  , "limegreen")
+        } ,100) //display_)
     }else  
         clearInterval(blink)  
 }
- 
+
+const stop_blink_on_faillure   = ( target ,  action_ctrl_callback  ) => {
+    if ( !target )  
+        action_ctrl_callback() 
+}
+
 //!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
 //          ->  cpus core avlailable  
 //          ->  where the  log file  is supposed to be  
  
-let  logfile  =  null  
-ipcRenderer.on("initialization" ,  (evt , data)  =>{
-    const  {  nbsim_limite ,  logpath_location,  available_cpus_core } = data  
+let  logfile  =  null
 
+ipcRenderer.on("initialization" ,  (evt , data)  =>{
+    const  {logpath_location,  available_cpus_core } =  data.initiate
+     const {os_detail_info}  =  data.initiate   
+    if   ( data.init_proc == 1 &&  localStorage["iproc"] != 1 )
+    {   
+        for ( let si  in  os_detail_info )
+        {
+            if ( si !== "range") 
+            { 
+                term.value += `${si} : ${os_detail_info[si]}\n`  
+                global_info+= `${si} : ${os_detail_info[si]}\n`  
+            } 
+        } 
+         localStorage["iproc"]= data.init_proc 
+    } 
+    if  ( localStorage['iproc'] == 1  )  {
+        for ( let si  in  os_detail_info )
+        {
+            if ( si !== "range") 
+                global_info+= `${si} : ${os_detail_info[si]}\n`  
+        } 
+
+    }
     logfile  = logpath_location
     for  ( let i of   range(available_cpus_core) ) { 
     // set  how many  cpus  the os got 
@@ -166,15 +216,12 @@ ipcRenderer.on("initialization" ,  (evt , data)  =>{
         ncores_opt.text=i 
         nbcores.add(ncores_opt) 
     }
-    /* 
-    for ( let i of   range(nbsim_limite) ) {
-        const nbsim_opt =  _.createElement("option") 
-        nbsim_opt.text=i 
-        nbsim.add(nbsim_opt) 
-    }*/ 
-
-
 })
+
+ipcRenderer.on("clean::localStorage" ,  (evt , data ) => {
+    localStorage.clear()  
+})
+
 
 const  get_ext  = args   =>  {
     let  _d  =  args.split(".")  
@@ -231,14 +278,14 @@ ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   {
     paths_collections =  main_root  
     files_collections =  files 
     optsfeed(files)
-    progress_step(15 , `loading  files ` , 500) 
+    progress_step(15 , `loading  files ` ,  rand(400)) 
 }) 
 
 ipcRenderer.on("Browse::multiple" , (evt , mbrowse_data )  =>{
     const request_files =  Object.keys(mbrowse_data)   
     for ( let  htm_elmt  of  [ ped  , map , phen ]  )  htm_elmt.innerHTML= ""    
     optsfeed(request_files)
-    progress_step(15 , "loading files ..." , 500) 
+    progress_step(15 , "loading files ..." , rand(400)) 
 })
 //! sync select action  between  ped and maps
 const sync_select_action =  (s_elmt1 , s_elmt2) => {
@@ -294,7 +341,8 @@ let summary_already_run =  false ,
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
-    let  annoucement  = "▮ Generating Summary Statistics ... please wait\n"
+    let  annoucement  = "▮ Generating Summary Statistics ... please wait\n" 
+    let  warning_alert = false  
     //plugonlog() 
     //setInterval(plugonlog , term_display_speed)    
     status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
@@ -316,11 +364,18 @@ run_summary.addEventListener("click" , evt => {
  
     let  done   = is_satisfied (selected_files)  
     if  (!done)  {
-        annoucement = "▮ Error :  No files selected ! " 
+        annoucement = "❗ No files selected "  
+        warning_alert   = true  
         run_summary.disabled = false   
     }
-    term.value =  ""   //  clean output before 
-    term_write(annoucement) 
+    term.value =  ""   //  clean output before
+    if(warning_alert)  
+    { 
+        status.innerHTML =`<i style='color:orange' class="fas fa-exclamation-triangle"></i> Warning ${annoucement}...`
+        bar_progress.style.backgroundColor="orange"
+    }
+    term_write(annoucement  , warning_alert )    
+ 
     if (done) {
         [ped_  , map_ , phen_ ]  =  selected_files 
         summary_already_run = true  
@@ -357,12 +412,18 @@ ipcRenderer.on("load::phenotype" ,  (evt ,  incomming_data ) =>  {
 //! TODO  :  make realtime reading  stdout stream  
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus() 
-    if (summary_already_run) 
+    if (summary_already_run)  
+    {  
         progress_step(47 , "finishing ", 140)
-    if (analysis_on_going)  
+    }
+    if (analysis_on_going)
+    {  
         progress_step(99 , "Analysising ... ", 240)
+        use_cpus_resources(false) 
+    }  
     //progress_step(45 , 10) 
-    if  ( data  ) { 
+    if  ( data  ) 
+    { 
         term_write(data)  
        // run_summary.disabled  = summary_already_run 
         //term.value = data
@@ -375,15 +436,16 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
         blur_area.style.filter = "blur(0px)" 
     }
 })
-//! TODO :  [ optional]  style  output error  with red or yellow color  ...
+//! TODO :  [ optional]  style  output error  with red or orange color  ...
 let tigger  = false 
-ipcRenderer.on("log::fail"        , (evt , data)  => {
+ipcRenderer.on("log::fail" , (evt , data)  => {
     term.value = data 
     run_summary.disabled=false  
     term.style.color ="red"
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> failure ` 
     bar_progress.style.backgroundColor = "firebrick"
+    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     term.value = data 
@@ -392,6 +454,7 @@ ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> error log not found`
     bar_progress.style.backgroundColor = "firebrick"
+    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("term::logerr"     , (evt , data)  => {
     term.value = data 
@@ -400,6 +463,7 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> An error has occurred  ` 
     bar_progress.style.backgroundColor = "firebrick"
+    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false)) 
 })  
 ipcRenderer.on("log::broken"      , (evt , data)  => {
     term.value = data  
@@ -408,6 +472,12 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
+    if (!is_it_correct && is_it_correct != null)  
+    {
+        term_write(`✘ Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
+        bar_progress.style.backgroundColor="orange"
+        return 
+    }
     term_write("▮ Running Analysis")
     status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
     analysis_on_going = true 
@@ -433,15 +503,45 @@ run_analysis.addEventListener("click" ,  evt => {
     const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
     let  not_statified  = false  
     let  done  =  is_satisfied(require_needed) 
-    log(gobject) 
-    if   ( !done )  term_write ("▮ Run analysis  need to be satisfied" )   
-    else  {  
+    if   ( !done ) 
+    {
+        term_write ("❗Run analysis  need to be satisfied"  ,  true )   
+    
+    }  else {  
         run_analysis.disabled =  true
-        if (!nbcores.disabled)  { r 
-            trigger = true
-            use_cpus_resources(trigger) 
+        if (!nbcores.disabled) 
+        { 
+            notify("memory cpus" , { body :  `${_nbcores} are  stimulated`})
+            use_cpus_resources(true) 
         } 
         ipcRenderer.send("run::analysis" ,  gobject )
     }
+})
+
+
+//--------------- TERMINAL  -----------------------------
+let detach_term = _.querySelector("#detach_term")  ,  
+    taa         = _.querySelector("#term_ascii_art") , 
+    container_attached = _.querySelector("#term_area"),
+    term_footprint =  term  , 
+    is_detached  = false
+detach_term.addEventListener("click" , evt =>  {
+     //send signal to create full terminal emulator  
+    if  ( !is_detached )  
+    { 
+        ipcRenderer.send("detach::term",  true )
+        //container_attached.removeChild(term) 
+        term.hidden  = true 
+        taa.removeAttribute("hidden") 
+        detach_term.title ="bring back terminal"  
+        is_detached  = true 
+    }else  {  
+        ipcRenderer.send("attach::term ", false) 
+        //container_attached.appendChild(term_footprint) 
+        detach_term.title = "detach term" 
+        term.hidden  = false
+        taa.setAttribute("hidden"  , true)  
+        is_detached = false  
+    } 
 })
 
