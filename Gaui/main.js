@@ -16,9 +16,15 @@ menu        = require("./menu"),
 utils       = require("./utils"),  
 htm_static_path      = "index.html"   
 
-let mw  =  null  
+let mw  =  null   , tw  = null  
 
 const  mt_load = menu_template  =>  Menu.buildFromTemplate(menu_template)  
+
+const  through_transfer  = ( wi  , evt_name )  =>  {
+    ipcMain.on(evt_name , ( evt , data )  => {
+        wi.webContents.send(evt_name , data) 
+    })
+}
 
 const  action_event  =  wi  => {  
     if ( ! wi instanceof BrowserWindow) return  
@@ -35,7 +41,7 @@ const  action_event  =  wi  => {
                     if  (exit_code == 0x00)  {
                         wi.webContents.send("end"  , exit_code) 
                         //TODO  : send   signal to  stop printing  ... 
-                        wi.webContents.send("end" , exit_code)
+                        //wi.webContents.send("end" , exit_code)
                          
                         fs.readFile(".logout" , "utf8" ,  (e , d ) => {
                             if (e)  wi.webContents.send("log::fail" , e  )   
@@ -92,18 +98,25 @@ const  action_event  =  wi  => {
             })
         })
 
+        // terminal signal bridge  
+    ipcMain.on("annoucement" ,   ( evt , data  )  => {  
+        wi.webContents.send(data)
+    })
 }
 
+let tty = false ; 
+const   create_window =  (fd , { ...config }  )  => {
+    let instance = new BrowserWindow ( { ...config} )  
+    instance.loadURL( url.format ( {   
+        pathname  : path.join(__dirname ,  fd )  , 
+        protocol  : 'file:' ,
+        slashes   :  true 
+     }))
+     return  instance  
+}
 
 app.on("ready",  () =>  {
-    mw  =  new BrowserWindow ({...defconf["main_frame"]}) 
-    //mw.setIcon(path.join(__dirname ,"/assets/icons/linux/icon.png"))
-    mw.loadURL(url.format( { 
-               pathname:  path.join(__dirname, "index.html") , 
-               protocol: 'file:',
-               slashes :  true
-
-        } ))
+     mw = create_window ("index.html" , {  ...defconf["main_frame"]})  
         Menu.setApplicationMenu(mt_load(menu))  
         //! TODO : preload  default value    
         const  { cpus_core } = utils 
@@ -117,17 +130,40 @@ app.on("ready",  () =>  {
             if  (init_proc == 1 )  initiate["os_detail_info"] =  cpus_core(true)  
 
             evt.reply("initialization" ,  {  initiate ,  init_proc}  )   
-        })
-     action_event(mw) 
-     mw.once("ready-to-show" , ()=> { mw.show() } ) 
+    
+        }) 
+    action_event(mw)
      
-})  
+    ipcMain.on("detach::term" ,  (evt , data ) => {
+         tty= true  
+         terminal("term.htm")  
+         action_event(tw)  
+     })
+    
+    
+    //mw.once("ready-to-show" , ()=> { mw.show() } ) 
+     
+}) 
+
+
+const  terminal  =  fd  =>  {  
+    const  { webPreferences  }  = defconf["main_frame"]  
+    tw  = create_window (fd ,  { width:600 ,height: 400 ,  parent:mw , webPreferences  }) 
+    // tw.setMenu(Menu.buildFromTemplate([])) 
+    tw.on("closed" ,  evt =>{ 
+        tty=false
+        mw.webContents.send("attach::term", null)
+        tw = null 
+    }) 
+    /* MAKE ADDON  */  
+}
+
 app.on("close" ,  app_closed  => { 
     mw =  null  //! free memory  
     app.quit()
-})  
-process.on("exit" ,  code_status  =>  {
+}) 
 
+process.on("exit" ,  code_status  =>  {
     mw.webContents.send("clean::localStorage" ,  null ) 
     log(`Exit with :${code_status}`)
 })

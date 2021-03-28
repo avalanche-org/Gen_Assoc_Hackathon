@@ -91,10 +91,17 @@ __init__  = ( ()=> {
     display_              = display_speed(2)
    
 })()    
-
+let   show_nt = 0  ;  
 setInterval( () => {
-    if (check_network_connectivity()) _.querySelector("#network").style.color="green"  
-    else                         _.querySelector("#network").style.color="firebrick"  
+    if (check_network_connectivity()) 
+    {   
+        show_nt++ ;  
+        if  ( show_nt  == 1  ) notify("-><- " ,  {body : "Online"})
+        _.querySelector("#network").style.color="green"  
+    } else {  
+        show_nt =0 
+        _.querySelector("#network").style.color="firebrick"  
+    } 
 } , 10000 )
 
 let  numdigit =  []
@@ -342,6 +349,7 @@ let summary_already_run =  false ,
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     let  annoucement  = "▮ Generating Summary Statistics ... please wait\n" 
+    ipcRenderer.send("annoucement" ,  annoucement  )  
     let  warning_alert = false  
     //plugonlog() 
     //setInterval(plugonlog , term_display_speed)    
@@ -533,15 +541,20 @@ detach_term.addEventListener("click" , evt =>  {
         //container_attached.removeChild(term) 
         term.hidden  = true 
         taa.removeAttribute("hidden") 
-        detach_term.title ="bring back terminal"  
+        detach_term.title ="close  the terminal window to bring back it >_ "  
+        detach_term.disable=true
         is_detached  = true 
-    }else  {  
+    }
+    /*
         ipcRenderer.send("attach::term ", false) 
         //container_attached.appendChild(term_footprint) 
-        detach_term.title = "detach term" 
-        term.hidden  = false
-        taa.setAttribute("hidden"  , true)  
-        is_detached = false  
-    } 
+           } */  
 })
 
+ipcRenderer.on("attach::term" , (evt ,data ) => {
+    detach_term.disabled = false  
+    detach_term.title = "detach term" 
+    term.hidden  = false
+    taa.setAttribute("hidden"  , true)  
+    is_detached = false  
+}) 

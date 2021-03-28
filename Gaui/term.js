@@ -1,7 +1,10 @@
 const {ipcRenderer} =require("electron") ,
       {log}          = console            , 
       fs             = require("fs")      , 
-      {execSync , exec}     = require("child_process") 
+      {execSync , exec}     = require("child_process")
+
+const term =  document.querySelector("#term")  
+
 log(ipcRenderer) 
 __init__  = ( ()=> { 
     term.innerText        =  "▮ "
