@@ -3,16 +3,19 @@ const {ipcRenderer} =require("electron") ,
       fs             = require("fs")      , 
       {execSync , exec}     = require("child_process")
 
-const term =  document.querySelector("#term")  
 
-log(ipcRenderer) 
+const term =  document.querySelector("#term")  
 __init__  = ( ()=> { 
     term.innerText        =  "▮ "
-    term.setEditable      =  false
+    term.setAttribute("readonly", true) 
     writeSpeed            =  0 
     term_display_speed    =  500   //  millisec
    
-})()    
+})()
+/*
+ * []  simulat  typing 
+ * []  set allowed command  
+ * */
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  incomming_data => {
     let  c  =  0 ;    
@@ -30,7 +33,12 @@ const  term_write  =  incomming_data => {
             clearTimeout(write_simulation) 
     })()
 }
+
+ipcRenderer.on("term::start",  ( evt , data ) => { 
+    term.value = data 
+})
 let tigger  = false 
+//* ipc  event  listener  ----------------------
 ipcRenderer.on("log::fail"        , (evt , data)  => {
     term.value = data 
     term.style.color ="red"
@@ -47,8 +55,11 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {
 })  
 ipcRenderer.on("log::broken"      , (evt , data)  => {
     term.value = data  
-}) 
+})
 
+ipcRenderer.on("annoucement"    ,   (evt , data) => {
+    term.value = data 
+})
 
 ipcRenderer.on("term::logout" , ( evt , data ) => {
     term.focus()

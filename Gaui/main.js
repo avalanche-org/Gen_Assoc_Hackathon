@@ -20,12 +20,6 @@ let mw  =  null   , tw  = null
 
 const  mt_load = menu_template  =>  Menu.buildFromTemplate(menu_template)  
 
-const  through_transfer  = ( wi  , evt_name )  =>  {
-    ipcMain.on(evt_name , ( evt , data )  => {
-        wi.webContents.send(evt_name , data) 
-    })
-}
-
 const  action_event  =  wi  => {  
     if ( ! wi instanceof BrowserWindow) return  
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
@@ -35,11 +29,11 @@ const  action_event  =  wi  => {
             utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
            .then(res => {
                // TODO  : send   event to read stream  ...  
-               utils.Rlog(".logout"  ,  mw) 
+              // utils.Rlog(".logout"  ,  mw) 
                utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  {
-                        wi.webContents.send("end"  , exit_code) 
+                        //wi.webContents.send("end"  , exit_code) 
                         //TODO  : send   signal to  stop printing  ... 
                         //wi.webContents.send("end" , exit_code)
                          
@@ -90,19 +84,20 @@ const  action_event  =  wi  => {
                     fs.access(".logerr" , fs.constants["F_OK"] , error => {
                         if (error )  wi.webContents.send("logerr::notfound" , error)  
                         fs.readFile('.logerr' , "utf8" , (err , data) =>{
-                            if(err) wi.webContents.send("log::broken" ,  error )  
-                            wi.webContents.send ("term::logerr" , data) 
+                            if(err) wi.webContents.send("log::broken" ,  error ) 
+                            try {  
+                            wi.webContents.send ("term::logerr" , data)
+                            }catch (err) { }
                         })
                     }) 
                 }
             })
         })
 
-        // terminal signal bridge  
-    ipcMain.on("annoucement" ,   ( evt , data  )  => {  
-        wi.webContents.send(data)
-    })
+
+
 }
+
 
 let tty = false ; 
 const   create_window =  (fd , { ...config }  )  => {
@@ -115,38 +110,45 @@ const   create_window =  (fd , { ...config }  )  => {
      return  instance  
 }
 
-app.on("ready",  () =>  {
-     mw = create_window ("index.html" , {  ...defconf["main_frame"]})  
-        Menu.setApplicationMenu(mt_load(menu))  
-        //! TODO : preload  default value    
-        const  { cpus_core } = utils 
-        ipcMain.on("init" ,  ( evt ,  init_proc  )  => {
-            log("initializing  render process " ,  init_proc)  
-            const initiate  =  { 
-                logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
-                available_cpus_core   :  cpus_core() -1 
-            }
-            log(cpus_core(true)) 
-            if  (init_proc == 1 )  initiate["os_detail_info"] =  cpus_core(true)  
+app.on("ready",  () =>  {  
+     try  {    
+        mw = create_window ("index.html" , {  ...defconf["main_frame"]})  
+            Menu.setApplicationMenu(mt_load(menu))  
+            //! TODO : preload  default value    
+            const  { cpus_core } = utils 
+            ipcMain.on("init" ,  ( evt ,  init_proc  )  => {
+                log("initializing  render process " ,  init_proc)  
+                const initiate  =  { 
+                    logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
+                    available_cpus_core   :  cpus_core() -1 
+                }
+                log(cpus_core(true)) 
+                if  (init_proc == 1 )  initiate["os_detail_info"] =  cpus_core(true)  
 
-            evt.reply("initialization" ,  {  initiate ,  init_proc}  )   
+                evt.reply("initialization" ,  {  initiate ,  init_proc}  )   
     
-        }) 
+            }) 
     action_event(mw)
      
     ipcMain.on("detach::term" ,  (evt , data ) => {
          tty= true  
+         log ( "d" ,  data ) 
          terminal("term.htm")  
+         setTimeout ( () =>  {  
+             tw.webContents.send("term::start" , data) 
+         } ,500)  
          action_event(tw)  
      })
-    
+ 
     
     //mw.once("ready-to-show" , ()=> { mw.show() } ) 
-     
+    } catch ( err )  {
+        log(err) 
+    }
 }) 
 
 
-const  terminal  =  fd  =>  {  
+const  terminal  =   fd  =>  {  
     const  { webPreferences  }  = defconf["main_frame"]  
     tw  = create_window (fd ,  { width:600 ,height: 400 ,  parent:mw , webPreferences  }) 
     // tw.setMenu(Menu.buildFromTemplate([])) 
@@ -155,7 +157,11 @@ const  terminal  =  fd  =>  {
         mw.webContents.send("attach::term", null)
         tw = null 
     }) 
-    /* MAKE ADDON  */  
+    /* MAKE ADDON  */ 
+    //terminal  sync event 
+    ipcMain.on("annoucement" , (evt , data ) => { 
+        tw?.webContents.send("annoucement" , data ) 
+    })  
 }
 
 app.on("close" ,  app_closed  => { 

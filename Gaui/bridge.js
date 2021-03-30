@@ -134,7 +134,7 @@ markerset.addEventListener("keyup" ,  evt =>  {
     }
 
 })
-let  global_info = new Object("")  
+let  global_info =  ""    
 
 _.querySelector("#clear").addEventListener("click", evt => {term.value= "▮" ;  term.style.color="whitesmoke"})
 _.querySelector("#infosys").addEventListener("click" , evt =>  {  
@@ -160,9 +160,6 @@ const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  =>
             clearTimeout(write_simulation) 
     })()
 }
-
-function  AssertionError(message){  this.message =  message }  
-AssertionError.prototype = Error.prototype  
 
 const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed */)  => {
     if  (colorshemes.length > 2  || colorshemes <=1  ) 
@@ -206,9 +203,10 @@ ipcRenderer.on("initialization" ,  (evt , data)  =>{
                 global_info+= `${si} : ${os_detail_info[si]}\n`  
             } 
         } 
-         localStorage["iproc"]= data.init_proc 
+         localStorage["iproc"]= data.init_pro 
     } 
     if  ( localStorage['iproc'] == 1  )  {
+        global_info = "" 
         for ( let si  in  os_detail_info )
         {
             if ( si !== "range") 
@@ -349,7 +347,6 @@ let summary_already_run =  false ,
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
     let  annoucement  = "▮ Generating Summary Statistics ... please wait\n" 
-    ipcRenderer.send("annoucement" ,  annoucement  )  
     let  warning_alert = false  
     //plugonlog() 
     //setInterval(plugonlog , term_display_speed)    
@@ -376,12 +373,15 @@ run_summary.addEventListener("click" , evt => {
         warning_alert   = true  
         run_summary.disabled = false   
     }
+    
+    ipcRenderer.send("annoucement" ,  annoucement) 
     term.value =  ""   //  clean output before
     if(warning_alert)  
     { 
         status.innerHTML =`<i style='color:orange' class="fas fa-exclamation-triangle"></i> Warning ${annoucement}...`
         bar_progress.style.backgroundColor="orange"
     }
+
     term_write(annoucement  , warning_alert )    
  
     if (done) {
@@ -519,7 +519,7 @@ run_analysis.addEventListener("click" ,  evt => {
         run_analysis.disabled =  true
         if (!nbcores.disabled) 
         { 
-            notify("memory cpus" , { body :  `${_nbcores} are  stimulated`})
+            notify("memory cpus" , { body : `${nbcores_} are  stimulated`})
             use_cpus_resources(true) 
         } 
         ipcRenderer.send("run::analysis" ,  gobject )
@@ -536,8 +536,9 @@ let detach_term = _.querySelector("#detach_term")  ,
 detach_term.addEventListener("click" , evt =>  {
      //send signal to create full terminal emulator  
     if  ( !is_detached )  
-    { 
-        ipcRenderer.send("detach::term",  true )
+    {   
+        const  mirror_cpy  = term.value   
+        ipcRenderer.send("detach::term", mirror_cpy)
         //container_attached.removeChild(term) 
         term.hidden  = true 
         taa.removeAttribute("hidden") 
@@ -558,3 +559,6 @@ ipcRenderer.on("attach::term" , (evt ,data ) => {
     taa.setAttribute("hidden"  , true)  
     is_detached = false  
 }) 
+
+ipcRenderer.on("annoucement" ,  (evt , data )  => { 
+} ) 

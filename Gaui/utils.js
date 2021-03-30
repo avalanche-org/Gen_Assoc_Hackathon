@@ -98,11 +98,14 @@ module
         const stderr = createWriteStream(fstderr) 
         cmd.stdout.pipe(stdout)  
         cmd.stderr.pipe(stderr)   
-
-        cmd.on("close" , exit_code =>  {
-            callback(exit_code) 
-            process.stdout.write(`exiting with code ${exit_code}\n`)
-        })
+        try  {  
+            cmd.on("close" , exit_code =>  {
+                callback(exit_code) 
+                process.stdout.write(`exiting with code ${exit_code}\n`)
+            })
+        }catch (err) {  
+            console.log(err) 
+        } 
     } ,  
     Rlog :  ( logfile ,  mw_ ) => {  // Rlog  aka   realtime readable log 
          access( logfile  , constants["F_OK"] , error => {   
