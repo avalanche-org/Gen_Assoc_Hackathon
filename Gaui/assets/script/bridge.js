@@ -137,11 +137,17 @@ markerset.addEventListener("keyup" ,  evt =>  {
 })
 let  global_info =  ""    
 
-_.querySelector("#clear").addEventListener("click", evt => {term.value= "▮" ;  term.style.color="whitesmoke"})
+_.querySelector("#clear").addEventListener("click", evt => {
+    term.value= "▮" ;  term.style.color="whitesmoke"
+    ipcRenderer.send("clear::term" ,  null )   
+})
 _.querySelector("#infosys").addEventListener("click" , evt =>  {  
     term.value = "" 
-    term_write(global_info) 
+    term_write(global_info)  
+    ipcRenderer.send("system::info" , global_info )  
 })
+
+
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  => {
@@ -276,9 +282,7 @@ const  optsfeed  =  gdata   => {
 let 
 [paths_collections  , files_collections] = [ [] , [] ]  
 
-ipcRenderer.on("plug" ,  (evt , data ) => {
-     log(data) 
-})
+
 // on file  chooser  dialog  =>  +5 %  
 ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   { 
     paths_collections =  main_root  
@@ -465,7 +469,8 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
 //! TODO :  [ optional]  style  output error  with red or orange color  ...
 let tigger  = false 
 ipcRenderer.on("log::fail" , (evt , data)  => {
-    term.value = data 
+    term.value = data  
+    mm.disable = true  
     run_summary.disabled=false  
     term.style.color ="red"
     status.style.color ="red"
@@ -498,13 +503,16 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
+    let  annoucement =  ""  
     if (!is_it_correct && is_it_correct != null)  
     {
-        term_write(`✘ Error on marker set  syntax eg 1,3,23\n`  , warning = true )  
+        annoucement = `✘ Error on marker set  syntax eg 1,3,23\n` 
+        term_write(annoucement , warning = true )  
         bar_progress.style.backgroundColor="orange"
         return 
-    }
-    term_write("▮ Running Analysis")
+    } 
+    annoucement ="▮ Running Analysis"
+    term_write(annoucement) 
     status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
     analysis_on_going = true 
     //setInterval(plugonlog , term_display_speed)    
@@ -530,8 +538,9 @@ run_analysis.addEventListener("click" ,  evt => {
     let  not_statified  = false  
     let  done  =  is_satisfied(require_needed) 
     if   ( !done ) 
-    {
-        term_write ("❗Run analysis  need to be satisfied"  ,  true )   
+    {   
+        annoucement="❗Run analysis  need to be satisfied" 
+        term_write (annoucement ,  true )   
     
     }  else {  
         run_analysis.disabled =  true
@@ -540,6 +549,8 @@ run_analysis.addEventListener("click" ,  evt => {
             notify("memory cpus" , { body : `${nbcores_} are  stimulated`})
             use_cpus_resources(true) 
         } 
+
+        ipcRenderer.send("annoucement" , annoucement) 
         ipcRenderer.send("run::analysis" ,  gobject )
     }
 })

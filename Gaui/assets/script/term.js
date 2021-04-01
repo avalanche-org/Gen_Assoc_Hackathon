@@ -53,15 +53,11 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {
     run_summary.disabled=false 
     term.style.color   ="red"
 })  
-ipcRenderer.on("log::broken"      , (evt , data)  => {
-    term.value = data  
-})
-
-ipcRenderer.on("annoucement"    ,   (evt , data) => {
-    term.value = data 
-})
-
-ipcRenderer.on("term::logout" , ( evt , data ) => {
+ipcRenderer.on("log::broken"   , (evt , data) => {term.value = data })
+ipcRenderer.on("annoucement"   , (evt , data) => {term.value = data })
+ipcRenderer.on("clear::term"   , (evt , data) => {term.value = ""   }) 
+ipcRenderer.on ("system::info" , (evt , data) => {term.value = "" ; term_write(data) }) 
+ipcRenderer.on("term::logout"  , ( evt, data) => {
     term.focus()
     if  ( data  ) {
         term_write(data)

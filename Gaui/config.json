@@ -1,8 +1,8 @@
 {
     "main_frame":  {  
         "title" :  "Gen Assoc",   
-        "width" :  987 ,
-        "height":  830, 
+        "width" :  900 ,
+        "height":  800, 
         "resiaqble":false,
         "scrollBounce":true,  
         "webPreferences" : {

@@ -110,7 +110,7 @@ const   create_window =  (fd , { ...config }  )  => {
      return  instance  
 }
 
-app.on("ready",  () =>  {  
+app.on("ready",  () =>  { 
      try  {    
         mw = create_window ("index.html" , {  ...defconf["main_frame"]})  
             Menu.setApplicationMenu(mt_load(menu))  
@@ -132,13 +132,13 @@ app.on("ready",  () =>  {
      
     ipcMain.on("detach::term" ,  (evt , data ) => {
          tty= true  
-         log ( "d" ,  data ) 
          terminal("term.htm")  
          setTimeout ( () =>  {  
              tw.webContents.send("term::start" , data) 
          } ,500)  
          action_event(tw)  
      })
+
  
     
     //mw.once("ready-to-show" , ()=> { mw.show() } ) 
@@ -151,17 +151,18 @@ app.on("ready",  () =>  {
 const  terminal  =   fd  =>  {  
     const  { webPreferences  }  = defconf["main_frame"]  
     tw  = create_window (fd ,  { width:600 ,height: 400 ,  parent:mw , webPreferences  }) 
-    // tw.setMenu(Menu.buildFromTemplate([])) 
+    if  (  process.argv.includes("-exp")  )  
+        tw.setMenu(Menu.buildFromTemplate([])) 
     tw.on("closed" ,  evt =>{ 
         tty=false
         mw.webContents.send("attach::term", null)
         tw = null 
     }) 
-    /* MAKE ADDON  */ 
-    //terminal  sync event 
-    ipcMain.on("annoucement" , (evt , data ) => { 
-        tw?.webContents.send("annoucement" , data ) 
-    })  
+    
+    __BOUMRANG_EFFECT :  
+    ipcMain.on("annoucement"  , (evt , data ) => {tw?.webContents.send("annoucement",data)})
+    ipcMain.on("clear::term"  , (evt , data ) => {tw.webContents.send("clear::term",null)})
+    ipcMain.on("system::info" , (evt , data ) => {tw.webContents.send('system::info',data)})
 }
 
 app.on("close" ,  app_closed  => { 
