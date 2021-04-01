@@ -2,7 +2,7 @@
   "name": "gaui",
   "version": "1.0.0",
   "description": "Gen Assoc  Graphical User Interface",
-  "main": "gh3.js",
+  "main": "main.js",
   "scripts": {
     "enable::kernel::privilege": "sudo  sysctl kernel.unprivileged_userns_clone=1",
     "start": "electron .",

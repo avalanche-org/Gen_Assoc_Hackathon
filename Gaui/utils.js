@@ -35,15 +35,26 @@ module
         
         }) 
       },  
-    cpus_core  : (with_detail_object = false)   =>  {  
-        if  (with_detail_object) {  
-          return   { 
-              core_cpus_available  : os.cpus().length , 
-              core_cpus_detail     : os.cpus()
-          }
-        }
+    cpus_core  : (os_abstract = false  )   =>  {  
+        if (os_abstract)    
+        {  
+            return   {
+                
+                "version" :  os.version() , 
+                "release" :  os.release() ,
+                "type"    :  os.type() , 
+                "arch"    :  os.arch() , 
+                "cpus"    :  os.cpus().length, 
+                //"cpusInfo":  os.cpus().map(cpu =>  cpu.model), 
+                "username":  os.userInfo().username, 
+                "plvl"    :  os.userInfo().uid, // plvl as permission level  
+                "shellType": os.userInfo().shell 
+                
+            }
+        } 
        return  os.cpus().length 
-    },   
+    }, 
+     
     //! TODO :  check all requierment inside the directory file  [ ped map phen] 
     scan_directory  : (  dir_root_location , ...filter_extension  )  =>  {
        return   new Promise ( ( resolve , reject ) => {
@@ -83,18 +94,19 @@ module
     
     std_ofstream   : (command ,  callback )=> {
         const   cmd    = exec(command)
-        // TODO  :  redirect  log  to  native  system log 
-        const stdout = createWriteStream(fstdout) // ,  { flags : "a"}) 
+        const stdout = createWriteStream(fstdout ) // ,  { flags : "a"}) 
         const stderr = createWriteStream(fstderr) 
         cmd.stdout.pipe(stdout)  
         cmd.stderr.pipe(stderr)   
-
-        cmd.on("close" , exit_code =>  {
-            callback(exit_code) 
-            process.stdout.write(`exiting with code ${exit_code}\n`)
-        })
-    } , 
-    //! TODO   :   need to implement this  feature ...
+        try  {  
+            cmd.on("close" , exit_code =>  {
+                callback(exit_code) 
+                process.stdout.write(`exiting with code ${exit_code}\n`)
+            })
+        }catch (err) {  
+            console.log(err) 
+        } 
+    } ,  
     Rlog :  ( logfile ,  mw_ ) => {  // Rlog  aka   realtime readable log 
          access( logfile  , constants["F_OK"] , error => {   
              if  (error) log("Unable  to access file or permission denied!") 
