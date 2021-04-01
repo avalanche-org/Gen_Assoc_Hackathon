@@ -82,7 +82,8 @@ __init__  = ( ()=> {
     term.setEditable      =  false
     phenotype.disabled    =  true 
     nbsim.disabled        =  true 
-    nbcores.disabled      =  true  
+    nbcores.disabled      =  true 
+    mm.disabled           =  true 
     markerset.disabled    =  true
     markerset.style.backgroundColor="grey"
     markerset.style.color="whitesmoke"
@@ -314,7 +315,23 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
 sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
 sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
 //!--end sync
-
+mm.addEventListener("change" , evt => {
+    if (evt.target.checked) { 
+        markerset.disabled = false 
+        markerset.style.backgroundColor="whitesmoke"
+        markerset.style.color="grey"
+        markerset.focus()
+        //nbsim.disabled     = false 
+    }
+})
+sm.addEventListener("change" , evt => {
+    if(evt.target.checked) { 
+        markerset.disabled = true
+        markerset.style.backgroundColor="grey"
+        markerset.style.color="whitesmoke"
+        //nbsim.disabled     = true 
+    } 
+})
     
 /* TODO :  REAL TIME LOGOUT  FEATURING  NEED TO BE IMPLEMENTED 
  * NOTE :  THIS  A FEATURE REQUEST  !  
@@ -441,7 +458,8 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
         nbsim.disabled        = !summary_already_run
         i_lock.classList.remove("fa-lock") 
         i_lock.classList.add("fa-unlock") 
-        blur_area.style.filter = "blur(0px)" 
+        blur_area.style.filter = "blur(0px)"
+        mm.disabled            =  false 
     }
 })
 //! TODO :  [ optional]  style  output error  with red or orange color  ...
