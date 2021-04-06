@@ -11,6 +11,7 @@ const
     fs      = require("fs") , 
     url     = require("url"), 
     defconf = require("./config.json") , 
+    {version} = require("./package.json") , 
 {summary_src ,  run_analysis } = defconf["mtdt_pannel"], 
 menu        = require("./menu"), 
 utils       = require("./utils"),  
@@ -110,7 +111,7 @@ const   create_window =  (fd , { ...config }  )  => {
      return  instance  
 }
 
-app.on("ready",  () =>  { 
+app.on("ready",  () =>  {
      try  {    
         mw = create_window ("index.html" , {  ...defconf["main_frame"]})  
             Menu.setApplicationMenu(mt_load(menu))  
@@ -118,7 +119,8 @@ app.on("ready",  () =>  {
             const  { cpus_core } = utils 
             ipcMain.on("init" ,  ( evt ,  init_proc  )  => {
                 log("initializing  render process " ,  init_proc)  
-                const initiate  =  { 
+                const initiate  =  {  
+                    version               :  version, 
                     logpath_location      :  defconf["mtdt_pannel"]["logpath"] , 
                     available_cpus_core   :  cpus_core() -1 
                 }

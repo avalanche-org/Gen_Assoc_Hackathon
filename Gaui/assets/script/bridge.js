@@ -77,7 +77,6 @@ progress_step(10 ,"initialization..." , 200 )
  
 let terminal ,  writeSpeed  
 __init__  = ( ()=> {
-    notify("mtdt  beta version  1.0", { body : "This a beta version 1.0  under  development"})
     run_analysis.disabled =  true  
     term.innerText        =  "▮ "
     term.setEditable      =  false
@@ -197,10 +196,10 @@ const stop_blink_on_faillure   = ( target ,  action_ctrl_callback  ) => {
 //          ->  where the  log file  is supposed to be  
  
 let  logfile  =  null
-
 ipcRenderer.on("initialization" ,  (evt , data)  =>{
-    const  {logpath_location,  available_cpus_core } =  data.initiate
-     const {os_detail_info}  =  data.initiate   
+    const  { version ,logpath_location,  available_cpus_core } =  data.initiate
+    const {os_detail_info}  =  data.initiate   
+    notify("mTdt ", { body : ` mTdt  version ${version}`})
     if   ( data.init_proc == 1 &&  localStorage["iproc"] != 1 )
     {   
         for ( let si  in  os_detail_info )
