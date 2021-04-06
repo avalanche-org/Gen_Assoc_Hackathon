@@ -47,7 +47,7 @@ dt <- Sys.time()
 
 cat("_____________________________\n\n")
 cat("Working directory:",path,"\n")
-cat("Run started at: ",as.character(dt))
+cat("Run started at: ",as.character(dt),"\n")
 
 
 # Options
@@ -88,17 +88,19 @@ cat("\nGenerating Summary Statistics..\n")
 cat("\n   ---  Data loaded \n")
 cat("-- ", opt$pedfile,"\n-- ", opt$mapfile,"\n-- ", opt$phenfile,"\n")
 
-cat("\n   ---  Data description \n")    
+cat("\n   ---  Data description \n")   
 cat("-- ","Families :", length(unique(ped$V1)),"\n")
 cat("-- ","Founders :", length(which(ped$V3 == 0)),"\n")
 cat("-- ","Nuclear Families (trios) :", Numb_trios(ped),"\n\n")
-cat("   ---  Missing values \n")
-cat("-- ","missing at \t: ", length(ped[ped == '0 0']), "positions \n")
+cat("   -  Sex description \n")
+cat("-- ",nrow(ped), "individuals","\t",length(which(ped$V5== "1")), "males", length(which(ped$V5== "2")), "females \n\n")
+cat("   -  Markers :\n")
+cat("-- ",nrow(map)," markers \n\n")
+cat("   -  Missing values \n")
+cat("-- ","missing at \t: ", length(ped[ped == '0 0']), " / ",nrow(ped)* (ncol(ped)-6),"positions \n")
 cat("-- ","   % \t:  ", (length(ped[ped == '0 0'])/(nrow(ped)* (ncol(ped)-6))) * 100,"\n\n")
 
-cat("   ---  Sex description \n")
-cat("-- ",nrow(ped), "individuals","\t",length(which(ped$V5== "1")), "males", length(which(ped$V5== "2")), "females \n\n")
-cat("   ---  Phenotype description \n")
+cat("   -  Phenotype description \n")
 cat("-- ","in" ,opt$phenfile,"\t:" ,(ncol(phen)-2)," phenotype(s) detected\n\n")
 
 phenotypes = colnames(phen)[3:ncol(phen)]
