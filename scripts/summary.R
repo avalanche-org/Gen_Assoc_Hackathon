@@ -19,46 +19,46 @@ if(("optparse" %in% rownames(installed.packages())) == F){
 if(("stringr" %in% rownames(installed.packages())) == F){
   install.packages("optparse", dependencies=TRUE, repos="http://cran.r-project.org")
 } 
+if(("descr" %in% rownames(installed.packages())) == F){
+  install.packages("descr", dependencies=TRUE, repos="http://cran.r-project.org")
+} 
 
 #-------  Functions
 
 # -- [count the number of family the individual is implicated in]
-NucFam <- function(i, dataset) {
-  n =  nrow(unique(dataset[dataset$V3 == i, c(3,4)]))
-  if(n == 0){
-    n =  nrow(unique(dataset[dataset$V4 == i, c(3,4)]))
-  }
-  if(nrow(dataset[dataset$V2 == i,]) > 0 ){
-    if( dataset[dataset$V2 == i, 3] != "0" & dataset[dataset$V2 == i, 4] != "0"){
-      n = n + 1
+Numb_trios <- function(dataset){
+  for (i in dataset$V2){
+    for (i in intersect(dataset$V2,dataset$V3)){
+      numb_f_partners = nrow(unique(dataset[dataset$V3 == i, c(3,4)]))
+      numb_couple = numb_couple + numb_f_partners
     }
+    return(numb_couple)
   }
-  return(n)
 }
 
 #-------  Collect arguments
 
 library(optparse)
+library(stringr)
+library(descr)
 
 path = getwd()
+dt <- Sys.time()
 
-cat("_____________________________")
-cat("\n Working directory:",path,"\n")
+cat("_____________________________\n\n")
+cat("Working directory:",path,"\n")
+cat("Run started at: ",as.character(dt))
+
 
 # Options
 option_list = list(
   make_option(c("--pedfile"), type="character", help="ped file", metavar="character"),
   make_option(c("--mapfile"), type="character", help="map file", metavar="character"),
   make_option(c("--phenfile"), type="character", help="phenotype file", metavar="character")
-  
 )
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
-
-library(stringr)
-
-#path= (unlist(str_split(opt$pedfile,unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))])))[1]
 
 path_to_file = unlist(str_split(opt$pedfile, unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$pedfile,"/")))]))[1]
 
@@ -66,44 +66,68 @@ opt$pedfile = unlist(str_split(opt$pedfile,"/"))[length(unlist(str_split(opt$ped
 opt$mapfile = unlist(str_split(opt$mapfile,"/"))[length(unlist(str_split(opt$mapfile,"/")))]
 opt$phenfile = unlist(str_split(opt$phenfile,"/"))[length(unlist(str_split(opt$phenfile,"/")))]
 
-
-
 if(is.null(opt$pedfile)) {cat("Option --pedfile is required. \n Execution stopped.")}
 if(is.null(opt$mapfile)) {cat("Option --mapfile is required. \n Execution stopped.")}
 if(is.null(opt$phenfile)) stop(cat("Option --phenfile is required. \n Execution stopped."))
 
-
 # --- Files
-# plink_ = "/home/g4bbm/tools/Plink/plink"
 
 ped = read.delim(paste0(path_to_file, opt$pedfile), header = F , stringsAsFactors = F)
 map = read.delim(paste0(path_to_file, opt$mapfile), header = F , stringsAsFactors = F)
 phen = read.delim(paste0(path_to_file, opt$phenfile), header = F , stringsAsFactors = F)
 
+#phen = read.table(paste0(path_to_file, opt$phenfile), header = T)
+
 # --- Variables
-numb_snps = nrow(ped)* (ncol(ped)-6)
-missing_snps= length(ped[ped == '0 0'])
-total_nuc_Fam= 0
-individuals= ped$V2
-for (i in 1:length(individuals)) { total_nuc_Fam = total_nuc_Fam + NucFam(individuals[i], ped); i = i+1}
+numb_couple = 0
 
-# --- Summary output
+# ---   SUMMARY STATISTICS  ---
+# --- --- --- --- --- --- --- - 
 
-cat("\n Data loaded\n--- ",
-    opt$pedfile,"\n--- ",
-    opt$mapfile,"\n--- ",
-    opt$phenfile,"\n\n",
-    
-    ncol(ped)-6,"markers" ,nrow(ped), "individuals  | ",
-    length(which(ped$V5== "1")), "males", length(which(ped$V5== "2")), "females \n",
-    "Number of Nuclear families  : " , total_nuc_Fam,"\n",
-    "in" ,opt$phenfile,"\t:" ,(ncol(phen)-2)," phenotype(s) detected\n",
-    
-    "\n   ---  Missing values\n",
-    "missing at \t: ", missing_snps, "positions \n",
-    "%(0 0)\t\t:  ", (missing_snps/numb_snps)*100,"\n\n")
+cat("\nGenerating Summary Statistics..\n")
+cat("\n   ---  Data loaded \n")
+cat("-- ", opt$pedfile,"\n-- ", opt$mapfile,"\n-- ", opt$phenfile,"\n")
+
+cat("\n   ---  Data description \n")    
+cat("-- ","Families :", length(unique(ped$V1)),"\n")
+cat("-- ","Founders :", length(which(ped$V3 == 0)),"\n")
+cat("-- ","Nuclear Families (trios) :", Numb_trios(ped),"\n\n")
+cat("   ---  Missing values \n")
+cat("-- ","missing at \t: ", length(ped[ped == '0 0']), "positions \n")
+cat("-- ","   % \t:  ", (length(ped[ped == '0 0'])/(nrow(ped)* (ncol(ped)-6))) * 100,"\n\n")
+
+cat("   ---  Sex description \n")
+cat("-- ",nrow(ped), "individuals","\t",length(which(ped$V5== "1")), "males", length(which(ped$V5== "2")), "females \n\n")
+cat("   ---  Phenotype description \n")
+cat("-- ","in" ,opt$phenfile,"\t:" ,(ncol(phen)-2)," phenotype(s) detected\n\n")
+
+phenotypes = colnames(phen)[3:ncol(phen)]
+
+i=1; j = 1; count = 0
+
+for (i in 1:length(phenotypes)){
+  
+  if(isFALSE(phen[, phenotypes[i]][j]%%1==0) && isTRUE(phen[, phenotypes[i]][j] != 0)){
+    count = count + 1
+  }
+  cat("-- ","Phenotype ",phenotypes[i], " : ")
+  if(count>=1){
+    cat(" quantitative -------------\n\n")
+    cat( descr(phen[,phenotypes[i]]))
+  }
+  if (count==0){
+    cat(" categorial   -------------\n\n")
+    cat(" Levels:\t", sort(unique(phen[,phenotypes[i]])),"\n Frequency:\t", table(phen[,phenotypes[i]]),"\n")
+  }
+  
+  cat("\n")
+  count = 0
+}
+
 
 # --- Check for Mendelian errors
+
+# plink_ = "/home/g4bbm/tools/Plink/plink"
 
 #cat("--- Check Mendelian errors")
 # cmd = paste0("cp ",paste0(path_to_file, opt$pedfile)," check_mendel.ped ; cp ",paste0(path_to_file, opt$mapfile)," check_mendel.map")
