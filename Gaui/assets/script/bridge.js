@@ -17,7 +17,8 @@ const { ipcRenderer} =require("electron") ,
     no  , phenotype ,
     nbsim , nbcores ,
     markerset,term  , 
-    run_summary,run_analysis
+    run_summary,run_analysis, 
+    sync
   ]=[
         _.querySelector("#ped"),   
         _.querySelector("#map"), 
@@ -32,7 +33,8 @@ const { ipcRenderer} =require("electron") ,
         _.querySelector("#marker_set"), 
         _.querySelector("#term") , 
         _.querySelector("#run_summary"), 
-        _.querySelector("#run_analysis") 
+        _.querySelector("#run_analysis"), 
+        _.querySelector("#synced") 
     ] ,
     [  
      i_lock  , i_unlock,
@@ -46,7 +48,6 @@ const { ipcRenderer} =require("electron") ,
     _.querySelector("#microchip"), 
     _.querySelector("#bar")   
 ]   
-
 
 let jauge   =  0 
 const progress_step =(state  ,  status_message , duration /*millisec*/ ) => {
@@ -316,8 +317,14 @@ const sync_select_action =  (s_elmt1 , s_elmt2) => {
     })
 } 
 //!  this section  make a synchronisation  between ped map and  phen file  
-sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
-sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
+sync.addEventListener("change" , evt =>  {  
+    if  ( evt.target.checked )  
+    {   
+        notify("synced mode " , {body:"synced mode is activated"}) 
+        sync_select_action(ped , map) /*<--*/;/*-->*/sync_select_action(map, ped)  
+        sync_select_action(ped , phen)/*<--*/;/*-->*/sync_select_action(map,phen) 
+    }   
+})  
 //!--end sync
 mm.addEventListener("change" , evt => {
     if (evt.target.checked) { 
@@ -416,6 +423,7 @@ mm.addEventListener("change" , evt => {
         markerset.disabled = false 
         markerset.style.backgroundColor="whitesmoke"
         markerset.style.color="grey"
+        markerset.value=""
         markerset.focus()
         //nbsim.disabled     = false 
     }
@@ -425,6 +433,7 @@ sm.addEventListener("change" , evt => {
         markerset.disabled = true
         markerset.style.backgroundColor="grey"
         markerset.style.color="whitesmoke"
+        markerset.value="Choose your markers .eg 1,3,24"
         //nbsim.disabled     = true 
     } 
 })
