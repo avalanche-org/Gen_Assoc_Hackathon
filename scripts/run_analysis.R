@@ -150,7 +150,7 @@ for (i in 4:length(flag)){
   cmd = paste0(cmd," --",flag[i])
 }
 
-cat("\n ** Starting run.. \n ",cmd,"\n\n")
+cat("\n ** Starting run.. \n ")
 
 # RUN COMMAND 
 system(cmd)
