@@ -22,10 +22,11 @@ let mw  =  null   , tw  = null
 const  mt_load = menu_template  =>  Menu.buildFromTemplate(menu_template)  
 
 const  action_event  =  wi  => {  
-    if ( ! wi instanceof BrowserWindow) return  
+    if ( ! wi instanceof BrowserWindow) return 
+    let   pedfile  = null , mapfile  =  null ,  phenfile= null  
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
-            const  { paths  , selected_files  }  =  _data 
-            let    [pedfile,mapfile,phenfile]  = selected_files
+            let    { paths  , selected_files  }  =  _data  , 
+                [pedfile,mapfile,phenfile]  = selected_files
             if(typeof(paths) ==  "object"  && paths.length == 0x03 )  
             { 
                 pedfile  =  `/${paths[0]}/${pedfile}`

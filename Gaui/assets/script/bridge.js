@@ -178,6 +178,7 @@ const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed 
         element.style.color = colorshemes[0] 
 }
 const use_cpus_resources = signal_trap /* type : bool */ => {  
+    let  blink =  null 
     if  (signal_trap)   {
         blink = setInterval( () => {  
             toggle_blink(microchip ,  "black"  , "limegreen")
@@ -434,7 +435,7 @@ sm.addEventListener("change" , evt => {
         markerset.disabled = true
         markerset.style.backgroundColor="grey"
         markerset.style.color="whitesmoke"
-        markerset.value="Choose your markers .eg 1,3,24"
+        markerset.placeholder="Choose your markers .eg 1,3,24"
         //nbsim.disabled     = true 
     } 
 })
@@ -513,19 +514,31 @@ ipcRenderer.on("log::broken"      , (evt , data)  => {
 run_analysis.addEventListener("click" ,  evt => { 
     evt.preventDefault()
     term.focus()
-    let  annoucement =  ""  
+    let  annoucement =  ""
+  
     if (!is_it_correct && is_it_correct != null)  
     {
         annoucement = `✘ Error on marker set  syntax eg 1,3,23\n` 
         term_write(annoucement , warning = true )  
         bar_progress.style.backgroundColor="orange"
         return 
-    } 
+    }
+    if   ( mm.checked && markerset.value=="" )   
+    {
+        annoucement = "require marker set indexation to proceed ... \n"
+        term_write (annoucement , warning= true ) 
+        bar_progress.style.backgroundColor="orange"
+        return 
+    }
+    status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
+    status.style.color = "blue"   
+    bar_progress.style.backgroundColor = "limegreen"  
     annoucement ="▮ Running Analysis"
     term_write(annoucement) 
-    status.innerHTML =`<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> processing ...`
     analysis_on_going = true 
-    //setInterval(plugonlog , term_display_speed)    
+    //setInterval(plugonlog , term_display_speed)   
+     
+    
     const  { 
         selected_index
          }  = gobject  =  { 
@@ -542,7 +555,7 @@ run_analysis.addEventListener("click" ,  evt => {
             markerset  : mm.checked ? markerset.value : null 
         }  
     }
-    
+  
     const  {phenotype_, nbsim_, nbcores_}  = selected_index  
     const  require_needed   = [ phenotype_ ,  nbsim_ , nbcores_ ]  
     let  not_statified  = false  
