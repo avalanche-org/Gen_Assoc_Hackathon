@@ -292,7 +292,9 @@ ipcRenderer.on("Browse::single"   , (evt ,  { main_root , files}) =>   {
 }) 
 
 ipcRenderer.on("Browse::multiple" , (evt , mbrowse_data )  =>{
-    const request_files =  Object.keys(mbrowse_data)   
+    const request_files =  Object.keys(mbrowse_data)  
+    paths_collections   =  Object.values(mbrowse_data)   
+    
     for ( let  htm_elmt  of  [ ped  , map , phen ]  )  htm_elmt.innerHTML= ""    
     optsfeed(request_files)
     progress_step(15 , "loading files ..." , rand(400)) 

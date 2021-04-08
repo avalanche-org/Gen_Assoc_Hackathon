@@ -25,13 +25,22 @@ const  action_event  =  wi  => {
     if ( ! wi instanceof BrowserWindow) return  
         ipcMain.on("run::summary" ,   (evt  ,  _data /*_data is object*/ )  =>  {
             const  { paths  , selected_files  }  =  _data 
-            const  [pedfile,mapfile,phenfile]  = selected_files 
-
-            utils.rsv_file(`/${paths}/${phenfile}` ,  '\t')
+            let    [pedfile,mapfile,phenfile]  = selected_files
+            if(typeof(paths) ==  "object"  && paths.length == 0x03 )  
+            { 
+                pedfile  =  `/${paths[0]}/${pedfile}`
+                mapfile  =  `/${paths[1]}/${mapfile}`
+                phenfile =  `/${paths[2]}/${phenfile}`
+            }else  {
+                pedfile  =  `/${paths}/${pedfile}`
+                mapfile  =  `/${paths}/${mapfile}`
+                phenfile =  `/${paths}/${phenfile}`
+            }  
+            utils.rsv_file(phenfile ,  '\t')
            .then(res => {
                // TODO  : send   event to read stream  ...  
               // utils.Rlog(".logout"  ,  mw) 
-               utils.std_ofstream(`Rscript ${summary_src} --pedfile /${paths}/${pedfile} --mapfile /${paths}/${mapfile} --phenfile /${paths}/${phenfile}` ,
+               utils.std_ofstream(`Rscript ${summary_src} --pedfile ${pedfile} --mapfile ${mapfile} --phenfile ${phenfile}` ,
                     exit_code => {
                     if  (exit_code == 0x00)  {
                         //wi.webContents.send("end"  , exit_code) 
