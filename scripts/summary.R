@@ -28,7 +28,7 @@ if(("descr" %in% rownames(installed.packages())) == F){
 # -- [count the number of family the individual is implicated in]
 Numb_trios <- function(dataset){
   for (i in dataset$V2){
-    for (i in intersect(dataset$V2,dataset$V3)){
+    for (i in intersect(dataset$V2,dataset$V3)){      #si i est pere
       numb_f_partners = nrow(unique(dataset[dataset$V3 == i, c(3,4)]))
       numb_couple = numb_couple + numb_f_partners
     }
@@ -91,14 +91,14 @@ cat("-- ", opt$pedfile,"\n-- ", opt$mapfile,"\n-- ", opt$phenfile,"\n")
 cat("\n   ---  Data description \n")   
 cat("-- ","Families :", length(unique(ped$V1)),"\n")
 cat("-- ","Founders :", length(which(ped$V3 == 0)),"\n")
-cat("-- ","Nuclear Families (trios) :", Numb_trios(ped),"\n\n")
+cat("-- ","Nuclear Families :", Numb_trios(ped),"\n\n")
 cat("   -  Sex description \n")
 cat("-- ",nrow(ped), "individuals","\t",length(which(ped$V5== "1")), "males", length(which(ped$V5== "2")), "females \n\n")
 cat("   -  Markers :\n")
 cat("-- ",nrow(map)," markers \n\n")
 cat("   -  Missing values \n")
 cat("-- ","missing at \t: ", length(ped[ped == '0 0']), " / ",nrow(ped)* (ncol(ped)-6),"positions \n")
-cat("-- ","   % \t:  ", (length(ped[ped == '0 0'])/(nrow(ped)* (ncol(ped)-6))) * 100,"\n\n")
+cat("-- ","Percentage \t:  ", (length(ped[ped == '0 0'])/(nrow(ped)* (ncol(ped)-6))) * 100,"%\n\n")
 
 cat("   -  Phenotype description \n")
 cat("-- ","in" ,opt$phenfile,"\t:" ,(ncol(phen)-2)," phenotype(s) detected\n\n")
@@ -119,7 +119,7 @@ for (i in 1:length(phenotypes)){
   }
   if (count==0){
     cat(" categorial   -------------\n\n")
-    cat(" Levels:\t", sort(unique(phen[,phenotypes[i]])),"\n Frequency:\t", table(phen[,phenotypes[i]]),"\n")
+    cat(" Levels:\t", sort(unique(phen[,phenotypes[i]])),"\n Counts:\t", table(phen[,phenotypes[i]]),"\n")
   }
   
   cat("\n")
