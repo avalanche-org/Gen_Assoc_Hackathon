@@ -99,7 +99,6 @@ cat(" * Selected flags: \n")
 
 for (i in 1:length(flag)){cat(paste0(" --",flag[i], "\n"))}
 
-
 # ---  File management
 
 # --- Basenames
@@ -164,7 +163,7 @@ system(cmd)
 cat("\n ** Writing results... \n")
 
 output <- read.csv("weighted_res_multilocus.csv", sep = ";")
-
+system("rm *_CP.*")
 ##########################################################
 
 # --- No number of simulations selected, default value = 0, nbcores default = 1
@@ -274,7 +273,7 @@ if (is.null(opt$markerset) == FALSE){
   name_ = paste0(unlist(str_split(ped_basename,".ped"))[1],"_MM_results")
 }
 
-cmd = paste0("mkdir ", name_,"; mv weighted* ", name_," ; mv *_CP.* ", name_,"; mv ",phen_basename ,".phen ",name_)
+cmd = paste0("mkdir ", name_,"; mv weighted* ", name_," ;  rm ",phen_basename ,".phen ")
 system(cmd)
 
 #------------
