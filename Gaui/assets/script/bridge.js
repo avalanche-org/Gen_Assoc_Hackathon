@@ -177,8 +177,8 @@ const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  =>
     } 
     
 }
-
-const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed */)  => {
+/*
+const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed )  => {
     if  (colorshemes.length > 2  || colorshemes <=1  ) 
         AssertionError("requires two colornames")  
 
@@ -186,14 +186,18 @@ const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed 
         element.style.color =  colorshemes[1]
     else  
         element.style.color = colorshemes[0] 
-}
-const use_cpus_resources = signal_trap /* type : bool */ => { 
-    
-    let  blink = signal_trap ?   setInterval( () => {  
+}  
+let  x = 0 ; 
+const use_cpus_resources = signal_trap /* type : bool  => { 
+    if  (signal_trap)  
+    {    
+        let  blink =  setInterval( () => {  
             toggle_blink(microchip ,  "black"  , "limegreen")
-        } ,100)  : null  
+            } ,100)
+         
+    }  
     
-    if (blink) 
+    if (!signal_trap) 
         clearInterval(blink)  
 }
 
@@ -201,6 +205,7 @@ const stop_blink_on_faillure   = ( target ) => {
     if ( !target )  
         use_cpus_resources(false)
 }
+*/
 
 //!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
 //          ->  cpus core avlailable  
@@ -471,7 +476,7 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     {  
         progress_step(99 , "Analysising ... ", 240)
         //use_cpus_resources(false) 
-        stop_blink_on_faillure(!analysis_with_cpus) 
+        //stop_blink_on_faillure(!analysis_with_cpus) 
     }  
     //progress_step(45 , 10) 
     if  ( data  ) 
@@ -499,7 +504,7 @@ ipcRenderer.on("log::fail" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> failure ` 
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(!analysis_with_cpus ) 
+    //stop_blink_on_faillure(!analysis_with_cpus ) 
 }) 
 ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     term.value = data 
@@ -508,7 +513,7 @@ ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> error log not found`
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(!analysis_with_cpus) 
+    //stop_blink_on_faillure(!analysis_with_cpus) 
 }) 
 ipcRenderer.on("term::logerr"     , (evt , data)  => {
     term.value = data 
@@ -517,7 +522,7 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> An error has occurred  ` 
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_with_cpus) 
+    //stop_blink_on_faillure(analysis_with_cpus) 
 })  
 ipcRenderer.on("log::broken"      , (evt , data)  => {
     term.value = data  
@@ -582,7 +587,7 @@ run_analysis.addEventListener("click" ,  evt => {
         { 
             analysis_with_cpus = true 
             notify("memory cpus" , { body : `${nbcores_} are  stimulated`})
-            use_cpus_resources(true) 
+            //use_cpus_resources(true) 
         } 
 
         ipcRenderer.send("annoucement" , annoucement) 
