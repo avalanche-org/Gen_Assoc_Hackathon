@@ -187,18 +187,19 @@ const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed 
     else  
         element.style.color = colorshemes[0] 
 }
-const use_cpus_resources = signal_trap /* type : bool */ => {  
-    let  blink =  setInterval( () => {  
-            toggle_blink(microchip ,  "black"  , "limegreen")
-        } ,100) //display_)
+const use_cpus_resources = signal_trap /* type : bool */ => { 
     
-    if (!signal_trap) 
+    let  blink = signal_trap ?   setInterval( () => {  
+            toggle_blink(microchip ,  "black"  , "limegreen")
+        } ,100)  : null  
+    
+    if (blink) 
         clearInterval(blink)  
 }
 
 const stop_blink_on_faillure   = ( target ) => {
     if ( !target )  
-        use_cpus_resources(!target)
+        use_cpus_resources(false)
 }
 
 //!TODO  :  SEND ALL  CONFIG REQUIREMENT TO  PROCESS RENDERING ... 
