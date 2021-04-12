@@ -36,7 +36,7 @@ const  term_write  =  incomming_data => {
                 clearTimeout(write_simulation) 
         })()
     }else  {
-        term.value =  incomming_data
+        term.value +=  incomming_data
     }
 }
 

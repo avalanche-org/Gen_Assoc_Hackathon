@@ -172,7 +172,7 @@ const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  =>
                 clearTimeout(write_simulation) 
         })()
     }else {
-        term.value =  incomming_data 
+        term.value +=  incomming_data 
         is_warn(warning) 
     } 
     
@@ -188,12 +188,11 @@ const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed 
         element.style.color = colorshemes[0] 
 }
 const use_cpus_resources = signal_trap /* type : bool */ => {  
-    let  blink =  null 
-    if  (signal_trap)   {
-        blink = setInterval( () => {  
+    let  blink =  setInterval( () => {  
             toggle_blink(microchip ,  "black"  , "limegreen")
         } ,100) //display_)
-    }else  
+    
+    if (!signal_trap) 
         clearInterval(blink)  
 }
 
@@ -471,7 +470,7 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     {  
         progress_step(99 , "Analysising ... ", 240)
         //use_cpus_resources(false) 
-        stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false)) 
+        stop_blink_on_faillure(!analysis_with_cpus ,  use_cpus_resources(false)) 
     }  
     //progress_step(45 , 10) 
     if  ( data  ) 
@@ -499,7 +498,7 @@ ipcRenderer.on("log::fail" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> failure ` 
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false )) 
+    stop_blink_on_faillure(!analysis_with_cpus ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     term.value = data 
@@ -508,7 +507,7 @@ ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> error log not found`
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false )) 
+    stop_blink_on_faillure(!analysis_with_cpus ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("term::logerr"     , (evt , data)  => {
     term.value = data 
