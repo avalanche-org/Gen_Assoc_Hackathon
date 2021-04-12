@@ -20,19 +20,24 @@ __init__  = ( ()=> {
  * */
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  incomming_data => {
-    let  c  =  0 ;    
-    (function write_simulation () {
-        follow_scrollbar()  
-        if ( c <  incomming_data.length) { 
-            let termbuffer = `${incomming_data.charAt(c)}`  
-            if ( c != incomming_data.length -1) 
+    let  c  =  0 ;  
+    if ( vintage_output_term ) 
+    {
+        (function write_simulation () {
+            follow_scrollbar()  
+            if ( c <  incomming_data.length) { 
+                let termbuffer = `${incomming_data.charAt(c)}`  
+                if ( c != incomming_data.length -1) 
                 termbuffer =`${termbuffer}` 
-            term.value +=termbuffer
-            c++ 
-            setTimeout(write_simulation ,0)  
-        }else  
-            clearTimeout(write_simulation) 
-    })()
+                term.value +=termbuffer
+                c++ 
+                setTimeout(write_simulation ,0)  
+            }else  
+                clearTimeout(write_simulation) 
+        })()
+    }else  {
+        term.value =  incomming_data
+    }
 }
 
 ipcRenderer.on("term::start",  ( evt , data ) => { term.value = data})

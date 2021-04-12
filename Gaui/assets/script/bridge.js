@@ -71,7 +71,6 @@ const progress_step =(state  ,  status_message , duration /*millisec*/ ) => {
     }  
 
 }
-
 progress_step(10 ,"initialization..." , 200 )
 
  
@@ -151,21 +150,32 @@ _.querySelector("#infosys").addEventListener("click" , evt =>  {
 
 const  follow_scrollbar  =  () => {term.scrollTop =term.scrollHeight}
 const  term_write  =  ( incomming_data  , warning = false ,  wspeed = false)  => {
-    let  c  =  0 ;    
-    (function write_simulation () {
-        follow_scrollbar()  
-        if ( c <  incomming_data.length) { 
-            let termbuffer = `${incomming_data.charAt(c)}`  
-            if ( c != incomming_data.length -1) 
-                termbuffer =`${termbuffer}` 
-            term.value +=termbuffer
-            if  ( warning )   term.style.color ="orange" 
-            else   term.style.color = "whitesmoke" 
-            c++ 
-            setTimeout(write_simulation , wspeed ||writeSpeed)  
-        }else  
-            clearTimeout(write_simulation) 
-    })()
+    let  c  =  0 ;   
+    let  is_warn  =  warning  => {   
+        if  ( warning )   term.style.color ="orange" 
+        else   term.style.color = "whitesmoke" 
+    }
+
+    if ( vintage_output_term ) 
+    { 
+        (function write_simulation () {
+            follow_scrollbar()  // update  scroll bar  position 
+            if ( c <  incomming_data.length) { 
+                let termbuffer = `${incomming_data.charAt(c)}`  
+                if ( c != incomming_data.length -1) 
+                    termbuffer =`${termbuffer}` 
+                term.value +=termbuffer
+                is_warn(warning) 
+                c++ 
+                setTimeout(write_simulation , wspeed ||writeSpeed)  
+            }else  
+                clearTimeout(write_simulation) 
+        })()
+    }else {
+        term.value =  incomming_data 
+        is_warn(warning) 
+    } 
+    
 }
 
 const toggle_blink =  (  element ,  ...colorshemes/* only 2 colors  are allowed */)  => {
@@ -372,7 +382,8 @@ let ped_  = null ,
     phen_ = null   
 
 let summary_already_run =  false , 
-    analysis_on_going   =  false   
+    analysis_with_cpus  =  false   
+
 
 run_summary.addEventListener("click" , evt => {
     evt.preventDefault()
@@ -456,10 +467,11 @@ ipcRenderer.on("term::logout" , ( evt , data ) => {
     {  
         progress_step(47 , "finishing ", 140)
     }
-    if (analysis_on_going)
+    if (analysis_with_cpus) 
     {  
         progress_step(99 , "Analysising ... ", 240)
-        use_cpus_resources(false) 
+        //use_cpus_resources(false) 
+        stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false)) 
     }  
     //progress_step(45 , 10) 
     if  ( data  ) 
@@ -487,7 +499,7 @@ ipcRenderer.on("log::fail" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> failure ` 
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false )) 
+    stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     term.value = data 
@@ -496,7 +508,7 @@ ipcRenderer.on("logerr::notfound" , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> error log not found`
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false )) 
+    stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false )) 
 }) 
 ipcRenderer.on("term::logerr"     , (evt , data)  => {
     term.value = data 
@@ -505,7 +517,7 @@ ipcRenderer.on("term::logerr"     , (evt , data)  => {
     status.style.color ="red"
     status.innerHTML =`<i class="fa fa-times" aria-hidden="true"></i> An error has occurred  ` 
     bar_progress.style.backgroundColor = "firebrick"
-    stop_blink_on_faillure(analysis_on_going  ,  use_cpus_resources(false)) 
+    stop_blink_on_faillure(analysis_with_cpus ,  use_cpus_resources(false)) 
 })  
 ipcRenderer.on("log::broken"      , (evt , data)  => {
     term.value = data  
@@ -535,7 +547,6 @@ run_analysis.addEventListener("click" ,  evt => {
     bar_progress.style.backgroundColor = "limegreen"  
     annoucement ="▮ Running Analysis"
     term_write(annoucement) 
-    analysis_on_going = true 
     //setInterval(plugonlog , term_display_speed)   
      
     
@@ -569,6 +580,7 @@ run_analysis.addEventListener("click" ,  evt => {
         run_analysis.disabled =  true
         if (!nbcores.disabled) 
         { 
+            analysis_with_cpus = true 
             notify("memory cpus" , { body : `${nbcores_} are  stimulated`})
             use_cpus_resources(true) 
         } 

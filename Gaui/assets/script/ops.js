@@ -15,7 +15,8 @@ Object.prototype["range"]  = v_   =>   {
         }  
         return [...t]   
 
-} 
+}
+const vintage_output_term         =   false   //! change this value to true to activate the simulation typing ...    
 const notify                      =  ( title , {...props } ) =>  new  Notification ( title , { ...props})  
 const check_network_connectivity  =  ()                      =>  window.navigator.onLine 
 const rand                        =  ( min , max=0 )         =>  max? random() * (max-min) + min : floor(random() * floor(min)) // however when one arg was set it's defined as max  
