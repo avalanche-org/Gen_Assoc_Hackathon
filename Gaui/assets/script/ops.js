@@ -1,4 +1,9 @@
-//!  author  :  Umar aka  jukoo   
+//!  author  :  Umar aka  jukoo   < github.com/Jukoo  ||  j_umar@outlook.fr  
+//
+//
+const  { random, floor } = Math   
+function AssertionError ( message ) {   this.message =  message  }  
+AssertionError.prototyp =  Error.prototype 
 
 Object.prototype["range"]  = v_   =>   { 
         let [ t , i ]  = [[] , 0] 
@@ -11,13 +16,7 @@ Object.prototype["range"]  = v_   =>   {
         return [...t]   
 
 } 
-/*
-Object.prototype["createTag"] =  (htm_tag , txt , cb=false/* cb should be a  function  _=documen) => {
-    const  new_elmt =  _.createElement(htm_tag)   
-    if ( new_elmt.ELEMENT_NODE !=  Node.ElEMENT_NODE) throw new  Error("not allowed to create this tag")
-    new_elmt.text =  txt  ||  ""   
-    if  (cb) cb(new_elmt) 
-    return  new_elmt  
-}
-}*/
-
+const notify                      =  ( title , {...props } ) =>  new  Notification ( title , { ...props})  
+const check_network_connectivity  =  ()                      =>  window.navigator.onLine 
+const rand                        =  ( min , max=0 )         =>  max? random() * (max-min) + min : floor(random() * floor(min)) // however when one arg was set it's defined as max  
+const display_speed               =  hertz_frequency         =>  (1000/hertz_frequency) * 1 

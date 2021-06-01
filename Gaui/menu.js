@@ -41,7 +41,6 @@ module
   
                             abs_path = abs_path.slice(1 , -1).join(slash_orientaion)
                             //! TODO :  load  all required file  ped map phen 
-                            console.log("-> " , abs_path) 
                             const { scan_directory} = utils 
                             scan_directory(`${slash_orientaion}${abs_path}` , "ped","map","phen")
                             .then(res => {
@@ -64,7 +63,7 @@ module
                             })] 
                             const tree_signature  = {} 
                             files_collections.forEach((file, index) =>{ tree_signature[file] = path_location[index]})
-                            console.log(tree_signature) //console.log(path_location) console.log(files_collections)  
+                            console.log("multiselection -> " , tree_signature) //console.log(path_location) console.log(files_collections)  
                             //!  send  the related data  to renderer process 
                             wintarget.webContents.send("Browse::multiple" ,  tree_signature) 
 

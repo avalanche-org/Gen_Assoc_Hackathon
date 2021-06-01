@@ -6,31 +6,16 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="page_type" content="np-template-header-footer-from-plugin" />
-    <title>mtdt_GUI</title>
+    <title>mTdt</title>
     <link rel="stylesheet" href="style.css" media="screen" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=VT323:regular" media="screen" />
-    <meta name="generator" content="Nicepage 3.6.0, nicepage.com" />
+    <link rel="stylesheet" href="assets/styles/semantic/semantic.min.css"> 
+    <link rel="stylesheet" href="assets/styles/w3/w3.css">
+    <link rel="stylesheet" href="assets/styles/fa/css/all.min.css">
     <link
-      id="u-theme-google-font"
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto+Slab:100,300,400,700|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i"
     />
-
-    <script type="application/ld+json">
-      {
-        "@context": "http://schema.org",
-        "@type": "Organization",
-        "name": "",
-        "url": "index.html",
-        "logo": "images/default-logo.png"
-      }
-    </script>
-    <meta property="og:title" content="mtdt_html" />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#808080" />
-    <link rel="canonical" href="index.html" />
-    <meta property="og:url" content="index.html" />
-
     <style>
       /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
       @media (max-width: 3000px) {
@@ -75,10 +60,27 @@
       .w3-row-padding img {
         margin-bottom: 12px;
       }
+      #bar {
+          width: 1%;
+          height: 15px;
+          border-radius:3px;
+          background-color:limegreen ; 
+          text-align: center; /* To center it horizontally (if you want) */
+          line-height: 15px; /* To center it vertically */
+          color: white;
+          font-size:10px; 
+      }
+      .default-blur-content {
+      filter: blur(5px);
+  -webkit-filter: blur(5px);
+  -webkit-transition: 1s -webkit-filter linear; 
+  -o-transition: 1s -o-filter linear;
+      }
+  
     </style>
   </head>
-  <body class="u-body">
 
+  <body class="u-body">
     <!-- Header -->
     <!--header
       class="w3-panel w3-center w3-opacity"
@@ -94,6 +96,7 @@
         </div>
       </div>
     </header-->
+
     <section class="u-clearfix u-section-1" id="sec-2761">
       <div class="u-clearfix u-gutter-0 u-layout-wrap u-layout-wrap-1">
         <div class="u-layout">
@@ -107,11 +110,11 @@
                     >
 
                       <div class="u-container-layout u-container-layout-2">
-                        <div  class="u-form u-form-1">
+                        <div  class="u-form u-form-1 w3-container w3-center w3-animate-left">
                           <!--form to load files : run summary.R -->
                         <fieldset>
                               <legend  style="color:blue">
-                                  <small>  File Select </small>
+                                  <small> [ Step 1:Select Files <i  id="unlocked_default"style="font-size:20px" class="fas fa-unlock"></i> ]</small>
                               </legend>
 
 
@@ -120,10 +123,14 @@
                             style="padding: 10px"
                             source="email"
                             name="form"
-                          >  
-                                                                          <div
+                          > 
+                    
+                          <div
                               class="u-form-group u-form-select u-form-group-1"
                             >
+      <div> 
+                          <label > <small>Sync</small></label> <input type="checkbox" id="synced">
+                          </div>
                               <label
                                 for="select-30ab"
                                 class="u-form-control-hidden u-label"
@@ -216,8 +223,7 @@
                             </div>
                             <div
                               class="u-align-right u-form-group u-form-submit">
-                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary  &dtrif;</a>
-                             
+                              <button type="submit" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1" id ="run_summary">Launch Summary Statistics  <i class="fas fa-chart-bar"></i></button>
                               <input
                                 type="submit"
                                 value="load"
@@ -231,19 +237,25 @@
                         <!--div  style="border: thin solid yellow">
                             <small>  mTdt  version  Beta v1  </small> 
                         </div-->
+                        </br>
+                            <small style="color:blue" id="status">  </small>  
+                        </br>
+                        <div id="stepper-bar" class="w3-center w3-animate-opacity">
+                          <div id="bar">1%</div>
+                      </div>
                       </div>
                     </div>
                     <div
                       class="u-container-style u-layout-cell u-size-34 u-layout-cell-3"
                     >
-                      <div class="u-container-layout u-container-layout-3">
+                      <div class="u-container-layout u-container-layout-3 w3-container w3-center w3-animate-opacityw3-container w3-center w3-animate-right">
                         <div class="u-form u-form-2">
                             <fieldset>  
                                 <legend style="color:blue">
-                                  <small>Choose Option</small>
+                                  <small> [ Step 2 :Choose Options <i id="lock_default" style="font-size:20px" class="fas fa-lock"></i> ]</small>
                                 </legend> 
                           <form
-                            class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
+                            class="default-blur-content u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
                             style="padding: 10px"
                             source="email"
                             name="form-1"
@@ -322,8 +334,9 @@
                                 class="u-form-control-hidden u-label"
                                 >Select</label
                               >
-                              
-                              <input  id="nbsim" placeholder="number of simulations you want " class ="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" value=0>
+                              <small style="color:firebrick"> number of simulations you want </small> 
+
+                              <input  id="nbsim" placeholder="number of simulations you want " class ="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" >
 
                                   
                             </div> 
@@ -377,12 +390,19 @@
                             <div class="u-form-group u-form-message">
                          
                                 <!--markerset -->
-
-                              <input  id="marker_set" placeholder="Choose your marker .eg 1,3,24" class ="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" >
-                             
+                              <textarea
+                                placeholder="Choose your markers. eg: 1, 3, 24"
+                                rows="1"
+                                cols="30"
+                                id="marker_set"
+                                name="message"
+                                class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white"
+                                required=""
+                                
+                              ></textarea>
                               
                             </fieldset>
-                            <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis &rarr;</button>  
+                                <button  id="run_analysis" class="u-btn u-btn-round u-button-style u-grey-50 u-hover-grey-5 u-radius-50 u-btn-1"  > Run Analysis <i class="fas fa-dna"></i></button>  
                             </div>
                             </div>
                             <div
@@ -394,6 +414,16 @@
                         
                         
                       </div>
+                    <div style="padding-right: 16px; padding-top:1px;width:5%;"id="os-stat"  class="w3-left w3-animate-top" > 
+                        <fieldset>  
+                            <legend> <i class="fas fa-info-circle" aria-hidden="true"></i></legend>  
+                            <i id="network" class="fas fa-satellite-dish" title="network connectivity"></i><br>
+                        <i  id="microchip" class="fas fa-microchip" aria-hidden="true" title="memory usage alert"></i> 
+
+                        <br>
+                        
+                        </fieldset> 
+                    </div> 
                     </div>
                   </div>
 
@@ -412,9 +442,32 @@
               </div>
             </div>
           </div>
+ 
         </div>
+        
       </div>
-  <textarea 
+      <div class="w3-left w3-animate-bottom">
+          <div class=" ui small basic icon buttons"> 
+        <button class=" ui icon button" id="clear" title ="clear console">
+            <i class="fas fa-broom"></i>
+        </button> 
+         <button class=" ui  icon button" id="infosys" title="show system info">
+            <i class="fas fa-info"></i>
+        </button> 
+        <button class=" ui  icon button" id="detach_term" title="detach terminal">
+            <i class="fas fa-terminal"></i>
+        </button> 
+          </div> 
+          <div  id="term_area">  
+              <pre id="term_ascii_art"  hidden>                                                                                        
+ ,-.                ,--.   ,--.  ,--.     ,--. ,--------.                       
+ \  \               |   `.'   |,-'  '-. ,-|  | '--.  .--',---. ,--.--.,--,--,--.
+  \  \              |  |'.'|  |'-.  .-'' .-. |    |  |  | .-. :|  .--'|        | 
+  /  /,----.        |  |   |  |  |  |  \ `-' |    |  |  \   --.|  |   |  |  |  | 
+ /  / '----'        `--'   `--'  `--'   `---'     `--'   `----'`--'   `--`--`--' 
+ `-'                                                                                                            
+              </pre> 
+      <textarea 
           class="terminal" 
           readonly autocomplete="off" 
           autocorrect="off" 
@@ -422,9 +475,12 @@
           spellcheck="false" 
           id="term" 
           cols="400" 
-           rows="9">
+           rows="6">
         </textarea>
+      </div>
+      </div>
     </section>
+   
     
   </body>
   <script src="assets/script/ops.js"> </script>  
