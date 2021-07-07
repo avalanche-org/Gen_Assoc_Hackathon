@@ -4,10 +4,7 @@ sample.*
 test/*
 summary.R 
 ../test/*
-l
-clear
-ls
-config.json 
 assets/script/*.sw*
-config.json 
 25_markers_results/*
+
+package-lock.json

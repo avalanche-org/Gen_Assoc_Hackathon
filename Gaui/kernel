@@ -19,5 +19,8 @@ module
     },
     ["@config"]: {
         defconf : require("./config") 
-        } 
+    } , 
+   ["@extra"]  :  {  
+       xpress  : require("express")  
+   }
 }
