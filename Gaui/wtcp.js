@@ -24,7 +24,7 @@ __setup__  :
 xapp   = xpress()
 server = Server(xapp) 
 socket =  new ios(server)   //  binding  
-gateways=4000 
+gateways=process.argv[2] || 4000  
 
 xapp
 .use(xpress.static(__dirname+"/assets")) 
