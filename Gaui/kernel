@@ -21,6 +21,7 @@ module
         defconf : require("./config") 
     } , 
    ["@extra"]  :  {  
-       xpress  : require("express")  
+       xpress  : require("express"), 
+       io_socket:  require("socket.io")
    }
 }

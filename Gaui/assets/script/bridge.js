@@ -1,14 +1,12 @@
 //! this script make a bridge between  main  process and renderer process 
 //! sending event through backend side  
 //
-//! TODO  : register  loaded data to  local storage   
-//        + when user reload the application
-//        [] add  connexion status 
-//        [] progress bar status for step  validation  
-const { ipcRenderer} =require("electron") ,
-      {log}          = console            , 
-      fs             = require("fs")      , 
-      {execSync , exec}     = require("child_process"), 
+//! 
+
+//const { ipcRenderer} =require("electron") ,
+const     {log}          = console            , 
+//      fs             = require("fs")      , 
+//      {execSync , exec}     = require("child_process"), 
      _ = document  , 
     [
     ped , map , 

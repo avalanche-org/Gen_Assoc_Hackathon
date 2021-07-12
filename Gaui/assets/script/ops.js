@@ -1,6 +1,8 @@
 //!  author  :  Umar aka  jukoo   < github.com/Jukoo  ||  j_umar@outlook.fr  
 //
 //
+//
+
 const  { random, floor } = Math   
 function AssertionError ( message ) {   this.message =  message  }  
 AssertionError.prototyp =  Error.prototype 
